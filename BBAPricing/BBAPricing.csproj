@@ -1,0 +1,124 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{B1C1445D-5263-45E0-9936-B2CAEA0047D2}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>BBAPricing</RootNamespace>
+    <AssemblyName>BBAPricing</AssemblyName>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject>BBAPricing.Program</StartupObject>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="ExcelImportDll">
+      <HintPath>\\srv-ilia\FileServer\Developers\Add-On Pre Built Forms\Import Form\ExcelImportDll.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+    <Reference Include="SAPBusinessOneSDK" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="FormControllers\CalculationMaterialsController.cs" />
+    <Compile Include="FormControllers\CalculationResourcesController.cs" />
+    <Compile Include="ImportControllers\MaterialsController.cs" />
+    <Compile Include="DiManager.cs" />
+    <Compile Include="Forms\CalculationMaterials.b1f.cs">
+      <DependentUpon>CalculationMaterials.b1f</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\CalculationResources.b1f.cs">
+      <DependentUpon>CalculationResources.b1f</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Import Form.b1f.cs">
+      <DependentUpon>Import Form.b1f</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Pricing.b1f.cs">
+      <DependentUpon>Pricing.b1f</DependentUpon>
+    </Compile>
+    <Compile Include="Initialization\Addkeyes.cs" />
+    <Compile Include="Initialization\CreateFields.cs" />
+    <Compile Include="Initialization\CreateTables.cs" />
+    <Compile Include="Initialization\Initialization.cs" />
+    <Compile Include="Initialization\InsertData.cs" />
+    <Compile Include="Initialization\IRunnable.cs" />
+    <Compile Include="Models\MasterBomRowModel.cs" />
+    <Compile Include="Models\MaterialModel.cs" />
+    <Compile Include="Models\MasterBomModel.cs" />
+    <Compile Include="Models\MachinaryResourceModel.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="Menu.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="System Forms\SalesQuotation.b1f.cs">
+      <DependentUpon>SalesQuotation.b1f</DependentUpon>
+    </Compile>
+    <None Include="Forms\CalculationMaterials.b1f">
+      <FormCategory>UserForm</FormCategory>
+    </None>
+    <None Include="Forms\CalculationResources.b1f">
+      <FormCategory>UserForm</FormCategory>
+    </None>
+    <None Include="Forms\Import Form.b1f">
+      <FormCategory>UserForm</FormCategory>
+    </None>
+    <None Include="Forms\Pricing.b1f">
+      <FormCategory>UserForm</FormCategory>
+    </None>
+    <None Include="System Forms\SalesQuotation.b1f">
+      <FormCategory>SystemForm</FormCategory>
+    </None>
+    <None Include="System Forms\SalesQuotation.b1f__orig_srf">
+      <DependentUpon>SalesQuotation.b1f</DependentUpon>
+    </None>
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <Content Include="Media\c9.bmp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Media\Icon.bmp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Media\Sap.bmp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

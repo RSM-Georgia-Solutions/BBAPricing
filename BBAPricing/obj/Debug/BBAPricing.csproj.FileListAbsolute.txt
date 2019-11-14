@@ -1,0 +1,10 @@
+d:\users\nkurdadze\documents\visual studio 2015\Projects\BBAPricing\BBAPricing\bin\Debug\Media\c9.bmp
+d:\users\nkurdadze\documents\visual studio 2015\Projects\BBAPricing\BBAPricing\bin\Debug\Media\Icon.bmp
+d:\users\nkurdadze\documents\visual studio 2015\Projects\BBAPricing\BBAPricing\bin\Debug\Media\Sap.bmp
+d:\users\nkurdadze\documents\visual studio 2015\Projects\BBAPricing\BBAPricing\bin\Debug\BBAPricing.exe
+d:\users\nkurdadze\documents\visual studio 2015\Projects\BBAPricing\BBAPricing\bin\Debug\BBAPricing.pdb
+d:\users\nkurdadze\documents\visual studio 2015\Projects\BBAPricing\BBAPricing\bin\Debug\ExcelImportDll.dll
+d:\users\nkurdadze\documents\visual studio 2015\Projects\BBAPricing\BBAPricing\bin\Debug\SAPBusinessOneSDK.dll
+d:\users\nkurdadze\documents\visual studio 2015\Projects\BBAPricing\BBAPricing\obj\Debug\BBAPricing.exe
+d:\users\nkurdadze\documents\visual studio 2015\Projects\BBAPricing\BBAPricing\obj\Debug\BBAPricing.pdb
+d:\users\nkurdadze\documents\visual studio 2015\Projects\BBAPricing\BBAPricing\obj\Debug\BBAPricing.csprojResolveAssemblyReference.cache
