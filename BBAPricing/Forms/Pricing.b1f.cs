@@ -145,7 +145,7 @@ namespace BBAPricing.Forms
             var res = Grid0.DataTable.GetValue("Element", Grid0.GetDataTableRowIndex(rowindex)).ToString();
             MasterBomModel.ExchangeRateDate = DateTime.ParseExact(EditText8.Value, "yyyyMMdd", CultureInfo.InvariantCulture);
             MasterBomModel.Currency = ComboBox0.Value;
-            MasterBomModel.Rate = double.Parse(EditText9.Value);
+            MasterBomModel.Rate = double.Parse(EditText9.Value, CultureInfo.InvariantCulture);
 
             if (string.IsNullOrWhiteSpace(MasterBomModel.Code))
             {

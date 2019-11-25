@@ -3,6 +3,7 @@ using SAPbobsCOM;
 using SAPbouiCOM;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -325,7 +326,7 @@ FROM
 
         public void UpdateMaterials()
         {
-            string version = (int.Parse(_materialModelsList.First().Version) + 1).ToString();
+            string version = (int.Parse(_materialModelsList.First().Version,CultureInfo.InvariantCulture) + 1).ToString();
             _materialModelsList.Clear();
             _MasterBomModel.Version = version;
             _MasterBomModel.Add();

@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using SAPbobsCOM;
 using System.Reflection;
+using System.Globalization;
 
 namespace BBAPricing
 {
@@ -22,7 +23,7 @@ namespace BBAPricing
                 Company oCompany = xCompany;
                 SBObob oSbObob = (SBObob)oCompany.GetBusinessObject(BoObjectTypes.BoBridge);
                 Recordset oRecordSet = oSbObob.GetCurrencyRate(curCode, date.Date);
-                return double.Parse(oRecordSet.Fields.Item(0).Value.ToString());
+                return double.Parse(oRecordSet.Fields.Item(0).Value.ToString(),CultureInfo.InvariantCulture);
             }
             catch (Exception ex)
             {
@@ -219,7 +220,7 @@ namespace BBAPricing
             string sqlQuery = $"SELECT T0.TableID, T0.FieldID FROM CUFD T0 WHERE T0.TableID = '{tablename}' AND T0.AliasID = '{fieldname}'";
             oRecordSet.DoQuery(sqlQuery);
             var updateFlag = oRecordSet.RecordCount == 1;
-            var fieldId = int.Parse(oRecordSet.Fields.Item("FieldID").Value.ToString());
+            var fieldId = int.Parse(oRecordSet.Fields.Item("FieldID").Value.ToString(),CultureInfo.InvariantCulture);
             System.Runtime.InteropServices.Marshal.ReleaseComObject(oRecordSet);
 
             UserFieldsMD oUfield = (UserFieldsMD)Company.GetBusinessObject(BoObjectTypes.oUserFields);

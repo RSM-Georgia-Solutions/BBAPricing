@@ -3,6 +3,7 @@ using SAPbobsCOM;
 using SAPbouiCOM;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -184,7 +185,7 @@ namespace BBAPricing.FormControllers
 
         public void UpdateResources()
         {
-            string version = (int.Parse(_MachinaryResourceModelsList.First().Version) + 1).ToString();
+            string version = (int.Parse(_MachinaryResourceModelsList.First().Version,CultureInfo.InvariantCulture) + 1).ToString();
             _MachinaryResourceModelsList.Clear();
             _MasterBomModel.Version = version;
             _MasterBomModel.Add();
@@ -194,7 +195,7 @@ namespace BBAPricing.FormControllers
         }
         public void FillModelFromGrid()
         {
-            string version = (int.Parse(_MachinaryResourceModelsList.First().Version) + 1).ToString();
+            string version = (int.Parse(_MachinaryResourceModelsList.First().Version, CultureInfo.InvariantCulture) + 1).ToString();
             _MachinaryResourceModelsList.Clear();
             _MasterBomModel.Version = version;
             _MasterBomModel.Add();
