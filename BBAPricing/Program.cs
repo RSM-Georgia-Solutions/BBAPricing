@@ -19,8 +19,6 @@ namespace BBAPricing
                 myMenu.AddMenuItems();
                 oApp.RegisterMenuEventHandler(myMenu.SBO_Application_MenuEvent);
                 Application.SBO_Application.AppEvent += new SAPbouiCOM._IApplicationEvents_AppEventEventHandler(SBO_Application_AppEvent);
-                Initialization.Initialization initialization = new Initialization.Initialization();
-               // initialization.Run();
                 var x = DiManager.Company;
                 oApp.Run();
             }

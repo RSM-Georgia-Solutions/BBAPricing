@@ -18,7 +18,10 @@ namespace BBAPricing.Models
         public string UnitOfMeasure { get; set; }
         public double UnitCost { get; set; }
         public double TotalCost { get; set; }
+        public double TotalCostConverted { get; set; }
         public double UnitRetailPrice { get; set; }
+        public double UnitRetailPriceConverted { get; set; }
+        public double UnitWorkingPriceConverted { get; set; }
         public double UnitWorkingPrice { get; set; }
         public double DiscountPercentage { get; set; }
         public double DiscountAmount { get; set; }
@@ -26,13 +29,17 @@ namespace BBAPricing.Models
         public double SharedDiscountAmount { get; set; }
         public double MarginPercentage { get; set; }
         public double MarginAmount { get; set; }
+        public double MarginAmountConverted { get; set; }
         public double FinalCustomerPrice { get; set; }
+        public double FinalCustomerPriceTotalConverted { get; set; }        
         public double FinalCustomerPriceTotal { get; set; }
         public string Note { get; set; }
         public double Quantity { get; set; }
         public string SalesQuotationDocEntry { get; set; }
         public string ParentItemCode { get; set; }     
         public string Version { get; set; }
+        public string Currency { get; set; }
+        public string ConvertedCurrency { get; set; }
 
         public List<PropertyInfo> Properies { get; set; }
         public MaterialModel()

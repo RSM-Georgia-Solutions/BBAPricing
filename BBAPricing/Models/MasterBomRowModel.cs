@@ -45,7 +45,9 @@ namespace BBAPricing.Models
                 }
             }
             int res = userTable.Add();
-            var x = DiManager.Company.GetLastErrorDescription();
+            Recordset rec = (Recordset)DiManager.Company.GetBusinessObject(BoObjectTypes.BoRecordset);
+            rec.DoQuery($"select IDENT_CURRENT ('@RSM_MBOM_ROWS') as [Code]");
+            Code = rec.Fields.Item("Code").Value.ToString();
             return res == 0;
         }
 

@@ -45,10 +45,7 @@ namespace BBAPricing.FormControllers
         {
             GetGridColumns();
             Recordset recSet = (Recordset)DiManager.Company.GetBusinessObject(BoObjectTypes.BoRecordset);
-            recSet.DoQuery($@"SELECT * FROM [@RSM_RESOURCES] WHERE U_ParentItemCode = '{_MasterBomModel.ParentItem}' AND U_SalesQuotationDocEntry = '{_MasterBomModel.SalesQuotationDocEntry}' AND U_Version = (SELECT MAX(U_Version)
-                      FROM [@RSM_RESOURCES]
-                      WHERE U_ParentItemCode = '{_MasterBomModel.ParentItem}'
-                            AND U_SalesQuotationDocEntry = '{_MasterBomModel.SalesQuotationDocEntry}')");
+            recSet.DoQuery($@"SELECT * FROM [@RSM_RESOURCES] WHERE U_ParentItemCode = '{_MasterBomModel.ParentItem}' AND U_SalesQuotationDocEntry = '{_MasterBomModel.SalesQuotationDocEntry}' AND U_Version = '{_MasterBomModel.Version}'");
             if (!recSet.EoF)
             {
                 while (!recSet.EoF)
@@ -122,7 +119,7 @@ namespace BBAPricing.FormControllers
                 machinaryResourceModel.PriceOfUnit = machinaryResourceModel.ResourceTotalPrice / machinaryResourceModel.Quantity;
                 machinaryResourceModel.MarginOfUnit = machinaryResourceModel.PriceOfUnit - machinaryResourceModel.CostOfUnit;
                 machinaryResourceModel.InfoPercent = machinaryResourceModel.MarginOfUnit - machinaryResourceModel.PriceOfUnit;
-                machinaryResourceModel.Version = "1";
+                machinaryResourceModel.Version = _MasterBomModel.Version;
                 _MachinaryResourceModelsList.Add(machinaryResourceModel);
                 totalCost = totalCost += machinaryResourceModel.TotalStandartCost;
                 totalPrice = totalPrice += machinaryResourceModel.ResourceUnitPrice;
@@ -130,11 +127,14 @@ namespace BBAPricing.FormControllers
                 totalFinalCustomerPrice = totalFinalCustomerPrice += machinaryResourceModel.AmountOnUnit;
                 recSet.MoveNext();
             }
-            Recordset recSet2 = (Recordset)DiManager.Company.GetBusinessObject(BoObjectTypes.BoRecordset);
-            recSet2.DoQuery($"UPDATE [@RSM_MBOM_ROWS] SET U_Cost = {totalCost}, U_Price = {totalPrice}, U_Margin = {totalMargin}, U_FinalCustomerPrice = {totalFinalCustomerPrice} WHERE U_ElementID = 'Machinery Resources' AND U_SalesQuotationDocEntry = '{_MasterBomModel.SalesQuotationDocEntry}' AND U_ParentItemCode = '{_MasterBomModel.ParentItem}'  AND U_Version = '{_MasterBomModel.Version}'");
+            var mtrlLine = _MasterBomModel.Rows.First(x => x.ElementID == "Machinery Resources");
+            mtrlLine.Cost = totalCost;
+            mtrlLine.Price = totalPrice;
+            mtrlLine.Margin = totalMargin;
+            mtrlLine.FinalCustomerPrice = totalFinalCustomerPrice;
         }
 
-        public void InsertListToDb()
+        public void InsertMachinarLyistToDb()
         {
             foreach (var item in _MachinaryResourceModelsList)
             {
@@ -172,10 +172,13 @@ namespace BBAPricing.FormControllers
             if (!fromDb)
             {
                 GenerateModel();
-                InsertListToDb();
+                FillGridFromModel(_grid);
+                InsertMachinarLyistToDb();
             }
-            FillGridFromModel(_grid);
-            RefreshBom.Invoke();
+            else
+            {
+                FillGridFromModel(_grid);
+            }          
         }
 
 
@@ -186,7 +189,7 @@ namespace BBAPricing.FormControllers
             _MasterBomModel.Version = version;
             _MasterBomModel.Add();
             FillModelFromGrid();
-            InsertListToDb();
+            InsertMachinarLyistToDb();
             FillGridFromModel(_grid);
         }
         public void FillModelFromGrid()

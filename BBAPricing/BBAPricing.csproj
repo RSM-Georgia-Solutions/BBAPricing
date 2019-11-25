@@ -52,6 +52,10 @@
   <ItemGroup>
     <Compile Include="FormControllers\CalculationMaterialsController.cs" />
     <Compile Include="FormControllers\CalculationResourcesController.cs" />
+    <Compile Include="FormControllers\PricingController.cs" />
+    <Compile Include="Forms\InitializationForm.b1f.cs">
+      <DependentUpon>InitializationForm.b1f</DependentUpon>
+    </Compile>
     <Compile Include="ImportControllers\MaterialsController.cs" />
     <Compile Include="DiManager.cs" />
     <Compile Include="Forms\CalculationMaterials.b1f.cs">
@@ -89,6 +93,9 @@
       <FormCategory>UserForm</FormCategory>
     </None>
     <None Include="Forms\Import Form.b1f">
+      <FormCategory>UserForm</FormCategory>
+    </None>
+    <None Include="Forms\InitializationForm.b1f">
       <FormCategory>UserForm</FormCategory>
     </None>
     <None Include="Forms\Pricing.b1f">

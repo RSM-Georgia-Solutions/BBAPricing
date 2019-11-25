@@ -36,7 +36,11 @@ namespace BBAPricing.FormControllers
                 grid.DataTable.SetValue("Quantity", i, materialModel.Quantity);
                 grid.DataTable.SetValue("Total Cost", i, materialModel.TotalCost);
                 grid.DataTable.SetValue("Unit Working Price", i, materialModel.UnitWorkingPrice);
+                grid.DataTable.SetValue("Unit Working Price Converted", i, materialModel.UnitWorkingPriceConverted);
+                grid.DataTable.SetValue("Currency", i, materialModel.Currency);
+                grid.DataTable.SetValue("Converted Currency", i, materialModel.ConvertedCurrency);
                 grid.DataTable.SetValue("Unit Retail Price", i, materialModel.UnitRetailPrice);
+                grid.DataTable.SetValue("Unit Retail Price Converted", i, materialModel.UnitRetailPriceConverted);
                 grid.DataTable.SetValue("Discount Percentage", i, materialModel.DiscountPercentage);
                 grid.DataTable.SetValue("Discount Amount", i, materialModel.DiscountAmount);
                 grid.DataTable.SetValue("Shared Percentage", i, materialModel.SharedDiscountPercentage);
@@ -56,33 +60,46 @@ namespace BBAPricing.FormControllers
             _grid.Columns.Item("Final Customer Price Total").Editable = false;
             _grid.Columns.Item("Final Customer Price").Editable = false;
             _grid.Columns.Item("Margin Amount").Editable = false;
+            _grid.Columns.Item("Currency").Editable = false;
         }
         public void GetGridColumns()
         {
             string queryGrid =
-    $@"SELECT top(0) U_ComponentCode as [Component Code], U_ComponentName as [Component Name], U_UnitOFMeasure as [Unit Of Measure], U_Quantity as [Quantity],
-            U_UnitCost as [Unit Cost], U_TotalCost as [Total Cost], U_UnitRetailPrice as [Unit Retail Price],U_UnitWorkingPrice as [Unit Working Price],
-            U_DiscountPercentage as [Discount Percentage], U_DiscountAmount as [Discount Amount], U_SharedPercentage as [Shared Percentage],
-                U_SharedDiscountAmount as [Shared Discount Amount], U_MarginPercentage as [Margin Percentage], U_MarginAmount as [Margin Amount],
-                U_FinalCustomerPrice as [Final Customer Price], U_FinalCustomerPriceTotal as [Final Customer Price Total]
-            FROM [@RSM_MTRL]";
+    $@"SELECT TOP(0) U_ComponentCode AS [Component Code], 
+       U_ComponentName AS [Component Name], 
+       U_UnitOFMeasure AS [Unit Of Measure], 
+       U_Quantity AS [Quantity], 
+       U_UnitCost AS [Unit Cost], 
+       U_TotalCost AS [Total Cost], 
+       U_UnitRetailPrice AS [Unit Retail Price], 
+       U_UnitWorkingPrice AS [Unit Working Price], 
+       U_Currency AS [Currency], 
+       U_UnitRetailPriceConverted AS [Unit Retail Price Converted], 
+       U_UnitWorkingPriceConverted AS [Unit Working Price Converted], 
+	   U_ConvertedCurrency as [Converted Currency],
+       U_DiscountPercentage AS [Discount Percentage], 
+       U_DiscountAmount AS [Discount Amount], 
+       U_SharedPercentage AS [Shared Percentage], 
+       U_SharedDiscountAmount AS [Shared Discount Amount], 
+       U_MarginPercentage AS [Margin Percentage], 
+       U_MarginAmount AS [Margin Amount], 
+       U_FinalCustomerPrice AS [Final Customer Price], 
+       U_FinalCustomerPriceTotal AS [Final Customer Price Total]
+FROM [@RSM_MTRL]";
             _grid.DataTable.ExecuteQuery(queryGrid);
         }
-        public void InsertListToDb()
+        public void InsertMaterialsListToDb()
         {
             foreach (var item in _materialModelsList)
             {
                 var res = item.Add();
             }
         }
+
         public bool FillModelFromDb()
         {
-            GetGridColumns();
             Recordset recSet2 = (Recordset)DiManager.Company.GetBusinessObject(BoObjectTypes.BoRecordset);
-            recSet2.DoQuery($@"SELECT * FROM [@RSM_MTRL] WHERE U_ParentItemCode = '{_MasterBomModel.ParentItem}' AND U_SalesQuotationDocEntry = '{_MasterBomModel.SalesQuotationDocEntry}' AND U_Version = (SELECT MAX(U_Version)
-                      FROM [@RSM_MTRL]
-                      WHERE U_ParentItemCode = '{_MasterBomModel.ParentItem}'
-                            AND U_SalesQuotationDocEntry = '{_MasterBomModel.SalesQuotationDocEntry}')");
+            recSet2.DoQuery($@"SELECT * FROM [@RSM_MTRL] WHERE U_ParentItemCode = '{_MasterBomModel.ParentItem}' AND U_SalesQuotationDocEntry = '{_MasterBomModel.SalesQuotationDocEntry}' AND U_Version = '{_MasterBomModel.Version}'");
 
             if (!recSet2.EoF)
             {
@@ -96,7 +113,11 @@ namespace BBAPricing.FormControllers
                     materialModel.UnitOfMeasure = (string)recSet2.Fields.Item("U_UnitOfMeasure").Value;
                     materialModel.UnitCost = (double)recSet2.Fields.Item("U_UnitCost").Value;
                     materialModel.UnitRetailPrice = (double)recSet2.Fields.Item("U_UnitRetailPrice").Value;
+                    materialModel.UnitRetailPriceConverted = (double)recSet2.Fields.Item("U_UnitRetailPriceConverted").Value;
                     materialModel.UnitWorkingPrice = (double)recSet2.Fields.Item("U_UnitWorkingPrice").Value;
+                    materialModel.UnitWorkingPriceConverted = (double)recSet2.Fields.Item("U_UnitWorkingPriceConverted").Value;
+                    materialModel.Currency = recSet2.Fields.Item("U_Currency").Value.ToString();
+                    materialModel.ConvertedCurrency = recSet2.Fields.Item("U_ConvertedCurrency").Value.ToString();
                     materialModel.TotalCost = (double)recSet2.Fields.Item("U_TotalCost").Value;
                     materialModel.DiscountPercentage = (double)recSet2.Fields.Item("U_DiscountPercentage").Value;
                     materialModel.DiscountAmount = (double)recSet2.Fields.Item("U_DiscountAmount").Value;
@@ -117,8 +138,12 @@ namespace BBAPricing.FormControllers
         }
         public void FillModelFromGrid()
         {
-            string version = (int.Parse(_MasterBomModel.Version) + 1).ToString();
-            _materialModelsList.Clear();   
+            string version = _MasterBomModel.Version;
+            _materialModelsList.Clear();
+            double totalCost = 0;
+            double totalPrice = 0;
+            double totalMargin = 0;
+            double totalFinalCustomerPrice = 0;
             for (int i = 0; i < _grid.DataTable.Rows.Count; i++)
             {
                 MaterialModel materialModel = new MaterialModel();
@@ -128,8 +153,11 @@ namespace BBAPricing.FormControllers
                 materialModel.UnitCost = (double)_grid.DataTable.GetValue("Unit Cost", i);
                 materialModel.UnitRetailPrice = (double)_grid.DataTable.GetValue("Unit Retail Price", i);
                 materialModel.UnitWorkingPrice = (double)_grid.DataTable.GetValue("Unit Working Price", i);
+                materialModel.Currency = _grid.DataTable.GetValue("Currency", i).ToString();
+                materialModel.ConvertedCurrency = _grid.DataTable.GetValue("Currency", i).ToString();
                 materialModel.Quantity = (double)_grid.DataTable.GetValue("Quantity", i);
                 materialModel.TotalCost = Math.Round(materialModel.Quantity * materialModel.UnitCost, 4);
+
                 materialModel.SharedDiscountPercentage = (double)_grid.DataTable.GetValue("Shared Percentage", i);
                 materialModel.DiscountPercentage = (double)_grid.DataTable.GetValue("Discount Percentage", i);
                 materialModel.DiscountAmount = Math.Round((materialModel.UnitRetailPrice * materialModel.Quantity *
@@ -144,22 +172,59 @@ namespace BBAPricing.FormControllers
                 materialModel.Version = version;
                 materialModel.SalesQuotationDocEntry = _MasterBomModel.SalesQuotationDocEntry;
                 materialModel.ParentItemCode = _MasterBomModel.ParentItem;
+                ConvertPrices(materialModel);
                 _materialModelsList.Add(materialModel);
+                totalCost = totalCost += materialModel.TotalCostConverted;
+                totalFinalCustomerPrice = totalFinalCustomerPrice += materialModel.FinalCustomerPriceTotalConverted;
+                totalMargin = totalMargin += materialModel.MarginAmountConverted;
+                totalPrice = totalPrice += materialModel.UnitWorkingPriceConverted;
             }
+
         }
         public void GenerateModel()
         {
-            GetGridColumns();
             double totalCost = 0;
             double totalPrice = 0;
             double totalMargin = 0;
             double totalFinalCustomerPrice = 0;
             Recordset recSet = (Recordset)DiManager.Company.GetBusinessObject(BoObjectTypes.BoRecordset);
-            string queryData = $@"SELECT Working.Code as [ItemCode], Working.ItemName, Working.InvntryUom, working.quantity, Working.Price as [Working Price], Retail.Price as [Retail Price] FROM (
-            SELECT OITM.itemName, Code, OITM.InvntryUom, ITM1.Price, ListNum, ITT1.Quantity FROM ITT1
-                JOIN OITM on OITM.ItemCode = ITT1.Code
-            JOIN ITM1 on OITM.ItemCode = ITM1.ItemCode
-            JOIN OPLN on ITM1.PriceList = OPLN.ListNum
+            string queryData = $@"SELECT Working.Code AS [ItemCode], 
+       Working.ItemName, 
+       Working.InvntryUom, 
+       working.quantity, 
+       Working.Price AS [Working Price], 
+       Retail.Price AS [Retail Price], 
+       Working.Currency
+FROM
+(
+    SELECT OITM.itemName, 
+           Code, 
+           OITM.InvntryUom,
+           CASE
+               WHEN ITM1.Price = 0
+               THEN CASE
+                        WHEN ITM1.AddPrice1 = 0
+                        THEN ITM1.AddPrice2
+                        ELSE ITM1.AddPrice1
+                    END
+               ELSE ITM1.Price
+           END AS Price, 
+           ListNum, 
+           ITT1.Quantity, 
+		   CASE
+               WHEN ITM1.Price = 0
+               THEN CASE
+                        WHEN ITM1.AddPrice1 = 0
+                        THEN ITM1.Currency2
+                        ELSE ITM1.Currency1
+                    END
+               ELSE ITM1.Currency
+           END AS Currency 
+           
+    FROM ITT1
+         JOIN OITM ON OITM.ItemCode = ITT1.Code
+         JOIN ITM1 ON OITM.ItemCode = ITM1.ItemCode
+         JOIN OPLN ON ITM1.PriceList = OPLN.ListNum
             WHERE Father = '{_MasterBomModel.ParentItem}' AND OPLN.ListName = 'Unit Working Price') Working INNER JOIN
                 (SELECT ITM1.Price, Code FROM ITT1
                 JOIN OITM on OITM.ItemCode = ITT1.Code
@@ -180,8 +245,10 @@ namespace BBAPricing.FormControllers
                 materialModel.ComponentName = (string)recSet.Fields.Item("ItemName").Value;
                 materialModel.UnitOfMeasure = (string)recSet.Fields.Item("InvntryUom").Value;
                 materialModel.UnitCost = (double)recSet.Fields.Item("Working Price").Value;
+                materialModel.Currency = recSet.Fields.Item("Currency").Value.ToString();
                 materialModel.UnitRetailPrice = (double)recSet.Fields.Item("Retail Price").Value;
                 materialModel.UnitWorkingPrice = (double)recSet.Fields.Item("Working Price").Value;
+
                 materialModel.TotalCost = Math.Round(materialModel.Quantity * materialModel.UnitCost, 4);
                 materialModel.DiscountPercentage = (Math.Round(materialModel.UnitRetailPrice - materialModel.UnitWorkingPrice, 4) /
                                                  materialModel.UnitRetailPrice * 100);
@@ -199,39 +266,76 @@ namespace BBAPricing.FormControllers
                 materialModel.FinalCustomerPrice = materialModel.FinalCustomerPriceTotal / materialModel.Quantity;
                 materialModel.SalesQuotationDocEntry = _MasterBomModel.SalesQuotationDocEntry;
                 materialModel.ParentItemCode = _MasterBomModel.ParentItem;
-                materialModel.Version = "1";
+                materialModel.ConvertedCurrency = _MasterBomModel.Currency;
+                materialModel.Version = _MasterBomModel.Version;
+                ConvertPrices(materialModel);
                 _materialModelsList.Add(materialModel);
-                totalCost = totalCost += materialModel.TotalCost;
-                totalPrice = totalPrice += materialModel.UnitWorkingPrice;
-                totalMargin = totalMargin += materialModel.MarginAmount;
-                totalFinalCustomerPrice = totalFinalCustomerPrice += materialModel.FinalCustomerPriceTotal;
+                totalCost = totalCost += materialModel.TotalCostConverted;
+                totalPrice = totalPrice += materialModel.UnitWorkingPriceConverted;
+                totalMargin = totalMargin += materialModel.MarginAmountConverted;
+                totalFinalCustomerPrice = totalFinalCustomerPrice += materialModel.FinalCustomerPriceTotalConverted;
                 recSet.MoveNext();
             }
-            Recordset recSet3 = (Recordset)DiManager.Company.GetBusinessObject(BoObjectTypes.BoRecordset);
-            recSet3.DoQuery($"UPDATE [@RSM_MBOM_ROWS] SET U_Cost = {totalCost}, U_Price = {totalPrice}, U_Margin = {totalMargin}, U_FinalCustomerPrice = {totalFinalCustomerPrice} WHERE U_ElementID = 'MTRLs' AND U_SalesQuotationDocEntry = '{_MasterBomModel.SalesQuotationDocEntry}' AND U_ParentItemCode = '{_MasterBomModel.ParentItem}' AND U_Version = '{_MasterBomModel.Version}'");
+            var mtrlLine = _MasterBomModel.Rows.First(x => x.ElementID == "MTRLs");
+            mtrlLine.Cost = totalCost;
+            mtrlLine.Price = totalPrice;
+            mtrlLine.Margin = totalMargin;
+            mtrlLine.FinalCustomerPrice = totalFinalCustomerPrice;
         }
+
+        private void ConvertPrices(MaterialModel materialModel)
+        {
+            if (_MasterBomModel.Currency != materialModel.Currency)
+            {
+                materialModel.UnitRetailPriceConverted = materialModel.UnitRetailPrice / _MasterBomModel.Rate;
+                materialModel.UnitWorkingPriceConverted = materialModel.UnitWorkingPrice / _MasterBomModel.Rate;
+                materialModel.TotalCostConverted = materialModel.TotalCost / _MasterBomModel.Rate;
+                materialModel.MarginAmountConverted = materialModel.MarginAmount / _MasterBomModel.Rate;
+                materialModel.FinalCustomerPriceTotalConverted = materialModel.FinalCustomerPriceTotal / _MasterBomModel.Rate;
+            }
+            else
+            {
+                materialModel.UnitRetailPriceConverted = materialModel.UnitRetailPrice;
+                materialModel.UnitWorkingPriceConverted = materialModel.UnitWorkingPrice;
+                materialModel.TotalCostConverted = materialModel.TotalCost;
+                materialModel.MarginAmountConverted = materialModel.MarginAmount;
+                materialModel.FinalCustomerPriceTotalConverted = materialModel.FinalCustomerPriceTotal;
+            }
+        }
+
         public void CalculateMaterials()
         {
+            GetGridColumns();
             bool fromDb = FillModelFromDb();
             if (!fromDb)
             {
                 GenerateModel();
-                InsertListToDb();
+                FillGridFromModel(_grid);
+                _MasterBomModel.Update();
+                InsertMaterialsListToDb();
             }
-            FillGridFromModel(_grid);
-            RefreshBom.Invoke();
+            else
+            {
+                FillGridFromModel(_grid);
+            }
+          //  RefreshBom.Invoke();
         }
         public static Action RefreshBom;
 
 
         public void UpdateMaterials()
-        {            
+        {
             string version = (int.Parse(_materialModelsList.First().Version) + 1).ToString();
             _materialModelsList.Clear();
             _MasterBomModel.Version = version;
             _MasterBomModel.Add();
+            foreach (var row in _MasterBomModel.Rows)
+            {
+                row.Version = _MasterBomModel.Version;
+                row.Add();
+            }
             FillModelFromGrid();
-            InsertListToDb();
+            InsertMaterialsListToDb();
             FillGridFromModel(_grid);
         }
     }

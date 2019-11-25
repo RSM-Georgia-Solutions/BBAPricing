@@ -7,16 +7,20 @@ using SAPbouiCOM.Framework;
 using BBAPricing.Models;
 using SAPbouiCOM;
 using BBAPricing.FormControllers;
+using System.Globalization;
 
 namespace BBAPricing.Forms
 {
     [FormAttribute("BBAPricing.Forms.Pricing", "Forms/Pricing.b1f")]
     class Pricing : UserFormBase
     {
+        PricingController _pricingConroller;
         public Pricing()
         {
+            _pricingConroller = new PricingController(MasterBomModel, UIAPIRawForm);
         }
 
+        public MasterBomModel MasterBomModel { get; set; }
         /// <summary>
         /// Initialize components. Called by framework after form created.
         /// </summary>
@@ -40,6 +44,14 @@ namespace BBAPricing.Forms
             this.EditText5 = ((SAPbouiCOM.EditText)(this.GetItem("Item_13").Specific));
             this.StaticText5 = ((SAPbouiCOM.StaticText)(this.GetItem("Item_14").Specific));
             this.EditText6 = ((SAPbouiCOM.EditText)(this.GetItem("Item_15").Specific));
+            this.EditText7 = ((SAPbouiCOM.EditText)(this.GetItem("Item_16").Specific));
+            this.StaticText6 = ((SAPbouiCOM.StaticText)(this.GetItem("Item_17").Specific));
+            this.EditText8 = ((SAPbouiCOM.EditText)(this.GetItem("Item_18").Specific));
+            this.StaticText7 = ((SAPbouiCOM.StaticText)(this.GetItem("Item_19").Specific));
+            this.StaticText8 = ((SAPbouiCOM.StaticText)(this.GetItem("Item_20").Specific));
+            this.EditText9 = ((SAPbouiCOM.EditText)(this.GetItem("Item_21").Specific));
+            this.ComboBox0 = ((SAPbouiCOM.ComboBox)(this.GetItem("Item_22").Specific));
+            this.StaticText9 = ((SAPbouiCOM.StaticText)(this.GetItem("Item_23").Specific));
             this.OnCustomInitialize();
 
         }
@@ -49,34 +61,52 @@ namespace BBAPricing.Forms
         /// </summary>
         public override void OnInitializeFormEvents()
         {
-            this.VisibleAfter += new VisibleAfterHandler(this.Form_VisibleAfter);
 
         }
 
         private SAPbouiCOM.Grid Grid0;
-        private MasterBomModel _model;
-        public void Refresh(MasterBomModel model)
+        public void FillForm()
         {
-            _model = model;
-            EditText0.Value = model.CostCenter;
-            EditText1.Value = model.SalesQuotationDocNum.ToString();
-            EditText2.Value = model.ProjectCode;
-            EditText4.Value = model.CreateDate.ToString("yyyyMMdd");
-            EditText5.Value = model.OwnerCode;
+            FillHeader();
+            FillGridFromModel();
+        }
 
-            EditText3.Value = model.SalesQuotationDocEntry.ToString();
+        private void FillHeader()
+        {
+            EditText0.Value = MasterBomModel.CostCenter;
+            EditText1.Value = MasterBomModel.SalesQuotationDocNum.ToString();
+            EditText2.Value = MasterBomModel.ProjectCode;
+            EditText4.Value = MasterBomModel.CreateDate.ToString("yyyyMMdd");
+            EditText5.Value = MasterBomModel.OwnerCode;
+            EditText7.Value = MasterBomModel.Version;
+            EditText8.Value = MasterBomModel.ExchangeRateDate.ToString("yyyyMMdd");
+            EditText9.Value = MasterBomModel.Rate.ToString();
+            ComboBox0.Select(MasterBomModel.Currency.ToString(), BoSearchKey.psk_ByValue);
+            EditText3.Value = MasterBomModel.SalesQuotationDocEntry.ToString();
             EditText0.Item.Enabled = false;
             EditText1.Item.Enabled = false;
             EditText2.Item.Enabled = false;
             EditText4.Item.Enabled = false;
             EditText5.Item.Enabled = false;
+            EditText7.Item.Enabled = false;
             EditText3.Item.Left = 4000;
-            RefreshGrid();
         }
+
         private void OnCustomInitialize()
         {
-            CalculationMaterialsController.RefreshBom = RefreshGrid;
-            CalculationResourcesController.RefreshBom = RefreshGrid;
+            CalculationMaterialsController.RefreshBom = FillGridFromModel;
+            CalculationResourcesController.RefreshBom = FillGridFromModel;
+            while (ComboBox0.ValidValues.Count > 0)
+            {
+                ComboBox0.ValidValues.Remove(0, BoSearchKey.psk_Index);
+            }
+            Recordset rec = (Recordset)DiManager.Company.GetBusinessObject(BoObjectTypes.BoRecordset);
+            rec.DoQuery($"select CurrCode,CurrName from OCRN");
+            while (!rec.EoF)
+            {
+                ComboBox0.ValidValues.Add(rec.Fields.Item("CurrCode").Value.ToString(), rec.Fields.Item("CurrName").Value.ToString());
+                rec.MoveNext();
+            }
         }
 
         private SAPbouiCOM.StaticText StaticText0;
@@ -108,15 +138,41 @@ namespace BBAPricing.Forms
                 return;
             }
             int rowindex = Grid0.Rows.SelectedRows.Item(0, BoOrderType.ot_RowOrder);
+
+            var oldExchangeRateDate = MasterBomModel.ExchangeRateDate;
+            var oldCurrency = MasterBomModel.Currency;
+            var oldRate = MasterBomModel.Rate;
             var res = Grid0.DataTable.GetValue("Element", Grid0.GetDataTableRowIndex(rowindex)).ToString();
+            MasterBomModel.ExchangeRateDate = DateTime.ParseExact(EditText8.Value, "yyyyMMdd", CultureInfo.InvariantCulture);
+            MasterBomModel.Currency = ComboBox0.Value;
+            MasterBomModel.Rate = double.Parse(EditText9.Value);
+
+            if (string.IsNullOrWhiteSpace(MasterBomModel.Code))
+            {
+                var result = MasterBomModel.Add();
+            }
+
+            else if (!string.IsNullOrWhiteSpace(MasterBomModel.Code)
+                && (oldExchangeRateDate != MasterBomModel.ExchangeRateDate
+                || oldCurrency != MasterBomModel.Currency
+                || oldRate != MasterBomModel.Rate))
+            {
+                MasterBomModel.Version = (double.Parse(MasterBomModel.Version) + 1).ToString();
+                foreach (var row in MasterBomModel.Rows)
+                {
+                    row.Version = MasterBomModel.Version;
+                }
+                var result = MasterBomModel.Add();
+            }
+
             if (res == "MTRLs")
             {
-                CalculationMaterials calculationForm = new CalculationMaterials(_model);
+                CalculationMaterials calculationForm = new CalculationMaterials(MasterBomModel);
                 calculationForm.Show();
             }
             if (res == "Machinery Resources")
             {
-                CalculationResources calculationForm = new CalculationResources(_model);
+                CalculationResources calculationForm = new CalculationResources(MasterBomModel);
                 calculationForm.Show();
             }
         }
@@ -127,26 +183,62 @@ namespace BBAPricing.Forms
         private EditText EditText5;
         private StaticText StaticText5;
         private EditText EditText6;
-
-        private void Form_VisibleAfter(SBOItemEventArg pVal)
+        public void GetGridColumns()
         {
+            string query = $@"SELECT TOP(0) U_Element [Element], 
+               U_Cost [Cost], 
+               U_Price [Price], 
+               U_Margin [Margin], 
+               U_FinalCustomerPrice [FinalCustomer Price], 
+               U_Percent AS [%], 
+               U_I AS [I], 
+               U_II AS [II], 
+               U_III AS [III]
+        FROM [@RSM_MBOM_ROWS]
+        WHERE U_ParentItemCode = '{MasterBomModel.ParentItem}'
+              AND U_SalesQuotationDocEntry = '{MasterBomModel.SalesQuotationDocEntry}'
+              AND U_Version =
+        (
+            SELECT MAX(U_Version)
+            FROM [@RSM_MBOM]
+            WHERE U_ParentItem = '{MasterBomModel.ParentItem}'
+                  AND U_SalesQuotationDocEntry = '{MasterBomModel.ParentItem}'
+        )";
+            Grid0.DataTable.ExecuteQuery(query);
         }
-
-        private void RefreshGrid()
+        private void FillGridFromModel()
         {
-            Grid0.DataTable.ExecuteQuery($"SELECT U_Element [Element] , U_Cost [Cost], U_Price [Price], U_Margin [Margin], U_FinalCustomerPrice [FinalCustomer Price], U_Percent as [%], U_I as [I], U_II as [II], U_III as [III] FROM [@RSM_MBOM_ROWS] WHERE U_ParentItemCode = '{_model.ParentItem}' AND U_SalesQuotationDocEntry = {_model.SalesQuotationDocEntry}");
+            GetGridColumns();
             Recordset recSet = (Recordset)DiManager.Company.GetBusinessObject(BoObjectTypes.BoRecordset);
             recSet.DoQuery($"SELECT Code, U_Element FROM [@RSM_ELEM]");
             int i = 0;
             while (!recSet.EoF)
-            {             
+            {
                 SAPbouiCOM.Framework.Application.SBO_Application.Forms.ActiveForm.Freeze(true);
                 Grid0.DataTable.SetValue("Element", i, recSet.Fields.Item("U_Element").Value);
                 SAPbouiCOM.Framework.Application.SBO_Application.Forms.ActiveForm.Freeze(false);
+                Grid0.DataTable.SetValue("Cost", i, MasterBomModel.Rows[i].Cost);
+                Grid0.DataTable.SetValue("Price", i, MasterBomModel.Rows[i].Price);
+                Grid0.DataTable.SetValue("Margin", i, MasterBomModel.Rows[i].Margin);
+                Grid0.DataTable.SetValue("FinalCustomer Price", i, MasterBomModel.Rows[i].FinalCustomerPrice);
+                Grid0.DataTable.SetValue("I", i, MasterBomModel.Rows[i].I);
+                Grid0.DataTable.SetValue("II", i, MasterBomModel.Rows[i].II);
+                Grid0.DataTable.SetValue("III", i, MasterBomModel.Rows[i].III);  
                 i++;
+                Grid0.DataTable.Rows.Add();
                 recSet.MoveNext();
             }
             Grid0.Columns.Item("Element").Editable = false;
+            Grid0.DataTable.Rows.Remove(Grid0.DataTable.Rows.Count - 1);
         }
+
+        private EditText EditText7;
+        private StaticText StaticText6;
+        private EditText EditText8;
+        private StaticText StaticText7;
+        private StaticText StaticText8;
+        private EditText EditText9;
+        private ComboBox ComboBox0;
+        private StaticText StaticText9;
     }
 }

@@ -52,6 +52,11 @@ namespace BBAPricing
                 oCreationPackage.UniqueID = "BBAPricing.Import_Form";
                 oCreationPackage.String = "Import";
                 oMenus.AddEx(oCreationPackage);
+                // Create s sub menu
+                oCreationPackage.Type = SAPbouiCOM.BoMenuType.mt_STRING;
+                oCreationPackage.UniqueID = "BBAPricing.Forms.Initialization";
+                oCreationPackage.String = "Initialization";
+                oMenus.AddEx(oCreationPackage);
             }
             catch (Exception er)
             { //  Menu already exists
@@ -74,6 +79,11 @@ namespace BBAPricing
                 {
                     //Pricing activeForm = new Pricing();
                     //activeForm.Show();
+                }
+                else if (pVal.BeforeAction && pVal.MenuUID == "BBAPricing.Forms.Initialization")
+                {
+                    InitializationForm activeForm = new InitializationForm();
+                    activeForm.Show();
                 }
             }
             catch (Exception ex)

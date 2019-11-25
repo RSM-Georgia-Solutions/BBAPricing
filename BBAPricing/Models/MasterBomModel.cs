@@ -23,6 +23,9 @@ namespace BBAPricing.Models
         public string OwnerName { get; set; }
         public DateTime CreateDate { get; set; }
         public string Version { get; set; }
+        public string Currency { get; set; }
+        public double Rate { get; set; }
+        public DateTime ExchangeRateDate { get; set; }
         public double PriceForSquareMeter { get; set; }
 
         public List<MasterBomRowModel> Rows { get; set; }
@@ -49,10 +52,59 @@ namespace BBAPricing.Models
                 {
                 }
             }
-            int res = userTable.Add();
-            var x = DiManager.Company.GetLastErrorDescription();
-            return res == 0;
 
+            int res = userTable.Add();
+            Recordset rec = (Recordset)DiManager.Company.GetBusinessObject(BoObjectTypes.BoRecordset);
+            rec.DoQuery($"select IDENT_CURRENT ('@RSM_MBOM') as [Code]");
+            Code = rec.Fields.Item("Code").Value.ToString();
+            if (res != 0)
+            {
+                return false;
+            }
+            foreach (var row in Rows)
+            {
+                var rowResult = row.Add();
+                if (res != 0)
+                {
+                    return false;
+                }
+            }
+            return true;
         }
+
+        public bool Update()
+        {
+            UserTable userTable = DiManager.Company.UserTables.Item("RSM_MBOM");
+            userTable.GetByKey(Code.ToString());
+            foreach (var prop in Properies)
+            {
+                object value = DiManager.GetPropValue(this, prop.Name);
+                try
+                {
+                    userTable.UserFields.Fields.Item($"U_{prop.Name}").Value = value ?? string.Empty;
+                }
+                catch (Exception e)
+                {
+                }
+            }
+
+            int res = userTable.Update();           
+            if (res != 0)
+            {
+                return false;
+            }
+            foreach (var row in Rows)
+            {
+                var rowResult = row.Update();
+                if (res != 0)
+                {
+
+                    return false;
+                }
+            }
+            return true;
+        }
+
+
     }
 }
