@@ -7,22 +7,23 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using BBAPricing.Iterfaces;
 
 namespace BBAPricing.FormControllers
 {
-    public class CalculationMaterialsController
+    public class CalculationMaterialsController : IFormController
     {
         private MasterBomModel _MasterBomModel;
         private readonly List<MaterialModel> _materialModelsList;
         private readonly IForm _form;
         public Grid _grid { get { return (Grid)_form.Items.Item("Item_0").Specific; } }
-        public CalculationMaterialsController(MasterBomModel masterBomModel, IForm form)
+        public CalculationMaterialsController(MasterBomModel masterBomModel, IForm form) : base(form)
         {
-            _form = form;
             _MasterBomModel = masterBomModel;
+            _form = form;
             _materialModelsList = new List<MaterialModel>();
         }
-        public void FillGridFromModel(Grid grid)
+        public override void FillGridFromModel(Grid grid)
         {
             SAPbouiCOM.Framework.Application.SBO_Application.Forms.ActiveForm.Freeze(true);
             GetGridColumns();
@@ -63,7 +64,7 @@ namespace BBAPricing.FormControllers
             _grid.Columns.Item("Margin Amount").Editable = false;
             _grid.Columns.Item("Currency").Editable = false;
         }
-        public void GetGridColumns()
+        public override void GetGridColumns()
         {
             string queryGrid =
     $@"SELECT TOP(0) U_ComponentCode AS [Component Code], 
@@ -89,7 +90,8 @@ namespace BBAPricing.FormControllers
 FROM [@RSM_MTRL]";
             _grid.DataTable.ExecuteQuery(queryGrid);
         }
-        public void InsertMaterialsListToDb()
+
+        private void InsertMaterialsListToDb()
         {
             foreach (var item in _materialModelsList)
             {
@@ -97,7 +99,7 @@ FROM [@RSM_MTRL]";
             }
         }
 
-        public bool FillModelFromDb()
+        public override bool FillModelFromDb()
         {
             Recordset recSet2 = (Recordset)DiManager.Company.GetBusinessObject(BoObjectTypes.BoRecordset);
             recSet2.DoQuery($@"SELECT * FROM [@RSM_MTRL] WHERE U_ParentItemCode = '{_MasterBomModel.ParentItem}' AND U_SalesQuotationDocEntry = '{_MasterBomModel.SalesQuotationDocEntry}' AND U_Version = '{_MasterBomModel.Version}'");
@@ -137,7 +139,8 @@ FROM [@RSM_MTRL]";
             }
             return false;
         }
-        public void FillModelFromGrid()
+
+        private void FillModelFromGrid()
         {
             string version = _MasterBomModel.Version;
             _materialModelsList.Clear();
@@ -182,7 +185,7 @@ FROM [@RSM_MTRL]";
             }
 
         }
-        public void GenerateModel()
+        public override void GenerateModel()
         {
             double totalCost = 0;
             double totalPrice = 0;

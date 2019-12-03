@@ -12,6 +12,7 @@ namespace BBAPricing.Initialization
         public void Run()
         {
             DiManager.AddKey(DiManager.Company,"RSM_ELEM", "ElemUnic", "Element", BoYesNoEnum.tYES);
+            DiManager.AddKey(DiManager.Company, "RSM_OVERHEAD_C", "Component", "Component", BoYesNoEnum.tYES);
             //DiManager.AddKey(DiManager.Company,"RSM_MBOM", "SqKey", "SalesQuotationDocEntry", BoYesNoEnum.tYES);
         }
     }

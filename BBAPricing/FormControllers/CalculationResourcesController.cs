@@ -7,23 +7,24 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using BBAPricing.Iterfaces;
 
 namespace BBAPricing.FormControllers
 {
-    public class CalculationResourcesController
+    public class CalculationResourcesController : IFormController
     {
         private MasterBomModel _MasterBomModel;
         private List<MachinaryResourceModel> _MachinaryResourceModelsList;
         private readonly IForm _form;
         public Grid _grid { get { return (Grid)_form.Items.Item("Item_0").Specific; } }
-        public CalculationResourcesController(MasterBomModel masterBomModel, IForm form)
+        public CalculationResourcesController(MasterBomModel masterBomModel, IForm form) : base(form)
         {
             _form = form;
             _MasterBomModel = masterBomModel;
             _MachinaryResourceModelsList = new List<MachinaryResourceModel>();
         }
 
-        public void GetGridColumns()
+        public override void GetGridColumns()
         {
             string queryData = $@"SELECT TOP(0) Code as [ResourceCode], 
                                    OITM.itemName as [ResourceName], 
@@ -42,7 +43,7 @@ namespace BBAPricing.FormControllers
             _grid.DataTable.ExecuteQuery(queryData);
         }
 
-        public bool FillModelFromDb()
+        public override bool FillModelFromDb()
         {
             GetGridColumns();
             Recordset recSet = (Recordset)DiManager.Company.GetBusinessObject(BoObjectTypes.BoRecordset);
@@ -78,7 +79,7 @@ namespace BBAPricing.FormControllers
             return false;
         }
 
-        public void GenerateModel()
+        public override void GenerateModel()
         {
             GetGridColumns();
             Recordset recSet = (Recordset)DiManager.Company.GetBusinessObject(BoObjectTypes.BoRecordset);
@@ -143,7 +144,7 @@ namespace BBAPricing.FormControllers
             }
         }
 
-        public void FillGridFromModel(Grid grid)
+        public override void FillGridFromModel(Grid grid)
         {
             SAPbouiCOM.Framework.Application.SBO_Application.Forms.ActiveForm.Freeze(true);
             GetGridColumns();

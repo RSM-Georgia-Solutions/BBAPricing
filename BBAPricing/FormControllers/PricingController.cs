@@ -17,9 +17,7 @@ namespace BBAPricing.FormControllers
         public PricingController(MasterBomModel masterBomModel, IForm form)
         {
             _form = form;
-            MasterBomModel = masterBomModel;           
+            MasterBomModel = masterBomModel;
         }
-      
-
     }
 }

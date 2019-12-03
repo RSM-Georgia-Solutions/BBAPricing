@@ -42,6 +42,18 @@ namespace BBAPricing
                 // Get the menu collection of the newly added pop-up item
                 oMenuItem = Application.SBO_Application.Menus.Item("BBAPricing");
                 oMenus = oMenuItem.SubMenus;
+
+                oCreationPackage.Type = SAPbouiCOM.BoMenuType.mt_STRING;
+                oCreationPackage.UniqueID = "BBAPricing.Forms.OverheadParams";
+                oCreationPackage.String = "Overhead Params";
+                oMenus.AddEx(oCreationPackage);
+
+                oCreationPackage.Type = SAPbouiCOM.BoMenuType.mt_STRING;
+                oCreationPackage.UniqueID = "BBAPricing.Forms.Overheads";
+                oCreationPackage.String = "Overheads";
+                oMenus.AddEx(oCreationPackage);
+
+
                 // Create s sub menu
                 oCreationPackage.Type = SAPbouiCOM.BoMenuType.mt_STRING;
                 oCreationPackage.UniqueID = "BBAPricing.Forms.Pricing";
@@ -83,6 +95,16 @@ namespace BBAPricing
                 else if (pVal.BeforeAction && pVal.MenuUID == "BBAPricing.Forms.Initialization")
                 {
                     InitializationForm activeForm = new InitializationForm();
+                    activeForm.Show();
+                }
+                else if (pVal.BeforeAction && pVal.MenuUID == "BBAPricing.Forms.Overheads")
+                {
+                    Overheads activeForm = new Overheads();
+                    activeForm.Show();
+                }
+                else if (pVal.BeforeAction && pVal.MenuUID == "BBAPricing.Forms.OverheadParams")
+                {
+                    OverheadParams activeForm = new OverheadParams();
                     activeForm.Show();
                 }
             }

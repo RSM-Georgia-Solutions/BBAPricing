@@ -70,7 +70,14 @@ namespace BBAPricing
         }
         public static object GetPropValue(object src, string propName)
         {
-            return src.GetType().GetProperty(propName).GetValue(src, null);
+            try
+            {
+                return src.GetType().GetProperty(propName).GetValue(src, null);
+            }
+            catch (Exception)
+            {
+                return null;
+            }
         }
         public static Company Company => XCompany.Value;
 

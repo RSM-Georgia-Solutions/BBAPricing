@@ -51,10 +51,21 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="FormControllers\CalculationMaterialsController.cs" />
+    <Compile Include="FormControllers\OverheadParamController.cs" />
+    <Compile Include="FormControllers\OverheadsController.cs" />
     <Compile Include="FormControllers\CalculationResourcesController.cs" />
     <Compile Include="FormControllers\PricingController.cs" />
+    <Compile Include="Forms\OverheadParams.b1f.cs">
+      <DependentUpon>OverheadParams.b1f</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Overheads.b1f.cs">
+      <DependentUpon>Overheads.b1f</DependentUpon>
+    </Compile>
     <Compile Include="Forms\InitializationForm.b1f.cs">
       <DependentUpon>InitializationForm.b1f</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Settings.b1f.cs">
+      <DependentUpon>Settings.b1f</DependentUpon>
     </Compile>
     <Compile Include="ImportControllers\MaterialsController.cs" />
     <Compile Include="DiManager.cs" />
@@ -76,16 +87,26 @@
     <Compile Include="Initialization\Initialization.cs" />
     <Compile Include="Initialization\InsertData.cs" />
     <Compile Include="Initialization\IRunnable.cs" />
+    <Compile Include="Iterfaces\IFormController.cs" />
     <Compile Include="Models\MasterBomRowModel.cs" />
     <Compile Include="Models\MaterialModel.cs" />
     <Compile Include="Models\MasterBomModel.cs" />
     <Compile Include="Models\MachinaryResourceModel.cs" />
+    <Compile Include="Models\OverheadParamsModel.cs" />
+    <Compile Include="Models\OverheadsModel.cs" />
+    <Compile Include="Models\SettingsModel.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Menu.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="System Forms\SalesQuotation.b1f.cs">
       <DependentUpon>SalesQuotation.b1f</DependentUpon>
     </Compile>
+    <None Include="Forms\OverheadParams.b1f">
+      <FormCategory>UserForm</FormCategory>
+    </None>
+    <None Include="Forms\Overheads.b1f">
+      <FormCategory>UserForm</FormCategory>
+    </None>
     <None Include="Forms\CalculationMaterials.b1f">
       <FormCategory>UserForm</FormCategory>
     </None>
@@ -99,6 +120,9 @@
       <FormCategory>UserForm</FormCategory>
     </None>
     <None Include="Forms\Pricing.b1f">
+      <FormCategory>UserForm</FormCategory>
+    </None>
+    <None Include="Forms\Settings.b1f">
       <FormCategory>UserForm</FormCategory>
     </None>
     <None Include="System Forms\SalesQuotation.b1f">
