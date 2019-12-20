@@ -95,7 +95,7 @@ namespace BBAPricing.Forms
         private void OnCustomInitialize()
         {
             CalculationMaterialsController.RefreshBom = FillGridFromModel;
-            CalculationResourcesController.RefreshBom = FillGridFromModel;
+            CalculationMachinaryResourcesController.RefreshBom = FillGridFromModel;
             while (ComboBox0.ValidValues.Count > 0)
             {
                 ComboBox0.ValidValues.Remove(0, BoSearchKey.psk_Index);
@@ -157,7 +157,7 @@ namespace BBAPricing.Forms
                 || oldCurrency != MasterBomModel.Currency
                 || oldRate != MasterBomModel.Rate))
             {
-                MasterBomModel.Version = (double.Parse(MasterBomModel.Version) + 1).ToString();
+                MasterBomModel.Version = (double.Parse(MasterBomModel.Version) + 1).ToString(CultureInfo.InvariantCulture);
                 foreach (var row in MasterBomModel.Rows)
                 {
                     row.Version = MasterBomModel.Version;
@@ -173,6 +173,21 @@ namespace BBAPricing.Forms
             if (res == "Machinery Resources")
             {
                 CalculationResources calculationForm = new CalculationResources(MasterBomModel);
+                calculationForm.Show();
+            }
+            if (res == "Human Resources")
+            {
+                HumanResourcesCalculation calculationForm = new HumanResourcesCalculation(MasterBomModel);
+                calculationForm.Show();
+            }
+            if (res == "Administrative Overheads")
+            {
+                CalculateAdministrativeOverheads calculationForm = new CalculateAdministrativeOverheads(MasterBomModel);
+                calculationForm.Show();
+            }
+            if (res == "Manufacturing Overheads")
+            {
+                CalculateManufacturingOverheads calculationForm = new CalculateManufacturingOverheads(MasterBomModel);
                 calculationForm.Show();
             }
         }
@@ -223,7 +238,7 @@ namespace BBAPricing.Forms
                 Grid0.DataTable.SetValue("FinalCustomer Price", i, MasterBomModel.Rows[i].FinalCustomerPrice);
                 Grid0.DataTable.SetValue("I", i, MasterBomModel.Rows[i].I);
                 Grid0.DataTable.SetValue("II", i, MasterBomModel.Rows[i].II);
-                Grid0.DataTable.SetValue("III", i, MasterBomModel.Rows[i].III);  
+                Grid0.DataTable.SetValue("III", i, MasterBomModel.Rows[i].III);
                 i++;
                 Grid0.DataTable.Rows.Add();
                 recSet.MoveNext();

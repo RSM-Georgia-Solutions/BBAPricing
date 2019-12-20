@@ -29,12 +29,20 @@ namespace BBAPricing.Models
             Properies = DiManager.GetPropInfo(typeof(OverheadsModel));
         }
 
-        public bool Add()
+        public bool AddOrUpdate()
         {
-            UserTable userTable = DiManager.Company.UserTables.Item("RSM_OVERHEADS_R");
+            Recordset recSet = (Recordset)DiManager.Company.GetBusinessObject(BoObjectTypes.BoRecordset);
+            recSet.DoQuery($"SELECT * FROM [@RSM_OVERHEADS_R] WHERE U_ComponentId = N'{ComponentId}'");
+            bool updateFlag = recSet.RecordCount > 0;
 
+            UserTable userTable = DiManager.Company.UserTables.Item("RSM_OVERHEADS_R");
+            if (updateFlag)
+            {
+                userTable.GetByKey(recSet.Fields.Item("Code").Value.ToString());
+            }
             foreach (var prop in Properies)
             {
+                var propName = prop.Name;
                 object value = DiManager.GetPropValue(this, prop.Name);
                 try
                 {
@@ -44,9 +52,9 @@ namespace BBAPricing.Models
                 {
                 }
             }
-            int res = userTable.Add();
+            int res = updateFlag ? userTable.Update() : userTable.Add();
+            var x = DiManager.Company.GetLastErrorDescription();
             return res == 0;
         }
-
     }
 }

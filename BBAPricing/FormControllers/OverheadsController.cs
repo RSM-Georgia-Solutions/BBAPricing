@@ -111,7 +111,7 @@ namespace BBAPricing.FormControllers
 
             foreach (OverheadsModel overheadsModel in _OverheadsModel)
             {
-                overheadsModel.Add();
+                overheadsModel.AddOrUpdate();
             }
         }
 

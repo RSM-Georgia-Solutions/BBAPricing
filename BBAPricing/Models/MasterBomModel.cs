@@ -88,7 +88,7 @@ namespace BBAPricing.Models
                 }
             }
 
-            int res = userTable.Update();           
+            int res = userTable.Update();
             if (res != 0)
             {
                 return false;

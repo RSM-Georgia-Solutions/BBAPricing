@@ -22,6 +22,9 @@ namespace BBAPricing.Initialization
             DiManager.CreateTable("RSM_OVERHEADS_R", "RSM OVERHEADS R", BoUTBTableType.bott_NoObjectAutoIncrement);
             DiManager.CreateTable("RSM_OVERHEAD_C", "RSM_OVERHEAD_C", BoUTBTableType.bott_NoObjectAutoIncrement);
             DiManager.CreateTable("RSM_OVRHD_CLCB", "RSM_OVRHD_CLCB", BoUTBTableType.bott_NoObjectAutoIncrement);
+            DiManager.CreateTable("RSM_COMMON_ELEM", "RSM_COMMON_ELEM", BoUTBTableType.bott_NoObjectAutoIncrement);
+            DiManager.CreateTable("RSM_OVERHEADS_SQ", "RSM OVERHEADS SQ", BoUTBTableType.bott_NoObjectAutoIncrement);
+            DiManager.CreateTable("RSM_TRIP", "Business Trip", BoUTBTableType.bott_NoObjectAutoIncrement);
         }
     }
 }

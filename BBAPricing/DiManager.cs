@@ -220,7 +220,7 @@ namespace BBAPricing
             return updateFlag ? udo.Update() != 0 ? Company.GetLastErrorDescription() : string.Empty : udo.Add() != 0 ? Company.GetLastErrorDescription() : string.Empty;
         }
 
-        public static string CreateField(string tablename, string fieldname, string description, BoFieldTypes type, int size, bool isMandatory, bool isSapTable = false, string likedToTAble = "", string defaultValue = "", BoFldSubTypes subType = BoFldSubTypes.st_None)
+        public static string CreateField(string tablename, string fieldname, string description, BoFieldTypes type, int size, bool isMandatory, bool isSapTable = false, string likedToTAble = "", string defaultValue = "", BoFldSubTypes subType = BoFldSubTypes.st_None, Dictionary<dynamic,dynamic> validValues = null)
         {
             // Get a new Recordset object
             Recordset oRecordSet = (Recordset)Company.GetBusinessObject(BoObjectTypes.BoRecordset);
@@ -243,7 +243,6 @@ namespace BBAPricing
                 oUfield.Type = type;
                 oUfield.Mandatory = isMandatory ? BoYesNoEnum.tYES : BoYesNoEnum.tNO;
                 oUfield.DefaultValue = defaultValue;
-
                 if (type == BoFieldTypes.db_Float)
                 {
                     oUfield.SubType = subType;
@@ -254,6 +253,15 @@ namespace BBAPricing
                     oUfield.EditSize = size;
                 }
 
+                if (validValues != null)
+                {
+                    foreach (KeyValuePair<dynamic, dynamic> keyValuePair in validValues)
+                    {
+                        oUfield.ValidValues.Value = keyValuePair.Key;
+                        oUfield.ValidValues.Description = keyValuePair.Value;
+                        oUfield.ValidValues.Add();
+                    }
+                }
                 oUfield.LinkedTable = likedToTAble;
                 int ret = updateFlag ? oUfield.Update() : oUfield.Add();
                 if (ret == 0)

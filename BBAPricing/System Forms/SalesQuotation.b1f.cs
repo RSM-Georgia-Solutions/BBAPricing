@@ -29,6 +29,8 @@ namespace BBAPricing.System_Forms
         {
             this.Button0 = ((SAPbouiCOM.Button)(this.GetItem("Item_0").Specific));
             this.Button0.PressedAfter += new SAPbouiCOM._IButtonEvents_PressedAfterEventHandler(this.Button0_PressedAfter);
+            this.Button1 = ((SAPbouiCOM.Button)(this.GetItem("Item_1").Specific));
+            this.Button1.PressedAfter += new SAPbouiCOM._IButtonEvents_PressedAfterEventHandler(this.Button1_PressedAfter);
             this.OnCustomInitialize();
 
         }
@@ -64,20 +66,21 @@ JOIN[@RSM_MBOM_ROWS] on[@RSM_MBOM].U_SalesQuotationDocEntry = [@RSM_MBOM_ROWS].U
                             AND U_SalesQuotationDocEntry = '{docEntry}') ");
             if (rec.EoF)
             {
-                var cardCode = dataSourceOqut.GetValue("CardCode", row - 1);
-                var dateString = dataSourceOqut.GetValue("DocDate", row - 1);
+
+                var cardCode = dataSourceOqut.GetValue("CardCode", 0);
+                var dateString = dataSourceOqut.GetValue("DocDate", 0);
                 var date = DateTime.ParseExact(dateString, "yyyyMMdd", CultureInfo.InvariantCulture);
                 var costCenter = dataSourceQut1.GetValue("OcrCode", row - 1);
                 var quantity = dataSourceQut1.GetValue("Quantity", row - 1);
-                var docNum = dataSourceOqut.GetValue("DocNum", row - 1);
-                var project = dataSourceOqut.GetValue("Project", row - 1);
+                var docNum = dataSourceOqut.GetValue("DocNum", 0);
+                var project = dataSourceOqut.GetValue("Project", 0);
 
                 model = new MasterBomModel
                 {
                     ProjectCode = project,
                     SalesQuotationDocEntry = (docEntry),
                     SalesQuotationDocNum = int.Parse(docNum),
-                    Quantity = double.Parse(quantity,CultureInfo.InvariantCulture),
+                    Quantity = double.Parse(quantity, CultureInfo.InvariantCulture),
                     Currency = "GEL",
                     ExchangeRateDate = date,
                     Rate = 1.0,
@@ -108,7 +111,72 @@ JOIN[@RSM_MBOM_ROWS] on[@RSM_MBOM].U_SalesQuotationDocEntry = [@RSM_MBOM_ROWS].U
             }
             else return false;
         }
-        public bool FillModelFromDb()
+
+        public bool FillModelsFromDb()
+        {
+            {
+                Recordset rec = (Recordset)DiManager.Company.GetBusinessObject(BoObjectTypes.BoRecordset);
+                rec.DoQuery(
+                    $@"SELECT  [@RSM_MBOM].Code [MBOMCode],[@RSM_MBOM_ROWS].Code [MBOMRowCode], [@RSM_MBOM].U_SalesQuotationDocEntry [SalesQuotationDocEntry], *
+FROM [@RSM_MBOM]
+     JOIN [@RSM_MBOM_ROWS] ON [@RSM_MBOM].U_SalesQuotationDocEntry = [@RSM_MBOM_ROWS].U_SalesQuotationDocEntry
+                              AND [@RSM_MBOM].U_ParentItem = [@RSM_MBOM_ROWS].U_ParentItemCode
+                              AND [@RSM_MBOM_ROWS].U_Version = [@RSM_MBOM].U_Version
+WHERE [@RSM_MBOM].U_SalesQuotationDocEntry = '{docEntry}'
+      AND  CONCAT([@RSM_MBOM_ROWS].U_Version,U_ParentItem) IN (    SELECT CONCAT(MAX(U_Version),U_ParentItemCode)
+    FROM [@RSM_MBOM_ROWS]
+    GROUP BY U_ParentItemCode)
+ ");
+                List<MasterBomModel> models = new List<MasterBomModel>();
+                List<MasterBomRowModel> rows = new List<MasterBomRowModel>();
+                while (!rec.EoF)
+                {
+                    MasterBomModel model = new MasterBomModel
+                    {
+                        Code = rec.Fields.Item("MBOMCode").Value.ToString(),
+                        ProjectCode = rec.Fields.Item("U_ProjectCode").Value.ToString(),
+                        SalesQuotationDocEntry = rec.Fields.Item("U_SalesQuotationDocEntry").Value.ToString(),
+                        SalesQuotationDocNum = (int)rec.Fields.Item("U_SalesQuotationDocNum").Value,
+                        CostCenter = rec.Fields.Item("U_CostCenter").Value.ToString(),
+                        ParentItem = rec.Fields.Item("U_ParentItemCode").Value.ToString(),
+                        CardCode = rec.Fields.Item("U_ParentItem").Value.ToString(),
+                        CreateDate = (DateTime)rec.Fields.Item("U_CreateDate").Value,
+                        OwnerCode = rec.Fields.Item("U_OwnerCode").Value.ToString(),
+                        Version = rec.Fields.Item("U_Version").Value.ToString(),
+                        Rate = (double)rec.Fields.Item("U_Rate").Value,
+                        ExchangeRateDate = (DateTime)rec.Fields.Item("U_ExchangeRateDate").Value,
+                        Currency = rec.Fields.Item("U_Currency").Value.ToString(),
+                    };
+                    models.Add(model);
+                    MasterBomRowModel masterBomRowModel = new MasterBomRowModel();
+                    masterBomRowModel.Code = rec.Fields.Item("MBOMRowCode").Value.ToString();
+                    masterBomRowModel.Cost = (double)rec.Fields.Item("U_Cost").Value;
+                    masterBomRowModel.Price = (double)rec.Fields.Item("U_Price").Value;
+                    masterBomRowModel.Margin = (double)rec.Fields.Item("U_Margin").Value;
+                    masterBomRowModel.Percent = (double)rec.Fields.Item("U_Percent").Value;
+                    masterBomRowModel.FinalCustomerPrice = (double)rec.Fields.Item("U_FinalCustomerPrice").Value;
+                    masterBomRowModel.I = (double)rec.Fields.Item("U_I").Value;
+                    masterBomRowModel.II = (double)rec.Fields.Item("U_II").Value;
+                    masterBomRowModel.III = (double)rec.Fields.Item("U_III").Value;
+                    masterBomRowModel.SalesQuotationDocEntry =
+                        rec.Fields.Item("SalesQuotationDocEntry").Value.ToString();
+                    masterBomRowModel.ParentItemCode = rec.Fields.Item("U_ParentItemCode").Value.ToString();
+                    masterBomRowModel.Version = rec.Fields.Item("U_Version").Value.ToString();
+                    masterBomRowModel.ElementID = rec.Fields.Item("U_ElementID").Value.ToString();
+                    rows.Add(masterBomRowModel);
+                    rec.MoveNext();
+                }
+
+                var headers = models.GroupBy(x => new { x.Version, x.ParentItem });
+                foreach (var bomModels in headers)
+                {
+                    bomModels.First().Rows.AddRange(rows.Where(x => x.ParentItemCode == bomModels.First().ParentItem));
+                    _masterBomModels.Add(bomModels.First());
+                }
+                return _masterBomModels.Count > 0;
+            }
+        }
+        public bool FillItemModelFromDb()
         {
             Recordset rec = (Recordset)DiManager.Company.GetBusinessObject(BoObjectTypes.BoRecordset);
             rec.DoQuery($@"SELECT [@RSM_MBOM].Code [MBOMCode],[@RSM_MBOM_ROWS].Code [MBOMRowCode], [@RSM_MBOM].U_SalesQuotationDocEntry [SalesQuotationDocEntry], * FROM [@RSM_MBOM] 
@@ -182,7 +250,7 @@ JOIN[@RSM_MBOM_ROWS] on[@RSM_MBOM].U_SalesQuotationDocEntry = [@RSM_MBOM_ROWS].U
             itemCode = dataSourceQut1.GetValue("ItemCode", row - 1);
             docEntry = dataSourceQut1.GetValue("DocEntry", row - 1);
             _masterBomModels.Clear();
-            var fromDb = FillModelFromDb();
+            var fromDb = FillItemModelFromDb();
             if (!fromDb)
             {
                 GenerateModel(activeForm);
@@ -192,6 +260,26 @@ JOIN[@RSM_MBOM_ROWS] on[@RSM_MBOM].U_SalesQuotationDocEntry = [@RSM_MBOM_ROWS].U
             pricingForm.MasterBomModel = _masterBomModels.First();
             pricingForm.FillForm();
             pricingForm.Show();
+        }
+
+        private Button Button1;
+
+        private void Button1_PressedAfter(object sboObject, SBOItemEventArg pVal)
+        {
+            var activeForm = SAPbouiCOM.Framework.Application.SBO_Application.Forms.ActiveForm;
+            var dataSourceQut1 = activeForm.DataSources.DBDataSources.Item("QUT1");
+            var dataSourceOqut = activeForm.DataSources.DBDataSources.Item("OQUT");
+            var matrix = (Matrix)activeForm.Items.Item("38").Specific;
+            var row = matrix.GetNextSelectedRow();
+            docEntry = dataSourceOqut.GetValue("DocEntry", 0);
+            _masterBomModels.Clear();
+            var fromDb = FillModelsFromDb();
+            if (!fromDb)
+            {
+                GenerateModel(activeForm);
+            }
+            CommonElements commonElements = new CommonElements(_masterBomModels);
+            commonElements.Show();
         }
     }
 }

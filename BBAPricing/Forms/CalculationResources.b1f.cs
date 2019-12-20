@@ -15,11 +15,11 @@ namespace BBAPricing.Forms
         {
         }
 
-        CalculationResourcesController _calculateResourcesController;
+        CalculationMachinaryResourcesController _calculateResourcesController;
 
         public CalculationResources(MasterBomModel model)
         {
-            _calculateResourcesController = new CalculationResourcesController(model, UIAPIRawForm);
+            _calculateResourcesController = new CalculationMachinaryResourcesController(model, UIAPIRawForm);
         }
 
         /// <summary>
@@ -52,7 +52,7 @@ namespace BBAPricing.Forms
 
         private void Form_VisibleAfter(SAPbouiCOM.SBOItemEventArg pVal)
         {
-            var calculationForm = SAPbouiCOM.Framework.Application.SBO_Application.Forms.ActiveForm;
+            var calculationForm = Application.SBO_Application.Forms.ActiveForm;
             if (calculationForm.Title == "Machinary Resources Calculation")
             {
                 _calculateResourcesController.CalculateResources();

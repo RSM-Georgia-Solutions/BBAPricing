@@ -25,7 +25,7 @@ namespace BBAPricing.Models
         public double UnitWorkingPrice { get; set; }
         public double DiscountPercentage { get; set; }
         public double DiscountAmount { get; set; }
-        public double SharedDiscountPercentage { get; set; }
+        public double SharedPercentage { get; set; }
         public double SharedDiscountAmount { get; set; }
         public double MarginPercentage { get; set; }
         public double MarginAmount { get; set; }
@@ -46,11 +46,9 @@ namespace BBAPricing.Models
         {
             Properies = DiManager.GetPropInfo(typeof(MaterialModel));
         }
-       
-
         public bool Add()
         {
-            UserTable userTable = DiManager.Company.UserTables.Item("RSM_MTRL");       
+            UserTable userTable = DiManager.Company.UserTables.Item("RSM_MTRL");
             foreach (var prop in Properies)
             {
                 var propName = prop.Name;

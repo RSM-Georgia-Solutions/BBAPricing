@@ -50,7 +50,16 @@ namespace BBAPricing.Models
                 {
                 }
             }
-            int res = updateFlag ? userTable.Update() : userTable.Add();
+            int res;
+            if (updateFlag)
+            {
+                res = userTable.Update();
+            }
+            else
+            {
+                res = userTable.Add();
+            }
+
             var x = DiManager.Company.GetLastErrorDescription();
             return res == 0;
         }

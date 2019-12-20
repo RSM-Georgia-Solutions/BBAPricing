@@ -3,8 +3,8 @@ D:\Users\nkurdadze\Documents\Visual Studio 2015\Projects\BBAPricing\BBAPricing\b
 D:\Users\nkurdadze\Documents\Visual Studio 2015\Projects\BBAPricing\BBAPricing\bin\Debug\Media\Sap.bmp
 D:\Users\nkurdadze\Documents\Visual Studio 2015\Projects\BBAPricing\BBAPricing\bin\Debug\BBAPricing.exe
 D:\Users\nkurdadze\Documents\Visual Studio 2015\Projects\BBAPricing\BBAPricing\bin\Debug\BBAPricing.pdb
-D:\Users\nkurdadze\Documents\Visual Studio 2015\Projects\BBAPricing\BBAPricing\bin\Debug\ExcelImportDll.dll
 D:\Users\nkurdadze\Documents\Visual Studio 2015\Projects\BBAPricing\BBAPricing\bin\Debug\SAPBusinessOneSDK.dll
 D:\Users\nkurdadze\Documents\Visual Studio 2015\Projects\BBAPricing\BBAPricing\obj\Debug\BBAPricing.exe
 D:\Users\nkurdadze\Documents\Visual Studio 2015\Projects\BBAPricing\BBAPricing\obj\Debug\BBAPricing.pdb
+D:\Users\nkurdadze\Documents\Visual Studio 2015\Projects\BBAPricing\BBAPricing\bin\Debug\ExcelImportDll.dll
 D:\Users\nkurdadze\Documents\Visual Studio 2015\Projects\BBAPricing\BBAPricing\obj\Debug\BBAPricing.csprojResolveAssemblyReference.cache
