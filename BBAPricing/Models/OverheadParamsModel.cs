@@ -13,6 +13,9 @@ namespace BBAPricing.Models
         public int Code { get; set; }
         public string Name { get; set; }
         public double DailyWorkHours { get; set; }
+        public double Corian { get; set; }
+        public double Neolith { get; set; }
+        public double Furniture { get; set; }
         public double WorkingDaysMonthly { get; set; }
         public double ManufacuringOverhead { get; set; }
         public double AdministrativeOverhead { get; set; }
@@ -21,16 +24,25 @@ namespace BBAPricing.Models
         public double NeolithEmployee { get; set; }
         public double TotalEmps { get; set; }
         public DateTime ChangeDate { get; set; }
+        public string Version { get; set; }
         public List<PropertyInfo> Properies { get; set; }
         public OverheadParamsModel()
         {
             Properies = DiManager.GetPropInfo(typeof(OverheadParamsModel));
         }
-
+        public virtual bool Equals(OverheadParamsModel obj)
+        {
+            return DailyWorkHours == obj.DailyWorkHours && AdministrativeOverhead == obj.AdministrativeOverhead
+                                                        && Corian == obj.Corian && Neolith == obj.Neolith
+                                                        && Furniture == obj.Furniture && WorkingDaysMonthly == obj.WorkingDaysMonthly
+                                                        && TotalEmps == obj.TotalEmps && NeolithEmployee == obj.NeolithEmployee
+                                                        && FurnitureEmployee == obj.FurnitureEmployee && CorianEmployee == obj.CorianEmployee
+                                                        && ManufacuringOverhead == obj.ManufacuringOverhead;
+        }
         public bool AddOrUpdate()
         {
             Recordset recSet = (Recordset)DiManager.Company.GetBusinessObject(BoObjectTypes.BoRecordset);
-            recSet.DoQuery($"SELECT * FROM [@RSM_OVRHD_CLCB]");
+            recSet.DoQuery($"SELECT * FROM [@RSM_OVRHD_CLCB] WHERE U_Version = '{Version}'");
             bool updateFlag = recSet.RecordCount > 0;
 
             UserTable userTable = DiManager.Company.UserTables.Item("RSM_OVRHD_CLCB");

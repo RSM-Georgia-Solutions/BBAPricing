@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using SAPbobsCOM;
 
 namespace BBAPricing.Models
@@ -22,7 +19,7 @@ namespace BBAPricing.Models
         public string ComponentName { get; set; }
         public string ElementId { get; set; }
         public DateTime ChangeDate { get; set; }
-        public List<PropertyInfo> Properies { get; set; }
+        private List<PropertyInfo> Properies { get; }
 
         public OverheadsModel()
         {
@@ -42,18 +39,17 @@ namespace BBAPricing.Models
             }
             foreach (var prop in Properies)
             {
-                var propName = prop.Name;
                 object value = DiManager.GetPropValue(this, prop.Name);
                 try
                 {
                     userTable.UserFields.Fields.Item($"U_{prop.Name}").Value = value ?? string.Empty;
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
+                    // Model And Db MisMatch
                 }
             }
             int res = updateFlag ? userTable.Update() : userTable.Add();
-            var x = DiManager.Company.GetLastErrorDescription();
             return res == 0;
         }
     }

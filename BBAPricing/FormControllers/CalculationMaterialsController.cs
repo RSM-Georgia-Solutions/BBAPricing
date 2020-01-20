@@ -38,11 +38,9 @@ namespace BBAPricing.FormControllers
                 grid.DataTable.SetValue("Quantity", i, materialModel.Quantity);
                 grid.DataTable.SetValue("Total Cost", i, materialModel.TotalCost);
                 grid.DataTable.SetValue("Unit Working Price", i, materialModel.UnitWorkingPrice);
-                grid.DataTable.SetValue("Unit Working Price Converted", i, materialModel.UnitWorkingPriceConverted);
                 grid.DataTable.SetValue("Currency", i, materialModel.Currency);
                 grid.DataTable.SetValue("Converted Currency", i, materialModel.ConvertedCurrency);
                 grid.DataTable.SetValue("Unit Retail Price", i, materialModel.UnitRetailPrice);
-                grid.DataTable.SetValue("Unit Retail Price Converted", i, materialModel.UnitRetailPriceConverted);
                 grid.DataTable.SetValue("Discount Percentage", i, materialModel.DiscountPercentage);
                 grid.DataTable.SetValue("Discount Amount", i, materialModel.DiscountAmount);
                 grid.DataTable.SetValue("Shared Percentage", i, materialModel.SharedPercentage);
@@ -52,7 +50,6 @@ namespace BBAPricing.FormControllers
                 grid.DataTable.SetValue("Final Customer Price Total", i, materialModel.FinalCustomerPriceTotal);
                 grid.DataTable.SetValue("Final Customer Price", i, materialModel.FinalCustomerPrice);
             }
-            SAPbouiCOM.Framework.Application.SBO_Application.Forms.ActiveForm.Freeze(false);
             _grid.DataTable.Rows.Remove(_grid.DataTable.Rows.Count - 1);
             _grid.Columns.Item("Component Code").Editable = false;
             _grid.Columns.Item("Component Name").Editable = false;
@@ -67,14 +64,16 @@ namespace BBAPricing.FormControllers
             _grid.Columns.Item("Quantity").Editable = false;
             _grid.Columns.Item("Unit Cost").Editable = false;
             _grid.Columns.Item("Unit Retail Price").Editable = false;
-            _grid.Columns.Item("Unit Retail Price Converted").Editable = false;
-            _grid.Columns.Item("Unit Working Price Converted").Editable = false;
             _grid.Columns.Item("Converted Currency").Editable = false;
             _grid.Columns.Item("Discount Percentage").Editable = false;
             _grid.Columns.Item("Margin Percentage").Editable = false;
+            _grid.Columns.Item("Shared Percentage").Editable = false;
+            _grid.Columns.Item("Unit Working Price").Editable = false;
+            SAPbouiCOM.Framework.Application.SBO_Application.Forms.ActiveForm.Freeze(false);
         }
         public override void GetGridColumns()
         {
+            Form.Freeze(true);
             string queryGrid =
     $@"SELECT TOP(0) U_ComponentCode AS [Component Code], 
        U_ComponentName AS [Component Name], 
@@ -84,9 +83,7 @@ namespace BBAPricing.FormControllers
        U_TotalCost AS [Total Cost], 
        U_UnitRetailPrice AS [Unit Retail Price], 
        U_UnitWorkingPrice AS [Unit Working Price], 
-       U_Currency AS [Currency], 
-       U_UnitRetailPriceConverted AS [Unit Retail Price Converted], 
-       U_UnitWorkingPriceConverted AS [Unit Working Price Converted], 
+       U_Currency AS [Currency],  
 	   U_ConvertedCurrency as [Converted Currency],
        U_DiscountPercentage AS [Discount Percentage], 
        U_DiscountAmount AS [Discount Amount], 
@@ -98,6 +95,7 @@ namespace BBAPricing.FormControllers
        U_FinalCustomerPriceTotal AS [Final Customer Price Total]
 FROM [@RSM_MTRL]";
             _grid.DataTable.ExecuteQuery(queryGrid);
+            Form.Freeze(false);
         }
 
         private void InsertMaterialsListToDb()
@@ -106,6 +104,7 @@ FROM [@RSM_MTRL]";
             {
                 var res = item.Add();
             }
+            _MasterBomModel.Update();
         }
 
         public override bool FillModelFromDb()
@@ -125,9 +124,9 @@ FROM [@RSM_MTRL]";
                     materialModel.UnitOfMeasure = (string)recSet2.Fields.Item("U_UnitOfMeasure").Value;
                     materialModel.UnitCost = (double)recSet2.Fields.Item("U_UnitCost").Value;
                     materialModel.UnitRetailPrice = (double)recSet2.Fields.Item("U_UnitRetailPrice").Value;
-                    materialModel.UnitRetailPriceConverted = (double)recSet2.Fields.Item("U_UnitRetailPriceConverted").Value;
+                    materialModel.UnitRetailPrice = (double)recSet2.Fields.Item("U_UnitRetailPrice").Value;
                     materialModel.UnitWorkingPrice = (double)recSet2.Fields.Item("U_UnitWorkingPrice").Value;
-                    materialModel.UnitWorkingPriceConverted = (double)recSet2.Fields.Item("U_UnitWorkingPriceConverted").Value;
+                    materialModel.UnitWorkingPrice = (double)recSet2.Fields.Item("U_UnitWorkingPrice").Value;
                     materialModel.Currency = recSet2.Fields.Item("U_Currency").Value.ToString();
                     materialModel.ConvertedCurrency = recSet2.Fields.Item("U_ConvertedCurrency").Value.ToString();
                     materialModel.TotalCost = (double)recSet2.Fields.Item("U_TotalCost").Value;
@@ -169,38 +168,41 @@ FROM [@RSM_MTRL]";
                 materialModel.Currency = _grid.DataTable.GetValue("Currency", i).ToString();
                 materialModel.ConvertedCurrency = _grid.DataTable.GetValue("Currency", i).ToString();
                 materialModel.Quantity = (double)_grid.DataTable.GetValue("Quantity", i);
-                materialModel.TotalCost = Math.Round(materialModel.Quantity * materialModel.UnitCost, 4);
+                materialModel.SharedPercentage = (double)_grid.DataTable.GetValue("Shared Percentage", i);
+                materialModel.DiscountPercentage = (double)_grid.DataTable.GetValue("Discount Percentage", i);
 
-                if (materialModel.Currency == _MasterBomModel.Currency)
+                if (_MasterBomModel.Currency == "GEL")
                 {
-                    materialModel.DiscountAmount = Math.Round(materialModel.UnitRetailPrice * materialModel.Quantity *
-                                                              materialModel.DiscountPercentage / 100, 4);
-                    materialModel.SharedDiscountAmount = Math.Round(materialModel.DiscountAmount * materialModel.SharedPercentage / 100, 4);
+                    var rate = DiManager.GetCurrencyRate(materialModel.Currency, _MasterBomModel.ExchangeRateDate, DiManager.Company);
+                    if (_MasterBomModel.Currency != materialModel.Currency)
+                    {
+                        materialModel.UnitCost *= rate;
+                        materialModel.UnitRetailPrice *= rate;
+                        materialModel.UnitWorkingPrice *= rate;
+                    }
                 }
                 else
                 {
-                    materialModel.DiscountAmount = Math.Round(materialModel.UnitRetailPrice * materialModel.Quantity *
-                                                              materialModel.DiscountPercentage / 100 / _MasterBomModel.Rate, 4);
-                    materialModel.SharedDiscountAmount = Math.Round(materialModel.DiscountAmount * materialModel.SharedPercentage / 100 / _MasterBomModel.Rate, 4);
+                    if (_MasterBomModel.Currency != materialModel.Currency)
+                    {
+                        materialModel.UnitCost /= _MasterBomModel.Rate;
+                        materialModel.UnitRetailPrice /= _MasterBomModel.Rate;
+                        materialModel.UnitWorkingPrice /= _MasterBomModel.Rate;
+                    }
                 }
 
-                materialModel.SharedPercentage = (double)_grid.DataTable.GetValue("Shared Percentage", i);
-                materialModel.DiscountPercentage = (double)_grid.DataTable.GetValue("Discount Percentage", i);
-                materialModel.MarginPercentage = Math.Round((materialModel.DiscountAmount - materialModel.SharedDiscountAmount) /
-                                               (materialModel.UnitWorkingPriceConverted * materialModel.Quantity +
-                                                materialModel.DiscountAmount - materialModel.SharedDiscountAmount) * 100, 4);
+                materialModel.TotalCost = Math.Round(materialModel.Quantity * materialModel.UnitCost, 4);
+
                 ConvertPrices(materialModel);
-                materialModel.MarginAmount = (Math.Round(materialModel.TotalCostConverted / (1 - Math.Round(materialModel.MarginPercentage / 100, 4)), 4) * (Math.Round(materialModel.MarginPercentage / 100, 4)));
-                materialModel.FinalCustomerPriceTotal = materialModel.TotalCostConverted + materialModel.MarginAmount;
-                materialModel.FinalCustomerPrice = materialModel.FinalCustomerPrice / materialModel.Quantity;
+
                 materialModel.Version = version;
                 materialModel.SalesQuotationDocEntry = _MasterBomModel.SalesQuotationDocEntry;
                 materialModel.ParentItemCode = _MasterBomModel.ParentItem;
                 _materialModelsList.Add(materialModel);
-                totalCost = totalCost += materialModel.TotalCostConverted;
-                totalFinalCustomerPrice = totalFinalCustomerPrice += materialModel.FinalCustomerPriceTotalConverted;
-                totalMargin = totalMargin += materialModel.MarginAmountConverted;
-                totalPrice = totalPrice += materialModel.UnitWorkingPriceConverted;
+                totalCost = totalCost += materialModel.TotalCost;
+                totalFinalCustomerPrice = totalFinalCustomerPrice += materialModel.FinalCustomerPriceTotal;
+                totalMargin = totalMargin += materialModel.MarginAmount;
+                totalPrice = totalPrice += materialModel.UnitWorkingPrice;
             }
 
         }
@@ -248,7 +250,7 @@ FROM
          JOIN OITM ON OITM.ItemCode = ITT1.Code
          JOIN ITM1 ON OITM.ItemCode = ITM1.ItemCode
          JOIN OPLN ON ITM1.PriceList = OPLN.ListNum
-            WHERE Father = '{_MasterBomModel.ParentItem}' AND OPLN.ListName = 'Unit Working Price') Working INNER JOIN
+            WHERE Father = '{_MasterBomModel.ParentItem}' AND OPLN.ListName = '{Settings.WorkingPriceList}') Working INNER JOIN
                 (SELECT CASE
                WHEN ITM1.Price = 0
                THEN CASE
@@ -261,7 +263,7 @@ FROM
                 JOIN OITM on OITM.ItemCode = ITT1.Code
             JOIN ITM1 on OITM.ItemCode = ITM1.ItemCode
             JOIN OPLN on ITM1.PriceList = OPLN.ListNum
-            WHERE Father = '{_MasterBomModel.ParentItem}' AND OPLN.ListName = 'Unit Retail Price') Retail on Working.Code = Retail.Code and type = 4";
+            WHERE Father = '{_MasterBomModel.ParentItem}' AND OPLN.ListName = '{Settings.RetailPriceList}') Retail on Working.Code = Retail.Code and type = 4";
             recSet.DoQuery(queryData);
 
             var bp = (BusinessPartners)DiManager.Company.GetBusinessObject(BoObjectTypes.oBusinessPartners);
@@ -280,40 +282,34 @@ FROM
                 materialModel.UnitRetailPrice = (double)recSet.Fields.Item("Retail Price").Value;
                 materialModel.UnitWorkingPrice = (double)recSet.Fields.Item("Working Price").Value;
 
-                materialModel.TotalCost = Math.Round(materialModel.Quantity * materialModel.UnitCost, 4);
-                materialModel.DiscountPercentage = (Math.Round(materialModel.UnitRetailPrice - materialModel.UnitWorkingPrice, 4) /
-                                                 materialModel.UnitRetailPrice * 100);
-                if (materialModel.Currency == _MasterBomModel.Currency)
+                if (_MasterBomModel.Currency == "GEL")
                 {
-                    materialModel.DiscountAmount = Math.Round((materialModel.UnitRetailPrice * materialModel.Quantity *
-                                                    materialModel.DiscountPercentage) / 100, 4);
-                    materialModel.SharedDiscountAmount =
-                        Math.Round((materialModel.DiscountAmount * materialModel.SharedPercentage) / 100, 4);
+                    if (_MasterBomModel.Currency != materialModel.Currency)
+                    {
+                        var rate = DiManager.GetCurrencyRate(materialModel.Currency, _MasterBomModel.ExchangeRateDate, DiManager.Company);
+                        materialModel.UnitCost *= rate;
+                        materialModel.UnitRetailPrice *= rate;
+                        materialModel.UnitWorkingPrice *= rate;
+                    }
                 }
                 else
                 {
-                    materialModel.DiscountAmount = Math.Round((materialModel.UnitRetailPrice * materialModel.Quantity *
-                                                               materialModel.DiscountPercentage) / 100 / _MasterBomModel.Rate, 4);
-                    materialModel.SharedDiscountAmount =
-                        Math.Round((materialModel.DiscountAmount * materialModel.SharedPercentage) / 100, 4);
-
+                    if (_MasterBomModel.Currency != materialModel.Currency)
+                    {
+                        materialModel.UnitCost /= _MasterBomModel.Rate;
+                        materialModel.UnitRetailPrice /= _MasterBomModel.Rate;
+                        materialModel.UnitWorkingPrice /= _MasterBomModel.Rate;
+                    }
                 }
                 ConvertPrices(materialModel);
-                materialModel.MarginPercentage = Math.Round((materialModel.DiscountAmount - materialModel.SharedDiscountAmount) /
-                                               (materialModel.UnitWorkingPriceConverted * materialModel.Quantity +
-                                                materialModel.DiscountAmount - materialModel.SharedDiscountAmount) * 100, 4);
 
-                ConvertPrices(materialModel);
-                materialModel.MarginAmount = Math.Round(materialModel.TotalCostConverted / (1 - Math.Round(materialModel.MarginPercentage / 100, 4)), 4) * Math.Round(materialModel.MarginPercentage / 100, 4);
-                materialModel.FinalCustomerPriceTotal = materialModel.TotalCostConverted + materialModel.MarginAmount;
-                materialModel.FinalCustomerPrice = materialModel.FinalCustomerPriceTotal / materialModel.Quantity;
                 materialModel.SalesQuotationDocEntry = _MasterBomModel.SalesQuotationDocEntry;
                 materialModel.ParentItemCode = _MasterBomModel.ParentItem;
                 materialModel.ConvertedCurrency = _MasterBomModel.Currency;
                 materialModel.Version = _MasterBomModel.Version;
                 _materialModelsList.Add(materialModel);
-                totalCost = totalCost += materialModel.TotalCostConverted;
-                totalPrice = totalPrice += materialModel.UnitWorkingPriceConverted;
+                totalCost = totalCost += materialModel.TotalCost;
+                totalPrice = totalPrice += materialModel.UnitWorkingPrice * materialModel.Quantity;
                 totalMargin = totalMargin += materialModel.MarginAmount;
                 totalFinalCustomerPrice = totalFinalCustomerPrice += materialModel.FinalCustomerPriceTotal;
                 recSet.MoveNext();
@@ -327,22 +323,20 @@ FROM
 
         private void ConvertPrices(MaterialModel materialModel)
         {
-            if (_MasterBomModel.Currency != materialModel.Currency)
-            {
-                materialModel.UnitRetailPriceConverted = materialModel.UnitRetailPrice / _MasterBomModel.Rate;
-                materialModel.UnitWorkingPriceConverted = materialModel.UnitWorkingPrice / _MasterBomModel.Rate;
-                materialModel.TotalCostConverted = materialModel.TotalCost / _MasterBomModel.Rate;
-                materialModel.MarginAmountConverted = materialModel.MarginAmount / _MasterBomModel.Rate;
-                materialModel.FinalCustomerPriceTotalConverted = materialModel.FinalCustomerPriceTotal / _MasterBomModel.Rate;
-            }
-            else
-            {
-                materialModel.UnitRetailPriceConverted = materialModel.UnitRetailPrice;
-                materialModel.UnitWorkingPriceConverted = materialModel.UnitWorkingPrice;
-                materialModel.TotalCostConverted = materialModel.TotalCost;
-                materialModel.MarginAmountConverted = materialModel.MarginAmount;
-                materialModel.FinalCustomerPriceTotalConverted = materialModel.FinalCustomerPriceTotal;
-            }
+            materialModel.DiscountPercentage = Math.Round(materialModel.UnitRetailPrice - materialModel.UnitWorkingPrice, 4) /
+                                               materialModel.UnitRetailPrice * 100;
+            materialModel.TotalCost = Math.Round(materialModel.Quantity * materialModel.UnitCost, 4);
+            materialModel.DiscountAmount = Math.Round(materialModel.UnitRetailPrice * materialModel.Quantity *
+                                                      materialModel.DiscountPercentage / 100, 4);
+            materialModel.SharedDiscountAmount = Math.Round(materialModel.DiscountAmount * materialModel.SharedPercentage / 100, 4);
+            materialModel.MarginPercentage = Math.Round((materialModel.DiscountAmount - materialModel.SharedDiscountAmount) /
+                                                        (materialModel.UnitWorkingPrice * materialModel.Quantity +
+                                                         materialModel.DiscountAmount - materialModel.SharedDiscountAmount) * 100, 4);
+            materialModel.MarginAmount = Math.Round(materialModel.TotalCost / (1 - Math.Round(materialModel.MarginPercentage / 100, 4)),
+                                             4) * Math.Round(materialModel.MarginPercentage / 100, 4);
+            materialModel.FinalCustomerPriceTotal = materialModel.TotalCost + materialModel.MarginAmount;
+            materialModel.FinalCustomerPrice = materialModel.FinalCustomerPriceTotal / materialModel.Quantity;
+
         }
 
         public void CalculateMaterials()
@@ -353,8 +347,8 @@ FROM
             {
                 GenerateModel();
                 FillGridFromModel(_grid);
-                _MasterBomModel.Update();
                 InsertMaterialsListToDb();
+                RefreshBom.Invoke();
             }
             else
             {
@@ -364,19 +358,25 @@ FROM
         public static Action RefreshBom;
 
 
-        public void UpdateMaterials()
+        public void UpdateMaterialsFromForm()
         {
             string version = (int.Parse(_materialModelsList.First().Version, CultureInfo.InvariantCulture) + 1).ToString();
             _materialModelsList.Clear();
             _MasterBomModel.Version = version;
-            _MasterBomModel.Add();
+            GenerateModel();
             foreach (var row in _MasterBomModel.Rows)
             {
-                row.Version = _MasterBomModel.Version;
-                row.Add();
+                row.Version = version;
             }
-            FillModelFromGrid();
             InsertMaterialsListToDb();
+            _MasterBomModel.Add();
+            FillGridFromModel(_grid);
+            RefreshBom.Invoke();
+        }
+        public void UpdateMaterialsFormFromPriceList()
+        {
+            _materialModelsList.Clear();
+            GenerateModel();
             FillGridFromModel(_grid);
         }
     }

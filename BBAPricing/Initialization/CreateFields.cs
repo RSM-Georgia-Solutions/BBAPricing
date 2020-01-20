@@ -11,6 +11,13 @@ namespace BBAPricing.Initialization
     {
         public void Run()
         {
+
+
+            DiManager.CreateField("@RSM_BBA_SETTINGS", "WorkingPriceList", "Working Price List", BoFieldTypes.db_Alpha, 250, false);
+            DiManager.CreateField("@RSM_BBA_SETTINGS", "RetailPriceList", "Retail Price List", BoFieldTypes.db_Alpha, 250, false);
+            DiManager.CreateField("@RSM_BBA_SETTINGS", "HumanResourceCoefficient", "HumanResource Coefficient", BoFieldTypes.db_Float, 250, false, false, "", "", BoFldSubTypes.st_Sum);
+            DiManager.CreateField("@RSM_BBA_SETTINGS", "DailyNormPerPerson", "Daily Norm Per Person", BoFieldTypes.db_Float, 250, false, false, "", "", BoFldSubTypes.st_Sum);
+
             DiManager.CreateField("@RSM_MBOM_ROWS", "ElementID", "Element ID", BoFieldTypes.db_Alpha, 250, false);
             DiManager.CreateField("@RSM_MBOM_ROWS", "Element", "Element", BoFieldTypes.db_Alpha, 250, false);
             DiManager.CreateField("@RSM_MBOM_ROWS", "Cost", "Cost", BoFieldTypes.db_Float, 250, false, false, "", "", BoFldSubTypes.st_Sum);
@@ -31,6 +38,7 @@ namespace BBAPricing.Initialization
             DiManager.CreateField("@RSM_MBOM", "SalesQuotationDocEntry", "Sales Quotation DocEntry", BoFieldTypes.db_Alpha, 250, false);
             DiManager.CreateField("@RSM_MBOM", "SalesQuotationDocNum", "Sales Quotation DocNum", BoFieldTypes.db_Numeric, 11, false);
             DiManager.CreateField("@RSM_MBOM", "ProjectCode", "Project Code", BoFieldTypes.db_Alpha, 250, false);
+            DiManager.CreateField("@RSM_MBOM", "CardCode", "Card Code", BoFieldTypes.db_Alpha, 250, false);
             DiManager.CreateField("@RSM_MBOM", "ProjectName", "Project Name", BoFieldTypes.db_Alpha, 250, false);
             DiManager.CreateField("@RSM_MBOM", "CreateDate", "Create Date", BoFieldTypes.db_Date, 250, false);
             DiManager.CreateField("@RSM_MBOM", "Currency", "Currency", BoFieldTypes.db_Alpha, 250, false);
@@ -40,6 +48,9 @@ namespace BBAPricing.Initialization
             DiManager.CreateField("@RSM_MBOM", "OwnerName", "Owner Name", BoFieldTypes.db_Alpha, 250, false);
             DiManager.CreateField("@RSM_MBOM", "Version", "Version", BoFieldTypes.db_Alpha, 250, false);
             DiManager.CreateField("@RSM_MBOM", "PriceForSquareMeter", "Price For Square Meter", BoFieldTypes.db_Float, 250, false, false, "", "", BoFldSubTypes.st_Price);
+            DiManager.CreateField("@RSM_MBOM", "TotalSquareMeter", "Total Square Meter", BoFieldTypes.db_Float, 250, false, false, "", "", BoFldSubTypes.st_Quantity);
+            DiManager.CreateField("@RSM_MBOM", "ReferenceFeePercentage", "Reference Fee Percentage", BoFieldTypes.db_Float, 250, false, false, "", "", BoFldSubTypes.st_Percentage);
+            DiManager.CreateField("@RSM_MBOM", "Quantity", "Quantity", BoFieldTypes.db_Float, 250, false, false, "", "", BoFldSubTypes.st_Quantity);
 
             DiManager.CreateField("@RSM_ELEM", "Element", "Element", BoFieldTypes.db_Alpha, 250, false);
 
@@ -56,13 +67,6 @@ namespace BBAPricing.Initialization
                                                                   "Working" +
                                                                   "Price", BoFieldTypes.db_Float, 250, false, false, "", "", BoFldSubTypes.st_Price);
 
-            DiManager.CreateField("@RSM_MTRL", "UnitRetailPriceConverted", "Unit" +
-                                                       "Retail" +
-                                                       "Price", BoFieldTypes.db_Float, 250, false, false, "", "", BoFldSubTypes.st_Price);
-            DiManager.CreateField("@RSM_MTRL", "UnitWorkingPriceConverted", "Unit" +
-                                                                  "Working" +
-                                                                  "Price", BoFieldTypes.db_Float, 250, false, false, "", "", BoFldSubTypes.st_Price);
-
             DiManager.CreateField("@RSM_MTRL", "DiscountPercentage", "Discount Percentage", BoFieldTypes.db_Float, 250, false, false, "", "", BoFldSubTypes.st_Percentage);
             DiManager.CreateField("@RSM_MTRL", "DiscountAmount", "Discount Amount", BoFieldTypes.db_Float, 250, false, false, "", "", BoFldSubTypes.st_Sum);
             DiManager.CreateField("@RSM_MTRL", "SharedPercentage", "Shared Percentage", BoFieldTypes.db_Float, 250, false, false, "", "", BoFldSubTypes.st_Percentage);
@@ -76,7 +80,6 @@ namespace BBAPricing.Initialization
             DiManager.CreateField("@RSM_MTRL", "Version", "Version", BoFieldTypes.db_Alpha, 250, false);
             DiManager.CreateField("@RSM_MTRL", "Currency", "Currency", BoFieldTypes.db_Alpha, 250, false);
             DiManager.CreateField("@RSM_MTRL", "ConvertedCurrency", "Currency", BoFieldTypes.db_Alpha, 250, false);
-
 
             DiManager.CreateField("@RSM_OPERATIONS", "OperationCode", "Operation Code", BoFieldTypes.db_Alpha, 250, false);
             DiManager.CreateField("@RSM_OPERATIONS", "OperationName", "Operation Name", BoFieldTypes.db_Alpha, 250, false);
@@ -108,6 +111,7 @@ namespace BBAPricing.Initialization
             DiManager.CreateField("@RSM_RESOURCES", "Version", "Version", BoFieldTypes.db_Alpha, 250, false);
             DiManager.CreateField("@RSM_RESOURCES", "OperationCode", "Operation Code", BoFieldTypes.db_Alpha, 250, false);
             DiManager.CreateField("@RSM_RESOURCES", "OperationName", "Operation Name", BoFieldTypes.db_Alpha, 250, false);
+            DiManager.CreateField("@RSM_RESOURCES", "Version", "Version", BoFieldTypes.db_Alpha, 250, false);
             DiManager.CreateField("@RSM_RESOURCES", "UomResourceMain", "Uom Resource Main", BoFieldTypes.db_Alpha, 250, false);
             DiManager.CreateField("@RSM_RESOURCES", "OtherQtyResource", "OtherQtyResource", BoFieldTypes.db_Float, 250, false, false, "", "", BoFldSubTypes.st_Quantity);
 
@@ -119,10 +123,7 @@ namespace BBAPricing.Initialization
             DiManager.CreateField("@RSM_OVERHEADS", "AdministrativeOverhead", "Administrative Overhead", BoFieldTypes.db_Float, 250, false, false, "", "", BoFldSubTypes.st_Sum);
             DiManager.CreateField("@RSM_OVERHEADS", "WorkingHours", "Working Hours", BoFieldTypes.db_Float, 250, false, false, "", "", BoFldSubTypes.st_Quantity);
             DiManager.CreateField("@RSM_OVERHEADS", "ChangeDate", "Change Date", BoFieldTypes.db_Date, 222, false);
-
-
-            DiManager.CreateField("@RSM_OVERHEADS_R", "ParentItemCode", "Parent Item Code", BoFieldTypes.db_Alpha, 250, false);
-            DiManager.CreateField("@RSM_OVERHEADS_R", "SalesQuotationDocEntry", "SalesQuotationDocEntry", BoFieldTypes.db_Alpha, 250, false);
+ 
             DiManager.CreateField("@RSM_OVERHEADS_R", "Version", "Version", BoFieldTypes.db_Alpha, 250, false);
             DiManager.CreateField("@RSM_OVERHEADS_R", "Corian", "Corian", BoFieldTypes.db_Float, 222, false, false, "", "", BoFldSubTypes.st_Quantity);
             DiManager.CreateField("@RSM_OVERHEADS_R", "Neolith", "Neolith", BoFieldTypes.db_Float, 222, false, false, "", "", BoFldSubTypes.st_Quantity);
@@ -135,6 +136,7 @@ namespace BBAPricing.Initialization
 
             DiManager.CreateField("@RSM_OVERHEAD_C", "Component", "Component", BoFieldTypes.db_Alpha, 250, false);
 
+
             DiManager.CreateField("@RSM_OVRHD_CLCB", "DailyWorkHours", "Daily Work Hours", BoFieldTypes.db_Float, 222, false, false, "", "", BoFldSubTypes.st_Quantity);
             DiManager.CreateField("@RSM_OVRHD_CLCB", "WorkingDaysMonthly", "WorkingDaysMonthly", BoFieldTypes.db_Float, 222, false, false, "", "", BoFldSubTypes.st_Quantity);
             DiManager.CreateField("@RSM_OVRHD_CLCB", "ManufacuringOverhead", "Manufacuring Overhead", BoFieldTypes.db_Float, 222, false, false, "", "", BoFldSubTypes.st_Sum);
@@ -144,6 +146,11 @@ namespace BBAPricing.Initialization
             DiManager.CreateField("@RSM_OVRHD_CLCB", "NeolithEmployee", "Neolith Employee", BoFieldTypes.db_Float, 222, false, false, "", "", BoFldSubTypes.st_Sum);
             DiManager.CreateField("@RSM_OVRHD_CLCB", "TotalEmps", "Total Employees", BoFieldTypes.db_Float, 222, false, false, "", "", BoFldSubTypes.st_Sum);
             DiManager.CreateField("@RSM_OVRHD_CLCB", "ChangeDate", "Change Date", BoFieldTypes.db_Date, 222, false);
+            DiManager.CreateField("@RSM_OVRHD_CLCB", "Corian", "Corian", BoFieldTypes.db_Float, 222, false, false, "", "", BoFldSubTypes.st_Sum);
+            DiManager.CreateField("@RSM_OVRHD_CLCB", "Neolith", "Neolith", BoFieldTypes.db_Float, 222, false, false, "", "", BoFldSubTypes.st_Sum);
+            DiManager.CreateField("@RSM_OVRHD_CLCB", "Furniture", "Furniture", BoFieldTypes.db_Float, 222, false, false, "", "", BoFldSubTypes.st_Sum);
+            DiManager.CreateField("@RSM_OVRHD_CLCB", "Version", "Version", BoFieldTypes.db_Alpha, 250, false);
+
 
             DiManager.CreateField("@RSM_COMMON_ELEM", "ProjectCode", "Project Code", BoFieldTypes.db_Alpha, 250, false);
             DiManager.CreateField("@RSM_COMMON_ELEM", "ChangeDate", "Change Date", BoFieldTypes.db_Date, 222, false);
@@ -172,6 +179,7 @@ namespace BBAPricing.Initialization
             //DiManager.CreateField("@RSM_TRIP", "HotelUnitCost", "Hotel Unit Cost", BoFieldTypes.db_Float, 222, false, false, "", "", BoFldSubTypes.st_Sum);
             //DiManager.CreateField("@RSM_TRIP", "HotelTotalCost", "Hotel Total Cost", BoFieldTypes.db_Float, 222, false, false, "", "", BoFldSubTypes.st_Sum);
             //DiManager.CreateField("@RSM_TRIP", "TotalCost", "Total Cost", BoFieldTypes.db_Float, 222, false, false, "", "", BoFldSubTypes.st_Sum);
+
 
             DiManager.CreateField("ITT1", "Operation", "Operation", BoFieldTypes.db_Alpha, 250, false);
             DiManager.CreateField("ITT1", "QtyOfBom", "Qty Of Bom", BoFieldTypes.db_Float, 222, false, true, "", "", BoFldSubTypes.st_Sum);

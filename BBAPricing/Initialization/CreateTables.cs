@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SAPbobsCOM;
+﻿using SAPbobsCOM;
 
 namespace BBAPricing.Initialization
 {
@@ -24,7 +19,7 @@ namespace BBAPricing.Initialization
             DiManager.CreateTable("RSM_OVRHD_CLCB", "RSM_OVRHD_CLCB", BoUTBTableType.bott_NoObjectAutoIncrement);
             DiManager.CreateTable("RSM_COMMON_ELEM", "RSM_COMMON_ELEM", BoUTBTableType.bott_NoObjectAutoIncrement);
             DiManager.CreateTable("RSM_OVERHEADS_SQ", "RSM OVERHEADS SQ", BoUTBTableType.bott_NoObjectAutoIncrement);
-            DiManager.CreateTable("RSM_TRIP", "Business Trip", BoUTBTableType.bott_NoObjectAutoIncrement);
+            DiManager.CreateTable("RSM_BBA_SETTINGS", "SettingsForm BBA", BoUTBTableType.bott_NoObjectAutoIncrement);
         }
     }
 }

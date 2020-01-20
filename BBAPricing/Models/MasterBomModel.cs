@@ -27,7 +27,8 @@ namespace BBAPricing.Models
         public double Rate { get; set; }
         public DateTime ExchangeRateDate { get; set; }
         public double PriceForSquareMeter { get; set; }
-
+        public double TotalSquareMeter { get; set; }
+        public double ReferenceFeePercentage { get; set; }
         public List<MasterBomRowModel> Rows { get; set; }
 
         public List<PropertyInfo> Properies { get; set; }
@@ -75,7 +76,7 @@ namespace BBAPricing.Models
         public bool Update()
         {
             UserTable userTable = DiManager.Company.UserTables.Item("RSM_MBOM");
-            userTable.GetByKey(Code.ToString());
+            userTable.GetByKey(Code);
             foreach (var prop in Properies)
             {
                 object value = DiManager.GetPropValue(this, prop.Name);

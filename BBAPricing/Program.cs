@@ -20,6 +20,13 @@ namespace BBAPricing
                 oApp.RegisterMenuEventHandler(myMenu.SBO_Application_MenuEvent);
                 Application.SBO_Application.AppEvent += new SAPbouiCOM._IApplicationEvents_AppEventEventHandler(SBO_Application_AppEvent);
                 var x = DiManager.Company;
+                try
+                {
+                    DiManager.GetSettings();
+                }
+                catch (Exception)
+                {
+                }
                 oApp.Run();
             }
             catch (Exception ex)
@@ -33,7 +40,7 @@ namespace BBAPricing
             switch (EventType)
             {
                 case SAPbouiCOM.BoAppEventTypes.aet_ShutDown:
-                    //Exit Add-On
+                    //Exit AddOrUpdate-On
                     System.Windows.Forms.Application.Exit();
                     break;
                 case SAPbouiCOM.BoAppEventTypes.aet_CompanyChanged:

@@ -62,7 +62,12 @@ namespace BBAPricing.Forms
 
         private void Button0_PressedAfter(object sboObject, SBOItemEventArg pVal)
         {
-            _materialControler.UpdateMaterials();
+            _materialControler.UpdateMaterialsFromForm();
+        }
+
+        private void Button1_PressedAfter(object sboObject, SBOItemEventArg pVal)
+        {
+            _materialControler.UpdateMaterialsFormFromPriceList();
         }
     }
 }

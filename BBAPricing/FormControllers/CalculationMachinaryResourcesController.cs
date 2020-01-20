@@ -13,19 +13,20 @@ namespace BBAPricing.FormControllers
 {
     public class CalculationMachinaryResourcesController : IFormController
     {
-        private MasterBomModel _MasterBomModel;
+        private MasterBomModel MasterBomModel;
         private List<ResourceModel> _MachinaryResourceModelsList;
         private readonly IForm _form;
         public Grid _grid { get { return (Grid)_form.Items.Item("Item_0").Specific; } }
         public CalculationMachinaryResourcesController(MasterBomModel masterBomModel, IForm form) : base(form)
         {
             _form = form;
-            _MasterBomModel = masterBomModel;
+            MasterBomModel = masterBomModel;
             _MachinaryResourceModelsList = new List<ResourceModel>();
         }
 
         public override void GetGridColumns()
         {
+            _form.Freeze(true);
             string queryData = $@"SELECT TOP(0)    
                 U_ResourceCode as [ResourceCode],
                 U_ResourceName          as ResourceName,
@@ -69,6 +70,7 @@ namespace BBAPricing.FormControllers
             _grid.Columns.Item("PriceOfUnit").Editable = false;
             _grid.Columns.Item("MarginOfUnit").Editable = false;
             _grid.Columns.Item("InfoPercent").Editable = false;
+            _form.Freeze(false);
         }
 
         public override bool FillModelFromDb()
@@ -78,17 +80,17 @@ namespace BBAPricing.FormControllers
             recSet.DoQuery($@"SELECT  * FROM [@RSM_RESOURCES]
                                 JOIN [@RSM_OPERATIONS] ON [@RSM_RESOURCES].U_ResourceCode = [@RSM_OPERATIONS].U_ResourceCode 
                                 AND [@RSM_OPERATIONS].U_OperationCode  = [@RSM_RESOURCES].U_OperationCode
-                                WHERE U_ParentItemCode = '{_MasterBomModel.ParentItem}' 
-                                    AND U_SalesQuotationDocEntry = '{_MasterBomModel.SalesQuotationDocEntry}'
-                                    AND U_Version = '{_MasterBomModel.Version}' 
+                                WHERE U_ParentItemCode = '{MasterBomModel.ParentItem}' 
+                                    AND U_SalesQuotationDocEntry = '{MasterBomModel.SalesQuotationDocEntry}'
+                                    AND U_Version = '{MasterBomModel.Version}' 
                                     AND U_ResourceType = 'M'");
             if (!recSet.EoF)
             {
                 while (!recSet.EoF)
                 {
                     ResourceModel model = new ResourceModel();
-                    model.SalesQuotationDocEntry = _MasterBomModel.SalesQuotationDocEntry;
-                    model.ParentItemCode = _MasterBomModel.ParentItem;
+                    model.SalesQuotationDocEntry = MasterBomModel.SalesQuotationDocEntry;
+                    model.ParentItemCode = MasterBomModel.ParentItem;
                     model.ResourceCode = recSet.Fields.Item("U_ResourceCode").Value.ToString();
                     model.ResourceName = recSet.Fields.Item("U_ResourceName").Value.ToString();
                     model.OperationCode = recSet.Fields.Item("U_OperationCode").Value.ToString();
@@ -162,8 +164,8 @@ namespace BBAPricing.FormControllers
                                  JOIN ITM1 ON OITM.ItemCode = ITM1.ItemCode   
                                  JOIN OPLN on ITM1.PriceList = OPLN.ListNum
    JOIN OUGP on OUGP.UgpEntry = OITM.UgpEntry
-                            	 JOIN ORSC ON ORSC.VisResCode =  ITT1.Code WHERE Father = '{_MasterBomModel.ParentItem}' 
-                                    AND OPLN.ListName = 'Unit Retail Price' 
+                            	 JOIN ORSC ON ORSC.VisResCode =  ITT1.Code WHERE Father = '{MasterBomModel.ParentItem}' 
+                                    AND OPLN.ListName = '{Settings.RetailPriceList}' 
                                     AND ORSC.ResType = 'M'
                                     AND U_ResourceType = 'M'";
             recSet.DoQuery(query);
@@ -171,8 +173,8 @@ namespace BBAPricing.FormControllers
             while (!recSet.EoF)
             {
                 ResourceModel resourceModel = new ResourceModel();
-                resourceModel.SalesQuotationDocEntry = _MasterBomModel.SalesQuotationDocEntry;
-                resourceModel.ParentItemCode = _MasterBomModel.ParentItem;
+                resourceModel.SalesQuotationDocEntry = MasterBomModel.SalesQuotationDocEntry;
+                resourceModel.ParentItemCode = MasterBomModel.ParentItem;
                 resourceModel.ResourceCode = recSet.Fields.Item("ResourceCode").Value.ToString();
                 resourceModel.ResourceName = recSet.Fields.Item("ResourceName").Value.ToString();
                 resourceModel.OperationCode = recSet.Fields.Item("OperationCode").Value.ToString();
@@ -183,6 +185,14 @@ namespace BBAPricing.FormControllers
                 resourceModel.TotalStandartCost = (double)recSet.Fields.Item("TotalStandartCost").Value;
                 resourceModel.ResourceUnitPrice = (double)recSet.Fields.Item("ResourceUnitPrice").Value;
                 resourceModel.ResourceTotalPrice = (double)recSet.Fields.Item("ResourceTotalPrice").Value;
+
+                if (MasterBomModel.Currency != "GEL")
+                {
+                    resourceModel.TotalStandartCost /= MasterBomModel.Rate;
+                    resourceModel.ResourceTotalPrice /= MasterBomModel.Rate;
+                    resourceModel.ResourceUnitPrice /= MasterBomModel.Rate;
+                }
+
                 resourceModel.OtherQtyResource = (double)recSet.Fields.Item("OtherQtyResource").Value;
                 resourceModel.UomResourceMain = recSet.Fields.Item("UomResourceMain").Value.ToString();
                 resourceModel.MarginPercent = (resourceModel.ResourceTotalPrice - resourceModel.TotalStandartCost) / resourceModel.ResourceTotalPrice;
@@ -192,7 +202,7 @@ namespace BBAPricing.FormControllers
                 resourceModel.PriceOfUnit = resourceModel.ResourceTotalPrice / resourceModel.OtherQtyResource;
                 resourceModel.MarginOfUnit = resourceModel.PriceOfUnit - resourceModel.CostOfUnit;
                 resourceModel.InfoPercent = resourceModel.MarginOfUnit / resourceModel.PriceOfUnit;
-                resourceModel.Version = _MasterBomModel.Version;
+                resourceModel.Version = MasterBomModel.Version;
                 resourceModel.Currency = recSet.Fields.Item("Currency").Value.ToString();
                 _MachinaryResourceModelsList.Add(resourceModel);
                 totalCost += resourceModel.TotalStandartCost;
@@ -201,7 +211,7 @@ namespace BBAPricing.FormControllers
                 totalFinalCustomerPrice += resourceModel.AmountOnUnit;
                 recSet.MoveNext();
             }
-            var mtrlLine = _MasterBomModel.Rows.First(x => x.ElementID == "Machinery Resources");
+            var mtrlLine = MasterBomModel.Rows.First(x => x.ElementID == "Machinery Resources");
             mtrlLine.Cost = totalCost;
             mtrlLine.Price = totalPrice;
             mtrlLine.Margin = totalMargin;
@@ -214,7 +224,7 @@ namespace BBAPricing.FormControllers
             {
                 var res = item.Add();
             }
-            _MasterBomModel.Update();
+            MasterBomModel.Update();
         }
 
         public override void FillGridFromModel(Grid grid)
@@ -234,7 +244,7 @@ namespace BBAPricing.FormControllers
                 grid.DataTable.SetValue("ResourceTotalPrice", i, machinaryResource.ResourceTotalPrice);
                 grid.DataTable.SetValue("OperationCode", i, machinaryResource.OperationCode);
                 grid.DataTable.SetValue("OperationName", i, machinaryResource.OperationName);
-                grid.DataTable.SetValue("Currency", i, _MasterBomModel.Currency);
+                grid.DataTable.SetValue("Currency", i, MasterBomModel.Currency);
                 grid.DataTable.SetValue("MarginPercent", i, machinaryResource.MarginPercent * 100);
                 grid.DataTable.SetValue("AmountOnUnit", i, machinaryResource.AmountOnUnit);
                 grid.DataTable.SetValue("TotalAmount", i, machinaryResource.TotalAmount);
@@ -260,6 +270,7 @@ namespace BBAPricing.FormControllers
                 GenerateModel();
                 FillGridFromModel(_grid);
                 InsertMachinarLyistToDb();
+                RefreshBom.Invoke();
             }
             else
             {
@@ -267,23 +278,23 @@ namespace BBAPricing.FormControllers
             }
         }
 
-
         public void UpdateResources()
         {
             string version = (int.Parse(_MachinaryResourceModelsList.First().Version, CultureInfo.InvariantCulture) + 1).ToString();
             _MachinaryResourceModelsList.Clear();
-            _MasterBomModel.Version = version;
-            _MasterBomModel.Add();
-            FillModelFromGrid();
-            InsertMachinarLyistToDb();
+            GenerateModel();
+            MasterBomModel.Version = version;
+            foreach (var row in MasterBomModel.Rows)
+            {
+                row.Version = version;
+            }
             FillGridFromModel(_grid);
+            MasterBomModel.Add();
+            InsertMachinarLyistToDb();
+            RefreshBom.Invoke();
         }
         public void FillModelFromGrid()
         {
-            string version = (int.Parse(_MachinaryResourceModelsList.First().Version, CultureInfo.InvariantCulture) + 1).ToString();
-            _MachinaryResourceModelsList.Clear();
-            _MasterBomModel.Version = version;
-            _MasterBomModel.Add();
             for (int i = 0; i < _grid.DataTable.Rows.Count; i++)
             {
                 ResourceModel resourceModel = new ResourceModel();
@@ -297,8 +308,8 @@ namespace BBAPricing.FormControllers
                 resourceModel.ResourceTotalPrice = (double)_grid.DataTable.GetValue("ResourceTotalPrice", i);
                 resourceModel.OperationCode = _grid.DataTable.GetValue("OperationCode", i).ToString();
                 resourceModel.OperationName = _grid.DataTable.GetValue("OperationName", i).ToString();
-                resourceModel.SalesQuotationDocEntry = _MasterBomModel.SalesQuotationDocEntry;
-                resourceModel.ParentItemCode = _MasterBomModel.ParentItem;
+                resourceModel.SalesQuotationDocEntry = MasterBomModel.SalesQuotationDocEntry;
+                resourceModel.ParentItemCode = MasterBomModel.ParentItem;
                 _MachinaryResourceModelsList.Add(resourceModel);
                 SAPbouiCOM.Framework.Application.SBO_Application.Forms.ActiveForm.Freeze(false);
             }

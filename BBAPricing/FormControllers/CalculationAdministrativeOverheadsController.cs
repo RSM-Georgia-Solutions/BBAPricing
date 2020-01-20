@@ -14,6 +14,7 @@ namespace BBAPricing.FormControllers
     {
         private readonly MasterBomModel MasterBomModel;
         private OverheadModel OverheadModel;
+        private OverheadModel OverheadModelDb;
 
         private new readonly IForm Form;
 
@@ -22,26 +23,45 @@ namespace BBAPricing.FormControllers
             MasterBomModel = masterBomModel;
             Form = form;
             OverheadModel = new OverheadModel();
+            OverheadModelDb = new OverheadModel();
         }
+        public static Action RefreshBom;
         public void CalculateAdministrativeOverheads()
         {
             bool fromDb = FillModelFromDb();
-            if (!fromDb)
+            GenerateModel();
+            bool isChanged = CompareVersions();
+            OverheadModel.AddOrUpdate();
+            FillGridFromModel(Form);
+            if (isChanged)
             {
-                GenerateModel();
-                FillGridFromModel(Form);
-                InsertOverheadIntoDb();
-            }
-            else
-            {
-                FillGridFromModel(Form);
+                if (fromDb)
+                {
+                    IncrementMasterVersion();
+                }
+                else
+                {
+                    MasterBomModel.Update();
+                }
+                RefreshBom.Invoke();
             }
         }
 
-        private void InsertOverheadIntoDb()
+        private bool CompareVersions()
         {
-            OverheadModel.Add();
-            MasterBomModel.Update();
+            return OverheadModelDb.RequiredResource != OverheadModel.RequiredResource
+                   || OverheadModelDb.UnitCost != OverheadModel.UnitCost
+                   || OverheadModelDb.TotalCost != OverheadModel.TotalCost;
+        }
+        private void IncrementMasterVersion()
+        {
+            string version = (int.Parse(MasterBomModel.Version, CultureInfo.InvariantCulture) + 1).ToString();
+            MasterBomModel.Version = version;
+            foreach (var row in MasterBomModel.Rows)
+            {
+                row.Version = version;
+            }
+            MasterBomModel.Add();
         }
 
         private void FillGridFromModel(IForm form)
@@ -58,7 +78,11 @@ namespace BBAPricing.FormControllers
             recForCmp.DoQuery($"select * from [@RSM_OVERHEADS_R] WHERE U_ComponentId = N'Administrative Overhead 1 კაც/საათზე'");
             Recordset recSet =
                 (Recordset)DiManager.Company.GetBusinessObject(BoObjectTypes.BoRecordset);
-            recSet.DoQuery($"SELECT * FROM [@RSM_RESOURCES] JOIN OITM ON OITM.ItemCode = U_ParentItemCode JOIN ORSC ON ORSC.VisResCode =  [@RSM_RESOURCES].U_resourcecode  WHERE U_Version = '{MasterBomModel.Version}' AND U_SalesQuotationDocEntry = {MasterBomModel.SalesQuotationDocEntry} AND U_ParentItemCode  = N'{MasterBomModel.ParentItem}' AND ORSC.ResType = 'L'");
+            recSet.DoQuery($"SELECT * FROM [@RSM_RESOURCES] JOIN OITM ON OITM.ItemCode = U_ParentItemCode " +
+                           $"JOIN ORSC ON ORSC.VisResCode =  [@RSM_RESOURCES].U_resourcecode " +
+                           $" WHERE U_Version =  (SELECT MAX(U_Version)FROM[@RSM_RESOURCES]GROUP BY U_ParentItemCode) " +
+                           $"AND U_SalesQuotationDocEntry = {MasterBomModel.SalesQuotationDocEntry} " +
+                           $"AND U_ParentItemCode  = N'{MasterBomModel.ParentItem}' AND ORSC.ResType = 'L'");
             var type = recSet.Fields.Item("U_SBU").Value.ToString();
             double requiredResource = 0;
             double unitCost = 0;
@@ -83,6 +107,18 @@ namespace BBAPricing.FormControllers
             }
             double totalCost = requiredResource * unitCost;
             OverheadModel overheadModel = new OverheadModel();
+
+            if (MasterBomModel.Currency != "GEL")
+            {
+                overheadModel.TotalCost /= MasterBomModel.Rate;
+                overheadModel.UnitCost /= MasterBomModel.Rate;
+            }
+            else
+            {
+                overheadModel.UnitCost = unitCost;
+                overheadModel.TotalCost = totalCost;
+            }
+
             overheadModel.RequiredResource = requiredResource;
             overheadModel.UnitCost = unitCost;
             overheadModel.TotalCost = totalCost;
@@ -93,6 +129,9 @@ namespace BBAPricing.FormControllers
             OverheadModel = overheadModel;
             var mtrlLine = MasterBomModel.Rows.First(x => x.ElementID == "Administrative Overheads");
             mtrlLine.Cost = totalCost;
+            mtrlLine.Price = totalCost;
+            mtrlLine.Margin = totalCost;
+            mtrlLine.FinalCustomerPrice = totalCost;
         }
 
 
@@ -113,7 +152,7 @@ namespace BBAPricing.FormControllers
                 model.UnitCost = (double)recSet.Fields.Item("U_UnitCost").Value;
                 model.TotalCost = (double)recSet.Fields.Item("U_TotalCost").Value;
                 model.OverheadType = recSet.Fields.Item("U_OverheadType").Value.ToString();
-                OverheadModel = model;
+                OverheadModelDb = model;
                 return true;
             }
             return false;

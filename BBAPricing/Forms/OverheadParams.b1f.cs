@@ -47,6 +47,16 @@ namespace BBAPricing.Forms
             this.Button0.PressedAfter += new SAPbouiCOM._IButtonEvents_PressedAfterEventHandler(this.Button0_PressedAfter);
             this.StaticText10 = ((SAPbouiCOM.StaticText)(this.GetItem("Item_19").Specific));
             this.EditText8 = ((SAPbouiCOM.EditText)(this.GetItem("Item_20").Specific));
+            this.StaticText11 = ((SAPbouiCOM.StaticText)(this.GetItem("Item_21").Specific));
+            this.StaticText12 = ((SAPbouiCOM.StaticText)(this.GetItem("Item_24").Specific));
+            this.StaticText13 = ((SAPbouiCOM.StaticText)(this.GetItem("Item_26").Specific));
+            this.StaticText14 = ((SAPbouiCOM.StaticText)(this.GetItem("Item_27").Specific));
+            this.StaticText15 = ((SAPbouiCOM.StaticText)(this.GetItem("Item_28").Specific));
+            this.EditText12 = ((SAPbouiCOM.EditText)(this.GetItem("Item_29").Specific));
+            this.EditText13 = ((SAPbouiCOM.EditText)(this.GetItem("Item_30").Specific));
+            this.EditText14 = ((SAPbouiCOM.EditText)(this.GetItem("Item_31").Specific));
+            this.StaticText16 = ((SAPbouiCOM.StaticText)(this.GetItem("Item_22").Specific));
+            this.EditText9 = ((SAPbouiCOM.EditText)(this.GetItem("Item_23").Specific));
             this.OnCustomInitialize();
 
         }
@@ -67,7 +77,10 @@ namespace BBAPricing.Forms
         private void OnCustomInitialize()
         {
             OverheadParamController = new OverheadParamController(UIAPIRawForm);
-            OverheadsController = new OverheadsController(UIAPIRawForm, OverheadParamController._Model);
+            UIAPIRawForm.EnableMenu("1288", true);
+            UIAPIRawForm.EnableMenu("1289", true);
+            UIAPIRawForm.EnableMenu("1290", true);
+            UIAPIRawForm.EnableMenu("1291", true);
         }
 
         private SAPbouiCOM.EditText EditText0;
@@ -93,6 +106,8 @@ namespace BBAPricing.Forms
         {
             OverheadParamController.HendldeSettings();
             OverheadParamController.Refresh();
+            OverheadsController = new OverheadsController(UIAPIRawForm,
+                OverheadParamController.FormModel);
             OverheadsController.CalculateOverheads();
         }
 
@@ -117,15 +132,29 @@ namespace BBAPricing.Forms
             string tittle = SAPbouiCOM.Framework.Application.SBO_Application.Forms.ActiveForm.Title;
             if (tittle == "Overhead Params")
             {
-                var fromDb = OverheadParamController.FillModelFromDb();
-                if (fromDb)
+                UIAPIRawForm.DataSources.DBDataSources.Item(0).Query();
+                if (UIAPIRawForm.DataSources.DBDataSources.Item(0).Size != 0)
                 {
-                    OverheadParamController.FillFormFromModel();
+                    UIAPIRawForm.DataSources.DBDataSources.Item(0).Offset = UIAPIRawForm.DataSources.DBDataSources.Item(0).Size - 1;
+                }
+                else
+                {
+                    UIAPIRawForm.DataSources.DBDataSources.Item(0).InsertRecord(0);
                 }
             }
         }
 
         private StaticText StaticText10;
         private EditText EditText8;
+        private StaticText StaticText11;
+        private StaticText StaticText12;
+        private StaticText StaticText13;
+        private StaticText StaticText14;
+        private StaticText StaticText15;
+        private EditText EditText12;
+        private EditText EditText13;
+        private EditText EditText14;
+        private StaticText StaticText16;
+        private EditText EditText9;
     }
 }

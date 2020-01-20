@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using BBAPricing.FormControllers;
 using BBAPricing.Models;
+using SAPbobsCOM;
 using SAPbouiCOM.Framework;
 
 namespace BBAPricing.Forms
@@ -109,11 +110,20 @@ namespace BBAPricing.Forms
             }
         }
 
+        public static Action RefreshBom;
         private void Button0_PressedAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
         {
-            CommonElementsController.HendldeSettings();
+            CommonElementsController.HandldeSettings();
             CommonElementsController.Refresh();
             CommonElementsController.UpdateMbom();
+            try
+            {
+                RefreshBom.Invoke();
+            }
+            catch (Exception)
+            {
+                //Form is Closed
+            }
         }
 
         private void EditText2_ValidateAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)

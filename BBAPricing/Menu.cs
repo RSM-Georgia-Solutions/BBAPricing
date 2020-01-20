@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Text;
 using BBAPricing.Forms;
+using SAPbobsCOM;
 using SAPbouiCOM.Framework;
 
 namespace BBAPricing
@@ -25,18 +27,31 @@ namespace BBAPricing
             oCreationPackage.Enabled = true;
             oCreationPackage.Position = -1;
 
+            Assembly entryAssembly = Assembly.GetEntryAssembly();
+            if (entryAssembly != null)
+            {
+                var path = System.IO.Path.GetDirectoryName(entryAssembly.Location) + "\\Media\\m_BBA (2).jpg";
+                oCreationPackage.Image = path;
+            }
+
             oMenus = oMenuItem.SubMenus;
 
             try
             {
                 //  If the manu already exists this code will fail
-                oMenus.AddEx(oCreationPackage);
+                oMenus.RemoveEx(oCreationPackage.UniqueID);
             }
             catch (Exception e)
             {
-
+                oMenus.AddEx(oCreationPackage);
             }
-
+            try
+            {
+                oMenus.AddEx(oCreationPackage);
+            }
+            catch (Exception)
+            {
+            }
             try
             {
                 // Get the menu collection of the newly added pop-up item
@@ -60,14 +75,20 @@ namespace BBAPricing
                 oCreationPackage.String = "Pricing";
                 oMenus.AddEx(oCreationPackage);
                 // Create s sub menu
-                oCreationPackage.Type = SAPbouiCOM.BoMenuType.mt_STRING;
-                oCreationPackage.UniqueID = "BBAPricing.Import_Form";
-                oCreationPackage.String = "Import";
-                oMenus.AddEx(oCreationPackage);
+                //oCreationPackage.Type = SAPbouiCOM.BoMenuType.mt_STRING;
+                //oCreationPackage.UniqueID = "BBAPricing.Import_Form";
+                //oCreationPackage.String = "Import";
+                //oMenus.AddEx(oCreationPackage);
                 // Create s sub menu
                 oCreationPackage.Type = SAPbouiCOM.BoMenuType.mt_STRING;
                 oCreationPackage.UniqueID = "BBAPricing.Forms.Initialization";
                 oCreationPackage.String = "Initialization";
+                oMenus.AddEx(oCreationPackage);
+
+                // Create s sub menu
+                oCreationPackage.Type = SAPbouiCOM.BoMenuType.mt_STRING;
+                oCreationPackage.UniqueID = "BBAPricing.Forms.SettingsForm";
+                oCreationPackage.String = "Settings";
                 oMenus.AddEx(oCreationPackage);
             }
             catch (Exception er)
@@ -82,17 +103,17 @@ namespace BBAPricing
 
             try
             {
-                if (pVal.BeforeAction && pVal.MenuUID == "BBAPricing.Import_Form")
-                {
-                    Import_Form activeForm = new Import_Form();
-                    activeForm.Show();
-                }
-                else if (pVal.BeforeAction && pVal.MenuUID == "BBAPricing.Forms.Pricing")
-                {
-                    //Pricing activeForm = new Pricing();
-                    //activeForm.Show();
-                }
-                else if (pVal.BeforeAction && pVal.MenuUID == "BBAPricing.Forms.Initialization")
+                //if (pVal.BeforeAction && pVal.MenuUID == "BBAPricing.Import_Form")
+                //{
+                //    Import_Form activeForm = new Import_Form();
+                //    activeForm.Show();
+                //}
+                //else if (pVal.BeforeAction && pVal.MenuUID == "BBAPricing.Forms.Pricing")
+                //{
+                //    //Pricing activeForm = new Pricing();
+                //    //activeForm.Show();
+                //}
+                if (pVal.BeforeAction && pVal.MenuUID == "BBAPricing.Forms.Initialization")
                 {
                     InitializationForm activeForm = new InitializationForm();
                     activeForm.Show();
@@ -106,6 +127,58 @@ namespace BBAPricing
                 {
                     OverheadParams activeForm = new OverheadParams();
                     activeForm.Show();
+                }
+                else if (pVal.BeforeAction && pVal.MenuUID == "BBAPricing.Forms.SettingsForm")
+                {
+                    SettingsForm activeForm = new SettingsForm();
+                    activeForm.Show();
+                }
+                else if (pVal.BeforeAction && pVal.MenuUID == "1288")
+                {
+                    string formTittle = Application.SBO_Application.Forms.ActiveForm.Title;
+                    var activeForm = Application.SBO_Application.Forms.ActiveForm;
+                    if (formTittle == "Overhead Params")
+                    {
+                        if (activeForm.DataSources.DBDataSources.Item(0).Offset + 1 == activeForm.DataSources.DBDataSources.Item(0).Size)
+                        {
+                            return;
+                        }
+                        activeForm.DataSources.DBDataSources.Item(0).Offset =
+                            activeForm.DataSources.DBDataSources.Item(0).Offset + 1;
+                    }
+                }
+                else if (pVal.BeforeAction && pVal.MenuUID == "1289")
+                {
+                    string formTittle = Application.SBO_Application.Forms.ActiveForm.Title;
+                    var activeForm = Application.SBO_Application.Forms.ActiveForm;
+                    if (formTittle == "Overhead Params")
+                    {
+                        if (activeForm.DataSources.DBDataSources.Item(0).Offset == 0)
+                        {
+                            return;
+                        }
+                        activeForm.DataSources.DBDataSources.Item(0).Offset =
+                            activeForm.DataSources.DBDataSources.Item(0).Offset - 1;
+                    }
+                }
+                else if (pVal.BeforeAction && pVal.MenuUID == "1290")
+                {
+                    string formTittle = Application.SBO_Application.Forms.ActiveForm.Title;
+                    var activeForm = Application.SBO_Application.Forms.ActiveForm;
+                    if (formTittle == "Overhead Params")
+                    {
+                        activeForm.DataSources.DBDataSources.Item(0).Offset = 0;
+                    }
+                }
+                else if (pVal.BeforeAction && pVal.MenuUID == "1291")
+                {
+                    string formTittle = Application.SBO_Application.Forms.ActiveForm.Title;
+                    var activeForm = Application.SBO_Application.Forms.ActiveForm;
+                    if (formTittle == "Overhead Params")
+                    {
+                        activeForm.DataSources.DBDataSources.Item(0).Offset =
+                            activeForm.DataSources.DBDataSources.Item(0).Size - 1;
+                    }
                 }
             }
             catch (Exception ex)

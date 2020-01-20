@@ -23,7 +23,7 @@ namespace BBAPricing
                 Company oCompany = xCompany;
                 SBObob oSbObob = (SBObob)oCompany.GetBusinessObject(BoObjectTypes.BoBridge);
                 Recordset oRecordSet = oSbObob.GetCurrencyRate(curCode, date.Date);
-                return double.Parse(oRecordSet.Fields.Item(0).Value.ToString(),CultureInfo.InvariantCulture);
+                return double.Parse(oRecordSet.Fields.Item(0).Value.ToString(), CultureInfo.InvariantCulture);
             }
             catch (Exception ex)
             {
@@ -80,6 +80,7 @@ namespace BBAPricing
             }
         }
         public static Company Company => XCompany.Value;
+        public static CompanyService CompanyService => companyService.Value;
 
         private static readonly Lazy<Company> XCompany =
             new Lazy<Company>(() => (Company)SAPbouiCOM.Framework
@@ -87,6 +88,8 @@ namespace BBAPricing
                 .SBO_Application
                 .Company.GetDICompany());
 
+        private static readonly Lazy<CompanyService> companyService =
+            new Lazy<CompanyService>(() => Company.GetCompanyService());
         public static string CreateTable(string tableName, string tableDescription, BoUTBTableType tableType)
         {
             try
@@ -117,8 +120,6 @@ namespace BBAPricing
             }
 
         }
-
-
         public static void AddFindForm(IUserObjectsMD oUserObjectMD, string name, string description, bool isEditable)
         {
             oUserObjectMD.FindColumns.Add();
@@ -130,7 +131,7 @@ namespace BBAPricing
             oUserObjectMD.FormColumns.FormColumnDescription = description;
             oUserObjectMD.FormColumns.Editable = isEditable ? BoYesNoEnum.tYES : BoYesNoEnum.tNO;
         }
-        public static void AddKey(SAPbobsCOM.Company company, string tablename, string keyname, string fieldAlias, BoYesNoEnum IsUnique,  string secondKeyAlias = "")
+        public static void AddKey(SAPbobsCOM.Company company, string tablename, string keyname, string fieldAlias, BoYesNoEnum IsUnique, string secondKeyAlias = "")
         {
             int result;
             UserKeysMD oUkey = (UserKeysMD)company.GetBusinessObject(BoObjectTypes.oUserKeys);
@@ -220,14 +221,14 @@ namespace BBAPricing
             return updateFlag ? udo.Update() != 0 ? Company.GetLastErrorDescription() : string.Empty : udo.Add() != 0 ? Company.GetLastErrorDescription() : string.Empty;
         }
 
-        public static string CreateField(string tablename, string fieldname, string description, BoFieldTypes type, int size, bool isMandatory, bool isSapTable = false, string likedToTAble = "", string defaultValue = "", BoFldSubTypes subType = BoFldSubTypes.st_None, Dictionary<dynamic,dynamic> validValues = null)
+        public static string CreateField(string tablename, string fieldname, string description, BoFieldTypes type, int size, bool isMandatory, bool isSapTable = false, string likedToTAble = "", string defaultValue = "", BoFldSubTypes subType = BoFldSubTypes.st_None, Dictionary<dynamic, dynamic> validValues = null)
         {
             // Get a new Recordset object
             Recordset oRecordSet = (Recordset)Company.GetBusinessObject(BoObjectTypes.BoRecordset);
             string sqlQuery = $"SELECT T0.TableID, T0.FieldID FROM CUFD T0 WHERE T0.TableID = '{tablename}' AND T0.AliasID = '{fieldname}'";
             oRecordSet.DoQuery(sqlQuery);
             var updateFlag = oRecordSet.RecordCount == 1;
-            var fieldId = int.Parse(oRecordSet.Fields.Item("FieldID").Value.ToString(),CultureInfo.InvariantCulture);
+            var fieldId = int.Parse(oRecordSet.Fields.Item("FieldID").Value.ToString(), CultureInfo.InvariantCulture);
             System.Runtime.InteropServices.Marshal.ReleaseComObject(oRecordSet);
 
             UserFieldsMD oUfield = (UserFieldsMD)Company.GetBusinessObject(BoObjectTypes.oUserFields);
@@ -286,5 +287,18 @@ namespace BBAPricing
 
         }
 
+        public static void GetSettings()
+        {
+            Recordset recSet = (Recordset)Company.GetBusinessObject(BoObjectTypes.BoRecordset);
+            recSet.DoQuery($"SELECT * FROM [@RSM_BBA_SETTINGS]");
+            if (recSet.EoF)
+            {
+                return;
+            }
+            Settings.DailyNormPerPerson = (double) recSet.Fields.Item($"U_DailyNormPerPerson").Value;
+            Settings.HumanResourceCoefficient = (double) recSet.Fields.Item($"U_DailyNormPerPerson").Value;
+            Settings.RetailPriceList = recSet.Fields.Item($"U_RetailPriceList").Value.ToString();
+            Settings.WorkingPriceList = recSet.Fields.Item($"U_WorkingPriceList").Value.ToString();
+        }
     }
 }

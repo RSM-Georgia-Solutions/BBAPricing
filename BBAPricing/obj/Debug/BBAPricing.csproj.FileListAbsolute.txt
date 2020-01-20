@@ -7,4 +7,7 @@ D:\Users\nkurdadze\Documents\Visual Studio 2015\Projects\BBAPricing\BBAPricing\b
 D:\Users\nkurdadze\Documents\Visual Studio 2015\Projects\BBAPricing\BBAPricing\obj\Debug\BBAPricing.exe
 D:\Users\nkurdadze\Documents\Visual Studio 2015\Projects\BBAPricing\BBAPricing\obj\Debug\BBAPricing.pdb
 D:\Users\nkurdadze\Documents\Visual Studio 2015\Projects\BBAPricing\BBAPricing\bin\Debug\ExcelImportDll.dll
+D:\Users\nkurdadze\Documents\Visual Studio 2015\Projects\BBAPricing\BBAPricing\bin\Debug\Media\m_BBA.jpg
+D:\Users\nkurdadze\Documents\Visual Studio 2015\Projects\BBAPricing\BBAPricing\bin\Debug\Media\m_BBA (1).jpg
+D:\Users\nkurdadze\Documents\Visual Studio 2015\Projects\BBAPricing\BBAPricing\bin\Debug\Media\m_BBA (2).jpg
 D:\Users\nkurdadze\Documents\Visual Studio 2015\Projects\BBAPricing\BBAPricing\obj\Debug\BBAPricing.csprojResolveAssemblyReference.cache

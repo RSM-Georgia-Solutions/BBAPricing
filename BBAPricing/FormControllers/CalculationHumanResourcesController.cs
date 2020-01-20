@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -58,6 +59,7 @@ namespace BBAPricing.FormControllers
 
         public override void GetGridColumns()
         {
+            Form.Freeze(true);
             string queryData = $@"SELECT TOP(0)    
                 U_ResourceCode as [ResourceCode],
                 U_ResourceName          as ResourceName,
@@ -101,26 +103,7 @@ namespace BBAPricing.FormControllers
            Grid.Columns.Item("PriceOfUnit").Editable = false;
            Grid.Columns.Item("MarginOfUnit").Editable = false;
            Grid.Columns.Item("InfoPercent").Editable = false;
-            //string queryData = $@"SELECT top(0) Itt1.Code as [ResourceCode], 
-            //                       OITM.itemName as [ResourceName],                                    
-            //                       ITT1.Quantity,
-            //                	   ORSC.StdCost1 as [StandartCost],
-            //                	   ORSC.StdCost1 * ITT1.Quantity as [TotalStandartCost],
-            //                	   ITM1.Price as [ResourceUnitPrice],
-            //                	   ITM1.Price * ITT1.Quantity as [ResourceTotalPrice] ,	                          
-            //                    [@RSM_OPERATIONS].U_UOM as [Uom],
-            //                    [@RSM_OPERATIONS].U_ResourceCode as [OperationCode],
-            //                    [@RSM_OPERATIONS].U_ResourceName as [OperationName]                                
-            //                FROM ITT1
-            //                     JOIN [@RSM_OPERATIONS] on [@RSM_OPERATIONS].U_OperationCode = ITT1.U_Operation
-            //                     JOIN OITM ON OITM.LinkRsc = ITT1.Code
-            //                     JOIN ITM1 ON OITM.ItemCode = ITM1.ItemCode   
-            //                     JOIN OPLN on ITM1.PriceList = OPLN.ListNum
-            //                	 JOIN ORSC ON ORSC.VisResCode =  ITT1.Code WHERE Father = '{MasterBomModel.ParentItem}' 
-            //                        AND OPLN.ListName = 'Unit Working Price' 
-            //                        AND ORSC.ResType = 'L'
-            //                        AND U_ResourceType = 'L'";
-            //Grid.DataTable.ExecuteQuery(queryData);
+           Form.Freeze(false);
         }
 
         public override bool FillModelFromDb()
@@ -215,7 +198,7 @@ namespace BBAPricing.FormControllers
                                  JOIN OPLN on ITM1.PriceList = OPLN.ListNum
    JOIN OUGP on OUGP.UgpEntry = OITM.UgpEntry
                             	 JOIN ORSC ON ORSC.VisResCode =  ITT1.Code WHERE Father = '{MasterBomModel.ParentItem}' 
-                                    AND OPLN.ListName = 'Unit Retail Price' 
+                                    AND OPLN.ListName = '{Settings.RetailPriceList}' 
                                     AND ORSC.ResType = 'L'
                                     AND U_ResourceType = 'L'";
             recSet.DoQuery(query);
@@ -235,20 +218,28 @@ namespace BBAPricing.FormControllers
                 resourceModel.Quantity = (double)recSet.Fields.Item("Quantity").Value;
                 resourceModel.StandartCost = (double)recSet.Fields.Item("StandartCost").Value;
                 resourceModel.TotalStandartCost = (double)recSet.Fields.Item("TotalStandartCost").Value;
-                resourceModel.ResourceUnitPrice = resourceModel.StandartCost * 3;//Todo (Move To Settings)
+                resourceModel.ResourceUnitPrice = resourceModel.StandartCost * Settings.HumanResourceCoefficient;
                 resourceModel.ResourceTotalPrice = resourceModel.ResourceUnitPrice * resourceModel.Quantity;
                 resourceModel.CostOfUnit = resourceModel.TotalStandartCost / resourceModel.OtherQtyResource;
                 resourceModel.TotalAmount = resourceModel.ResourceTotalPrice - resourceModel.TotalStandartCost;
                 resourceModel.MarginPercent = (resourceModel.ResourceTotalPrice - resourceModel.TotalStandartCost) / resourceModel.ResourceTotalPrice;
                 resourceModel.AmountOnUnit = resourceModel.ResourceUnitPrice - resourceModel.StandartCost;
+
+                if (MasterBomModel.Currency != "GEL")
+                {
+                        resourceModel.TotalStandartCost /= MasterBomModel.Rate;
+                        resourceModel.ResourceTotalPrice /= MasterBomModel.Rate;
+                        resourceModel.ResourceUnitPrice /= MasterBomModel.Rate;
+                }
+
                 resourceModel.PriceOfUnit = resourceModel.ResourceTotalPrice / resourceModel.OtherQtyResource;
                 resourceModel.MarginOfUnit = resourceModel.PriceOfUnit - resourceModel.CostOfUnit;
                 resourceModel.InfoPercent = resourceModel.MarginOfUnit / resourceModel.PriceOfUnit;
                 resourceModel.Version = MasterBomModel.Version;
                 HoumanResources.Add(resourceModel);
                 totalCost += resourceModel.TotalStandartCost;
-                totalPrice += resourceModel.ResourceUnitPrice;
-                totalMargin += resourceModel.MarginOfUnit;
+                totalPrice += resourceModel.ResourceTotalPrice;
+                totalMargin += resourceModel.MarginOfUnit * resourceModel.Quantity;
                 totalFinalCustomerPrice += resourceModel.AmountOnUnit;
                 recSet.MoveNext();
             }
@@ -258,7 +249,7 @@ namespace BBAPricing.FormControllers
             mtrlLine.Margin = totalMargin;
             mtrlLine.FinalCustomerPrice = totalFinalCustomerPrice;
         }
-
+        public static Action RefreshBom;
         public void CalculateResources()
         {
             GetGridColumns();
@@ -268,6 +259,7 @@ namespace BBAPricing.FormControllers
                 GenerateModel();
                 FillGridFromModel(Grid);
                 InsertMaterialsListToDb();
+                RefreshBom.Invoke();
             }
             else
             {
@@ -283,6 +275,22 @@ namespace BBAPricing.FormControllers
             }
 
             MasterBomModel.Update();
+        }
+
+        public void UpdateResources()
+        {
+            string version = (int.Parse(HoumanResources.First().Version, CultureInfo.InvariantCulture) + 1).ToString();
+            HoumanResources.Clear();
+            MasterBomModel.Version = version;
+            foreach (var row in MasterBomModel.Rows)
+            {
+                row.Version = version;
+            }
+            GenerateModel();
+            FillGridFromModel(Grid);
+            MasterBomModel.Add();
+            InsertMaterialsListToDb();
+            RefreshBom.Invoke();
         }
     }
 }

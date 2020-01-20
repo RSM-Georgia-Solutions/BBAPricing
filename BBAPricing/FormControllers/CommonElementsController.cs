@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using BBAPricing.Models;
 using SAPbobsCOM;
 using SAPbouiCOM;
@@ -15,49 +13,49 @@ namespace BBAPricing.FormControllers
     {
         private readonly IForm Form;
         private readonly List<MasterBomModel> MasterBomModel;
-        public CommonElementsModel _Model;
+        private readonly CommonElementsModel Model;
 
         public CommonElementsController(IForm form, List<MasterBomModel> masterBomModel)
         {
             Form = form;
             MasterBomModel = masterBomModel;
-            _Model = new CommonElementsModel();
+            Model = new CommonElementsModel();
         }
 
         public bool FillModelFromDb()
         {
             Recordset recSet = (Recordset)DiManager.Company.GetBusinessObject(BoObjectTypes.BoRecordset);
-            recSet.DoQuery($"SELECT * FROM [@RSM_COMMON_ELEM]");
+            recSet.DoQuery("SELECT * FROM [@RSM_COMMON_ELEM]");
             if (recSet.EoF)
             {
                 return false;
             }
-            _Model.ProjectCode = recSet.Fields.Item("U_ProjectCode").Value.ToString();
-            _Model.ChangeDate = (DateTime)recSet.Fields.Item("U_ChangeDate").Value;
-            _Model.SalesQuotationDocEntry = recSet.Fields.Item("U_SalesQuotationDocEntry").Value.ToString();
-            _Model.EmployeeQuantity = (double)recSet.Fields.Item("U_EmployeeQuantity").Value;
-            _Model.DailyNormPerPerson = (double)recSet.Fields.Item("U_DailyNormPerPerson").Value;
-            _Model.QuantityOfDays = (double)recSet.Fields.Item("U_QuantityOfDays").Value;
-            _Model.HostelCostPerDay = (double)recSet.Fields.Item("U_HostelCostPerDay").Value;
-            _Model.TotalHotelCost = (double)recSet.Fields.Item("U_TotalHotelCost").Value;
-            _Model.TotalCost = (double)recSet.Fields.Item("U_TotalCost").Value;
-            _Model.TransportationAmount = (double)recSet.Fields.Item("U_TransportationAmount").Value;
+            Model.ProjectCode = recSet.Fields.Item("U_ProjectCode").Value.ToString();
+            Model.ChangeDate = (DateTime)recSet.Fields.Item("U_ChangeDate").Value;
+            Model.SalesQuotationDocEntry = recSet.Fields.Item("U_SalesQuotationDocEntry").Value.ToString();
+            Model.EmployeeQuantity = (double)recSet.Fields.Item("U_EmployeeQuantity").Value;
+            Model.DailyNormPerPerson = (double)recSet.Fields.Item("U_DailyNormPerPerson").Value;
+            Model.QuantityOfDays = (double)recSet.Fields.Item("U_QuantityOfDays").Value;
+            Model.HostelCostPerDay = (double)recSet.Fields.Item("U_HostelCostPerDay").Value;
+            Model.TotalHotelCost = (double)recSet.Fields.Item("U_TotalHotelCost").Value;
+            Model.TotalCost = (double)recSet.Fields.Item("U_TotalCost").Value;
+            Model.TransportationAmount = (double)recSet.Fields.Item("U_TransportationAmount").Value;
             return true;
         }
 
         public void FillFormFromModel()
         {
-            SAPbouiCOM.Framework.Application.SBO_Application.Forms.ActiveForm.Freeze(true);
-            ((StaticText)Form.Items.Item("Item_25").Specific).Caption = _Model.ProjectCode.ToString(CultureInfo.InvariantCulture);
-            ((StaticText)Form.Items.Item("Item_22").Specific).Caption = _Model.ChangeDate.ToString("MM/dd/yyyy");
-            ((StaticText)Form.Items.Item("Item_24").Specific).Caption = _Model.SalesQuotationDocEntry.ToString(CultureInfo.InvariantCulture);
-            ((EditText)Form.Items.Item("Item_1").Specific).Value = _Model.TransportationAmount.ToString(CultureInfo.InvariantCulture);
-            ((EditText)Form.Items.Item("Item_11").Specific).Value = _Model.EmployeeQuantity.ToString(CultureInfo.InvariantCulture);
-            ((EditText)Form.Items.Item("Item_12").Specific).Value = _Model.DailyNormPerPerson.ToString(CultureInfo.InvariantCulture);
-            ((EditText)Form.Items.Item("Item_13").Specific).Value = _Model.QuantityOfDays.ToString(CultureInfo.InvariantCulture);
-            ((EditText)Form.Items.Item("Item_14").Specific).Value = _Model.HostelCostPerDay.ToString(CultureInfo.InvariantCulture);
-            ((EditText)Form.Items.Item("Item_15").Specific).Value = _Model.TotalHotelCost.ToString(CultureInfo.InvariantCulture);
-            ((EditText)Form.Items.Item("Item_16").Specific).Value = _Model.TotalCost.ToString(CultureInfo.InvariantCulture);
+            Application.SBO_Application.Forms.ActiveForm.Freeze(true);
+            ((StaticText)Form.Items.Item("Item_25").Specific).Caption = Model.ProjectCode.ToString(CultureInfo.InvariantCulture);
+            ((StaticText)Form.Items.Item("Item_22").Specific).Caption = Model.ChangeDate.ToString("MM/dd/yyyy", CultureInfo.InvariantCulture);
+            ((StaticText)Form.Items.Item("Item_24").Specific).Caption = Model.SalesQuotationDocEntry.ToString(CultureInfo.InvariantCulture);
+            ((EditText)Form.Items.Item("Item_1").Specific).Value = Model.TransportationAmount.ToString(CultureInfo.InvariantCulture);
+            ((EditText)Form.Items.Item("Item_11").Specific).Value = Model.EmployeeQuantity.ToString(CultureInfo.InvariantCulture);
+            ((EditText)Form.Items.Item("Item_12").Specific).Value = Model.DailyNormPerPerson.ToString(CultureInfo.InvariantCulture);
+            ((EditText)Form.Items.Item("Item_13").Specific).Value = Model.QuantityOfDays.ToString(CultureInfo.InvariantCulture);
+            ((EditText)Form.Items.Item("Item_14").Specific).Value = Model.HostelCostPerDay.ToString(CultureInfo.InvariantCulture);
+            ((EditText)Form.Items.Item("Item_15").Specific).Value = Model.TotalHotelCost.ToString(CultureInfo.InvariantCulture);
+            ((EditText)Form.Items.Item("Item_16").Specific).Value = Model.TotalCost.ToString(CultureInfo.InvariantCulture);
             Application.SBO_Application.Forms.ActiveForm.Freeze(false);
         }
 
@@ -69,71 +67,178 @@ namespace BBAPricing.FormControllers
 
             var employeeQty = double.Parse(((EditText)Form.Items.Item("Item_11").Specific).Value, CultureInfo.InvariantCulture);
             var dailyNormPerPerson = double.Parse(((EditText)Form.Items.Item("Item_12").Specific).Value, CultureInfo.InvariantCulture);
-            _Model.TotalHotelCost = totalHotelCost;
-            _Model.TotalCost = totalHotelCost + qtyofDays * employeeQty * dailyNormPerPerson;
+            Model.TotalHotelCost = totalHotelCost;
+            Model.TotalCost = totalHotelCost + qtyofDays * employeeQty * dailyNormPerPerson;
 
-            ((EditText)Form.Items.Item("Item_15").Specific).Value = _Model.TotalHotelCost.ToString(CultureInfo.InvariantCulture);
-            ((EditText)Form.Items.Item("Item_16").Specific).Value = _Model.TotalCost.ToString(CultureInfo.InvariantCulture);
+            ((EditText)Form.Items.Item("Item_15").Specific).Value = Model.TotalHotelCost.ToString(CultureInfo.InvariantCulture);
+            ((EditText)Form.Items.Item("Item_16").Specific).Value = Model.TotalCost.ToString(CultureInfo.InvariantCulture);
         }
 
-        public void HendldeSettings()
+        public void HandldeSettings()
         {
             FillModelFromForm();
             FillFormFromModel();
-            _Model.AddOrUpdate();
+            Model.AddOrUpdate();
         }
 
         private void FillModelFromForm()
         {
             var createDate = ((StaticText)Form.Items.Item("Item_22").Specific).Caption;
-            _Model.ChangeDate = string.IsNullOrWhiteSpace(createDate) ? DateTime.Now : DateTime.ParseExact(createDate, "MM/dd/yyyy", CultureInfo.InvariantCulture);
-            _Model.ProjectCode = ((StaticText)Form.Items.Item("Item_25").Specific).Caption;
-            _Model.SalesQuotationDocEntry = ((StaticText)Form.Items.Item("Item_24").Specific).Caption;
-            _Model.TransportationAmount = double.Parse(((EditText)Form.Items.Item("Item_1").Specific).Value, CultureInfo.InvariantCulture);
-            _Model.EmployeeQuantity = double.Parse(((EditText)Form.Items.Item("Item_11").Specific).Value, CultureInfo.InvariantCulture);
-            _Model.DailyNormPerPerson = double.Parse(((EditText)Form.Items.Item("Item_12").Specific).Value, CultureInfo.InvariantCulture);
-            _Model.QuantityOfDays = double.Parse(((EditText)Form.Items.Item("Item_13").Specific).Value, CultureInfo.InvariantCulture);
-            _Model.HostelCostPerDay = double.Parse(((EditText)Form.Items.Item("Item_14").Specific).Value, CultureInfo.InvariantCulture);
-            _Model.TotalHotelCost = double.Parse(((EditText)Form.Items.Item("Item_15").Specific).Value, CultureInfo.InvariantCulture);
-            _Model.TotalCost = double.Parse(((EditText)Form.Items.Item("Item_16").Specific).Value, CultureInfo.InvariantCulture);
+            Model.ChangeDate = string.IsNullOrWhiteSpace(createDate) ? DateTime.Now : DateTime.ParseExact(createDate, "MM/dd/yyyy", CultureInfo.InvariantCulture);
+            Model.ProjectCode = ((StaticText)Form.Items.Item("Item_25").Specific).Caption;
+            Model.SalesQuotationDocEntry = ((StaticText)Form.Items.Item("Item_24").Specific).Caption;
+            Model.TransportationAmount = double.Parse(((EditText)Form.Items.Item("Item_1").Specific).Value, CultureInfo.InvariantCulture);
+            Model.EmployeeQuantity = double.Parse(((EditText)Form.Items.Item("Item_11").Specific).Value, CultureInfo.InvariantCulture);
+            Model.DailyNormPerPerson = double.Parse(((EditText)Form.Items.Item("Item_12").Specific).Value, CultureInfo.InvariantCulture);
+            Model.QuantityOfDays = double.Parse(((EditText)Form.Items.Item("Item_13").Specific).Value, CultureInfo.InvariantCulture);
+            Model.HostelCostPerDay = double.Parse(((EditText)Form.Items.Item("Item_14").Specific).Value, CultureInfo.InvariantCulture);
+            Model.TotalHotelCost = double.Parse(((EditText)Form.Items.Item("Item_15").Specific).Value, CultureInfo.InvariantCulture);
+            Model.TotalCost = double.Parse(((EditText)Form.Items.Item("Item_16").Specific).Value, CultureInfo.InvariantCulture);
             Refresh();
         }
 
         public void GenerateModel()
         {
-            _Model.ChangeDate = DateTime.Now;
-            _Model.ProjectCode = MasterBomModel.First().ProjectCode;
-            _Model.SalesQuotationDocEntry = MasterBomModel.First().SalesQuotationDocEntry;
+            Model.ChangeDate = DateTime.Now;
+            Model.ProjectCode = MasterBomModel.First().ProjectCode;
+            Model.SalesQuotationDocEntry = MasterBomModel.First().SalesQuotationDocEntry;
         }
 
         public void UpdateMbom()
         {
             Recordset recSet =
                 (Recordset)DiManager.Company.GetBusinessObject(BoObjectTypes.BoRecordset);
-            recSet.DoQuery($"SELECT SUM(U_Cost) as [Sum], U_ParentItemCode FROM [@RSM_MBOM_ROWS]" +
-                           $" WHERE U_SalesQuotationDocentry = '{MasterBomModel.First().SalesQuotationDocEntry}'" +
-                           $" AND U_Version in (SELECT MAX(U_Version)FROM[@RSM_MBOM_ROWS]GROUP BY U_ParentItemCode) " +
-                           $" AND U_ElementID in (N'Administrative Overheads',N'Human Resources',N'Machinery Resources',N'Manufacturing Overheads',N'MTRLs')" +
-                           $" group by U_ParentItemCode");
-            double totalSum = 0;
+            string queryStr = $"SELECT SUM(U_Cost* U_Quantity) as [Sum], U_ParentItemCode FROM [@RSM_MBOM_ROWS]  join [@RSM_MBOM] on " +
+                              $"[@RSM_MBOM].U_SalesQuotationDocEntry = [@RSM_MBOM_ROWS].U_SalesQuotationDocEntry" +
+                              $" AND [@RSM_MBOM].U_ParentItem = [@RSM_MBOM_ROWS].U_ParentItemCode " +
+                              $" AND [@RSM_MBOM].U_Version = [@RSM_MBOM_ROWS].U_Version" +
+                              $" WHERE [@RSM_MBOM_ROWS].U_SalesQuotationDocentry = '{MasterBomModel.First().SalesQuotationDocEntry}'" +
+                              $" AND [@RSM_MBOM_ROWS].U_Version in (SELECT MAX(U_Version)FROM[@RSM_MBOM_ROWS]GROUP BY U_ParentItemCode) " +
+                              $" AND U_ElementID in" +
+                              $" (N'Administrative Overheads',N'Human Resources',N'Machinery Resources',N'Manufacturing Overheads',N'MTRLs', N'Material OverHeads')" +
+                              $" Group By U_ParentItemCode";
+            recSet.DoQuery(queryStr);
+            double totalCostForCommonElems = 0;
+            Dictionary<string, double> parentItemsAndSums = new Dictionary<string, double>();
             while (!recSet.EoF)
             {
                 var totalCostPerItem = (double)recSet.Fields.Item("Sum").Value;
-                totalSum += totalCostPerItem;
+                string parentItem = recSet.Fields.Item("U_ParentItemCode").Value.ToString();
+                parentItemsAndSums.Add(parentItem, totalCostPerItem);
+                totalCostForCommonElems += totalCostPerItem;
                 recSet.MoveNext();
             }
             recSet.MoveFirst();
+            int lineId = 0;
             foreach (MasterBomModel masterBomModel in MasterBomModel)
             {
-                var sum = (double) recSet.Fields.Item("Sum").Value;
-                var trip = _Model.TotalCost / totalSum * sum;
-                var transport = _Model.TransportationAmount / totalSum * (double)recSet.Fields.Item("Sum").Value;
+                var trip = Math.Round(Model.TotalCost / totalCostForCommonElems * parentItemsAndSums[masterBomModel.ParentItem], 4);
+                var transport = Math.Round(Model.TransportationAmount / totalCostForCommonElems * parentItemsAndSums[masterBomModel.ParentItem], 4);
                 var mBomTripRow = masterBomModel.Rows.First(x => x.ElementID == "Business Trip" && x.ParentItemCode == masterBomModel.ParentItem);
                 var mBomTransportRow = masterBomModel.Rows.First(x => x.ElementID == "Transportation" && x.ParentItemCode == masterBomModel.ParentItem);
-                mBomTripRow.Cost = trip;
-                mBomTransportRow.Cost = transport;
+                mBomTripRow.Cost = Math.Round(trip, 4);
+                mBomTripRow.Price = Math.Round(trip, 4);
+                mBomTripRow.Margin = Math.Round(trip, 4);
+                mBomTripRow.FinalCustomerPrice = Math.Round(trip, 4);
+                mBomTransportRow.Cost = Math.Round(transport, 4);
+                mBomTransportRow.Price = Math.Round(transport, 4);
+                mBomTransportRow.Margin = Math.Round(transport, 4);
+                mBomTransportRow.FinalCustomerPrice = Math.Round(transport, 4);
+                var mBomTotals = masterBomModel.Rows.First(x => x.ElementID == "Totals" && x.ParentItemCode == masterBomModel.ParentItem);
+                var mBomReferenceFeeRow = masterBomModel.Rows.First(x => x.ElementID == "Reference Fee" && x.ParentItemCode == masterBomModel.ParentItem);
+                var sumCostsExceptReferenceFee = masterBomModel.Rows.Where(x => x.ElementID != "Reference Fee" && x.ElementID != "Totals" && x.ParentItemCode == masterBomModel.ParentItem).Sum(x => x.Cost);
+                var sumPrice = Math.Round(masterBomModel.Rows.Where(y => y.ElementID != "Totals").Sum(x => x.Price), 4);
+                var sumFinalCustomerPrice = Math.Round(masterBomModel.Rows.Where(y => y.ElementID != "Totals").Sum(x => x.FinalCustomerPrice), 4);
+                var sumMargin = Math.Round(masterBomModel.Rows.Where(y => y.ElementID != "Totals").Sum(x => x.Margin), 4);
+                mBomReferenceFeeRow.Cost = Math.Round(sumCostsExceptReferenceFee * masterBomModel.ReferenceFeePercentage / 100, 4);
+                mBomReferenceFeeRow.Price = Math.Round(mBomReferenceFeeRow.Cost, 4);
+                mBomReferenceFeeRow.Margin = Math.Round(mBomReferenceFeeRow.Cost, 4);
+                mBomReferenceFeeRow.FinalCustomerPrice = Math.Round(mBomReferenceFeeRow.Cost, 4);
+                var sumCost = Math.Round(masterBomModel.Rows.Where(y => y.ElementID != "Totals").Sum(x => x.Cost), 4);
+                mBomTotals.Price = Math.Round(sumPrice, 4);
+                mBomTotals.FinalCustomerPrice = Math.Round(sumFinalCustomerPrice, 4);
+                mBomTotals.Margin = Math.Round(sumMargin, 4);
+                mBomTotals.Cost = Math.Round(sumCost, 4);
+
+                var mBomMtrlRow = masterBomModel.Rows.First(x => x.ElementID == "MTRLs" && x.ParentItemCode == masterBomModel.ParentItem);
+                mBomMtrlRow.Percent = Math.Round(mBomMtrlRow.Cost / mBomTotals.Cost * 100, 4);
+
+                var mBomMachinaryRow = masterBomModel.Rows.First(x => x.ElementID == "Machinery Resources" && x.ParentItemCode == masterBomModel.ParentItem);
+                mBomMachinaryRow.Percent = Math.Round(mBomMachinaryRow.Cost / mBomTotals.Cost * 100, 4);
+
+                var mBomHumanRow = masterBomModel.Rows.First(x => x.ElementID == "Human Resources" && x.ParentItemCode == masterBomModel.ParentItem);
+                mBomHumanRow.Percent = Math.Round(mBomHumanRow.Cost / mBomTotals.Cost * 100, 4);
+
+                var mBomManufacturingRow = masterBomModel.Rows.First(x => x.ElementID == "Manufacturing Overheads" && x.ParentItemCode == masterBomModel.ParentItem);
+                mBomManufacturingRow.Percent = Math.Round(mBomManufacturingRow.Cost / mBomTotals.Cost * 100, 4);
+
+                var mBomAdministrativeRow = masterBomModel.Rows.First(x => x.ElementID == "Administrative Overheads" && x.ParentItemCode == masterBomModel.ParentItem);
+                mBomAdministrativeRow.Percent = Math.Round(mBomAdministrativeRow.Cost / mBomTotals.Cost * 100, 4);
+
+                mBomTripRow.Percent = Math.Round(mBomTripRow.Cost / mBomTotals.Cost * 100, 4);
+                mBomTransportRow.Percent = Math.Round(mBomTransportRow.Cost / mBomTotals.Cost * 100, 4);
+
+                var mBomMaterialOverHeadsRow = masterBomModel.Rows.First(x => x.ElementID == "Material OverHeads" && x.ParentItemCode == masterBomModel.ParentItem);
+                mBomMaterialOverHeadsRow.Percent = Math.Round(mBomMaterialOverHeadsRow.Cost / mBomTotals.Cost * 100, 4);
+
+                mBomReferenceFeeRow.Percent = Math.Round(mBomReferenceFeeRow.Cost / mBomTotals.Cost * 100, 4);
+
+                mBomTotals.Percent = masterBomModel.Rows.Where(x => x.ElementID != "Totals" && x.ParentItemCode == masterBomModel.ParentItem).Sum(x => x.Percent);
+                var sumCosts = Math.Round(masterBomModel.Rows.Where(y => y.ElementID != "Totals").Sum(x => x.Cost), 4);
+                mBomTotals.Cost = Math.Round(sumCosts, 4);
                 recSet.MoveNext();
-                masterBomModel.Update();
+
+                masterBomModel.PriceForSquareMeter = sumFinalCustomerPrice / masterBomModel.TotalSquareMeter;
+
+                mBomMtrlRow.I = mBomMtrlRow.Margin / mBomTotals.Margin * 100;
+                mBomMachinaryRow.I = mBomMachinaryRow.Margin / mBomTotals.Margin * 100;
+                mBomHumanRow.I = mBomHumanRow.Margin / mBomTotals.Margin * 100;
+                mBomAdministrativeRow.I = mBomAdministrativeRow.Margin / mBomTotals.Margin * 100;
+                mBomTripRow.I = mBomTripRow.Margin / mBomTotals.Margin * 100;
+                mBomTransportRow.I = mBomTransportRow.Margin / mBomTotals.Margin * 100;
+                mBomMaterialOverHeadsRow.I = mBomMaterialOverHeadsRow.Margin / mBomTotals.Margin * 100;
+                mBomReferenceFeeRow.I = mBomReferenceFeeRow.Margin / mBomTotals.Margin * 100;
+                mBomManufacturingRow.I = mBomManufacturingRow.Margin / mBomTotals.Margin * 100;
+                var sumI = Math.Round(masterBomModel.Rows.Where(y => y.ElementID != "Totals").Sum(x => x.I), 4);
+                mBomTotals.I = sumI;
+
+                mBomMtrlRow.II = mBomMtrlRow.Margin / mBomMtrlRow.FinalCustomerPrice * 100;
+                mBomMachinaryRow.II = mBomMachinaryRow.Margin / mBomMachinaryRow.FinalCustomerPrice * 100;
+                mBomHumanRow.II = mBomHumanRow.Margin / mBomHumanRow.FinalCustomerPrice * 100;
+                mBomAdministrativeRow.II = mBomAdministrativeRow.Margin / mBomAdministrativeRow.FinalCustomerPrice * 100;
+                mBomTripRow.II = mBomTripRow.Margin / mBomTripRow.FinalCustomerPrice * 100;
+                mBomTransportRow.II = mBomTransportRow.Margin / mBomTransportRow.FinalCustomerPrice * 100;
+                mBomMaterialOverHeadsRow.II = mBomMaterialOverHeadsRow.Margin / mBomMaterialOverHeadsRow.FinalCustomerPrice * 100;
+                mBomReferenceFeeRow.II = mBomReferenceFeeRow.Margin / mBomReferenceFeeRow.FinalCustomerPrice * 100;
+                mBomManufacturingRow.II = mBomManufacturingRow.Margin / mBomManufacturingRow.FinalCustomerPrice * 100;
+                var sumII = Math.Round(masterBomModel.Rows.Where(y => y.ElementID != "Totals").Sum(x => x.II), 4);
+                mBomTotals.II = sumII;
+
+                mBomMtrlRow.III = mBomMtrlRow.Margin / mBomTotals.FinalCustomerPrice * 100;
+                mBomMachinaryRow.III = mBomMachinaryRow.Margin / mBomTotals.FinalCustomerPrice * 100;
+                mBomHumanRow.III = mBomHumanRow.Margin / mBomTotals.FinalCustomerPrice * 100;
+                mBomAdministrativeRow.III = mBomAdministrativeRow.Margin / mBomTotals.FinalCustomerPrice * 100;
+                mBomTripRow.III = mBomTripRow.Margin / mBomTotals.FinalCustomerPrice * 100;
+                mBomTransportRow.III = mBomTransportRow.Margin / mBomTotals.FinalCustomerPrice * 100;
+                mBomMaterialOverHeadsRow.III = mBomMaterialOverHeadsRow.Margin / mBomTotals.FinalCustomerPrice * 100;
+                mBomReferenceFeeRow.III = mBomReferenceFeeRow.Margin / mBomTotals.FinalCustomerPrice * 100;
+                mBomManufacturingRow.III = mBomManufacturingRow.Margin / mBomTotals.FinalCustomerPrice * 100;
+                var sumIII = Math.Round(masterBomModel.Rows.Where(y => y.ElementID != "Totals").Sum(x => x.III), 4);
+                mBomTotals.III = sumIII;
+                var salesQuotation = (Documents)DiManager.Company.GetBusinessObject(BoObjectTypes.oQuotations);
+                salesQuotation.GetByKey(int.Parse(masterBomModel.SalesQuotationDocEntry));
+                salesQuotation.Lines.SetCurrentLine(lineId);
+                salesQuotation.Lines.UnitPrice = Math.Round(MasterBomModel
+                    .First(i => i.ParentItem == salesQuotation.Lines.ItemCode).PriceForSquareMeter / 1.18,4);
+                salesQuotation.Update();
+                lineId++;
+                string version = (int.Parse(masterBomModel.Version, CultureInfo.InvariantCulture) + 1).ToString();
+                masterBomModel.Version = version;
+                foreach (var row in masterBomModel.Rows)
+                {
+                    row.Version = version;
+                }
+                masterBomModel.Add();
             }
         }
     }

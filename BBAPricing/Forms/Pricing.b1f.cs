@@ -52,6 +52,12 @@ namespace BBAPricing.Forms
             this.EditText9 = ((SAPbouiCOM.EditText)(this.GetItem("Item_21").Specific));
             this.ComboBox0 = ((SAPbouiCOM.ComboBox)(this.GetItem("Item_22").Specific));
             this.StaticText9 = ((SAPbouiCOM.StaticText)(this.GetItem("Item_23").Specific));
+            this.StaticText10 = ((SAPbouiCOM.StaticText)(this.GetItem("Item_24").Specific));
+            this.EditText10 = ((SAPbouiCOM.EditText)(this.GetItem("Item_25").Specific));
+            this.Button1 = ((SAPbouiCOM.Button)(this.GetItem("Item_26").Specific));
+            this.Button1.PressedAfter += new SAPbouiCOM._IButtonEvents_PressedAfterEventHandler(this.Button1_PressedAfter);
+            this.StaticText11 = ((SAPbouiCOM.StaticText)(this.GetItem("Item_27").Specific));
+            this.EditText11 = ((SAPbouiCOM.EditText)(this.GetItem("Item_28").Specific));
             this.OnCustomInitialize();
 
         }
@@ -80,22 +86,30 @@ namespace BBAPricing.Forms
             EditText5.Value = MasterBomModel.OwnerCode;
             EditText7.Value = MasterBomModel.Version;
             EditText8.Value = MasterBomModel.ExchangeRateDate.ToString("yyyyMMdd");
-            EditText9.Value = MasterBomModel.Rate.ToString();
-            ComboBox0.Select(MasterBomModel.Currency.ToString(), BoSearchKey.psk_ByValue);
-            EditText3.Value = MasterBomModel.SalesQuotationDocEntry.ToString();
+            EditText9.Value = MasterBomModel.Rate.ToString(CultureInfo.InvariantCulture);
+            EditText10.Value = MasterBomModel.TotalSquareMeter.ToString(CultureInfo.InvariantCulture);
+            EditText11.Value = MasterBomModel.ReferenceFeePercentage.ToString(CultureInfo.InvariantCulture);
+            EditText6.Value = MasterBomModel.PriceForSquareMeter.ToString(CultureInfo.InvariantCulture);
+            ComboBox0.Select(MasterBomModel.Currency);
+            EditText3.Value = MasterBomModel.SalesQuotationDocEntry;
             EditText0.Item.Enabled = false;
             EditText1.Item.Enabled = false;
             EditText2.Item.Enabled = false;
             EditText4.Item.Enabled = false;
             EditText5.Item.Enabled = false;
             EditText7.Item.Enabled = false;
+            EditText6.Item.Enabled = false;
             EditText3.Item.Left = 4000;
         }
 
         private void OnCustomInitialize()
         {
-            CalculationMaterialsController.RefreshBom = FillGridFromModel;
-            CalculationMachinaryResourcesController.RefreshBom = FillGridFromModel;
+            CalculationMaterialsController.RefreshBom = FillForm;
+            CalculationMachinaryResourcesController.RefreshBom = FillForm;
+            CalculationHumanResourcesController.RefreshBom = FillForm;
+            CalculationManufacturingOverheadsController.RefreshBom = FillForm;
+            CalculationAdministrativeOverheadsController.RefreshBom = FillForm;
+            CommonElements.RefreshBom = FillForm;
             while (ComboBox0.ValidValues.Count > 0)
             {
                 ComboBox0.ValidValues.Remove(0, BoSearchKey.psk_Index);
@@ -142,20 +156,22 @@ namespace BBAPricing.Forms
             var oldExchangeRateDate = MasterBomModel.ExchangeRateDate;
             var oldCurrency = MasterBomModel.Currency;
             var oldRate = MasterBomModel.Rate;
+            var oldRaferenceFee = MasterBomModel.ReferenceFeePercentage;
+            var oldTotalSquareMeter = MasterBomModel.TotalSquareMeter;
             var res = Grid0.DataTable.GetValue("Element", Grid0.GetDataTableRowIndex(rowindex)).ToString();
             MasterBomModel.ExchangeRateDate = DateTime.ParseExact(EditText8.Value, "yyyyMMdd", CultureInfo.InvariantCulture);
             MasterBomModel.Currency = ComboBox0.Value;
             MasterBomModel.Rate = double.Parse(EditText9.Value, CultureInfo.InvariantCulture);
+            MasterBomModel.TotalSquareMeter = double.Parse(string.IsNullOrEmpty(EditText10.Value) ? "0" : EditText10.Value, CultureInfo.InvariantCulture);
+            MasterBomModel.ReferenceFeePercentage = double.Parse(string.IsNullOrEmpty(EditText11.Value) ? "0" : EditText11.Value, CultureInfo.InvariantCulture);
 
             if (string.IsNullOrWhiteSpace(MasterBomModel.Code))
             {
                 var result = MasterBomModel.Add();
             }
 
-            else if (!string.IsNullOrWhiteSpace(MasterBomModel.Code)
-                && (oldExchangeRateDate != MasterBomModel.ExchangeRateDate
-                || oldCurrency != MasterBomModel.Currency
-                || oldRate != MasterBomModel.Rate))
+            else if (!string.IsNullOrWhiteSpace(MasterBomModel.Code) && (oldExchangeRateDate != MasterBomModel.ExchangeRateDate || oldCurrency != MasterBomModel.Currency
+                || oldRate != MasterBomModel.Rate) || oldRaferenceFee != MasterBomModel.ReferenceFeePercentage || oldTotalSquareMeter != MasterBomModel.TotalSquareMeter)
             {
                 MasterBomModel.Version = (double.Parse(MasterBomModel.Version) + 1).ToString(CultureInfo.InvariantCulture);
                 foreach (var row in MasterBomModel.Rows)
@@ -189,6 +205,64 @@ namespace BBAPricing.Forms
             {
                 CalculateManufacturingOverheads calculationForm = new CalculateManufacturingOverheads(MasterBomModel);
                 calculationForm.Show();
+            }
+            if (res == "Material OverHeads")
+            {
+                Recordset recForCmp =
+                    (Recordset)DiManager.Company.GetBusinessObject(BoObjectTypes.BoRecordset);
+                recForCmp.DoQuery($"select * from [@RSM_OVRHD_CLCB] Where U_Version = (SELECT MAX(U_Version) FROM [@RSM_OVRHD_CLCB])");
+                Recordset recSet =
+                    (Recordset)DiManager.Company.GetBusinessObject(BoObjectTypes.BoRecordset);
+                string queryStr = $"SELECT * FROM [@RSM_RESOURCES] JOIN OITM ON OITM.ItemCode = U_ParentItemCode " +
+                                  $"JOIN ORSC ON ORSC.VisResCode =  [@RSM_RESOURCES].U_resourcecode " +
+                                  $" WHERE U_Version = (SELECT MAX(U_Version)FROM[@RSM_RESOURCES]GROUP BY U_ParentItemCode)" +
+                                  $"AND U_SalesQuotationDocEntry = {MasterBomModel.SalesQuotationDocEntry} " +
+                                  $"AND U_ParentItemCode  = N'{MasterBomModel.ParentItem}' AND ORSC.ResType = 'L'";
+                recSet.DoQuery(queryStr);
+                var type = recSet.Fields.Item("U_SBU").Value.ToString();
+                double requiredResource = 0;
+                double unitCost = 0;
+                switch (type)
+                {
+                    case "01":
+                        unitCost = (double)recForCmp.Fields.Item("U_Corian").Value;
+                        break;
+                    case "02":
+                        unitCost = (double)recForCmp.Fields.Item("U_Neolith").Value;
+                        break;
+                    case "03":
+                        unitCost = (double)recForCmp.Fields.Item("U_Furniture").Value;
+                        break;
+                }
+
+                var materialOverheadsCost = unitCost * MasterBomModel.TotalSquareMeter * MasterBomModel.Quantity;
+                var mtrlLine = MasterBomModel.Rows.First(x => x.ElementID == "Material OverHeads");
+                if (MasterBomModel.Currency != "GEL")
+                {
+                    materialOverheadsCost /= MasterBomModel.Rate;
+                }
+                if (mtrlLine.Cost != materialOverheadsCost)
+                {
+                    mtrlLine.Cost = materialOverheadsCost;
+                    mtrlLine.Price = materialOverheadsCost;
+                    mtrlLine.Margin = materialOverheadsCost;
+                    mtrlLine.FinalCustomerPrice = materialOverheadsCost;
+                    if (mtrlLine.Cost == 0)
+                    {
+                        MasterBomModel.Update();
+                    }
+                    else
+                    {
+                        string version = (int.Parse(MasterBomModel.Version, CultureInfo.InvariantCulture) + 1).ToString();
+                        MasterBomModel.Version = version;
+                        foreach (var row in MasterBomModel.Rows)
+                        {
+                            row.Version = version;
+                        }
+                        MasterBomModel.Add();
+                    }
+                    FillForm();
+                }
             }
         }
 
@@ -225,25 +299,34 @@ namespace BBAPricing.Forms
         {
             GetGridColumns();
             Recordset recSet = (Recordset)DiManager.Company.GetBusinessObject(BoObjectTypes.BoRecordset);
-            recSet.DoQuery($"SELECT Code, U_Element FROM [@RSM_ELEM]");
+            recSet.DoQuery($"SELECT * FROM [@RSM_ELEM]");
             int i = 0;
             while (!recSet.EoF)
             {
-                SAPbouiCOM.Framework.Application.SBO_Application.Forms.ActiveForm.Freeze(true);
+                UIAPIRawForm.Freeze(true);
+                var elementId = recSet.Fields.Item("U_Element").Value.ToString();
                 Grid0.DataTable.SetValue("Element", i, recSet.Fields.Item("U_Element").Value);
-                SAPbouiCOM.Framework.Application.SBO_Application.Forms.ActiveForm.Freeze(false);
-                Grid0.DataTable.SetValue("Cost", i, MasterBomModel.Rows[i].Cost);
-                Grid0.DataTable.SetValue("Price", i, MasterBomModel.Rows[i].Price);
-                Grid0.DataTable.SetValue("Margin", i, MasterBomModel.Rows[i].Margin);
-                Grid0.DataTable.SetValue("FinalCustomer Price", i, MasterBomModel.Rows[i].FinalCustomerPrice);
-                Grid0.DataTable.SetValue("I", i, MasterBomModel.Rows[i].I);
-                Grid0.DataTable.SetValue("II", i, MasterBomModel.Rows[i].II);
-                Grid0.DataTable.SetValue("III", i, MasterBomModel.Rows[i].III);
+                Grid0.DataTable.SetValue("Cost", i, MasterBomModel.Rows.First(y => y.ElementID == elementId).Cost);
+                Grid0.DataTable.SetValue("Price", i, MasterBomModel.Rows.First(y => y.ElementID == elementId).Price);
+                Grid0.DataTable.SetValue("Margin", i, MasterBomModel.Rows.First(y => y.ElementID == elementId).Margin);
+                Grid0.DataTable.SetValue("FinalCustomer Price", i, MasterBomModel.Rows.First(y => y.ElementID == elementId).FinalCustomerPrice);
+                Grid0.DataTable.SetValue("%", i, MasterBomModel.Rows.First(y => y.ElementID == elementId).Percent);
+                Grid0.DataTable.SetValue("I", i, MasterBomModel.Rows.First(y => y.ElementID == elementId).I);
+                Grid0.DataTable.SetValue("II", i, MasterBomModel.Rows.First(y => y.ElementID == elementId).II);
+                Grid0.DataTable.SetValue("III", i, MasterBomModel.Rows.First(y => y.ElementID == elementId).III);
                 i++;
                 Grid0.DataTable.Rows.Add();
                 recSet.MoveNext();
+                UIAPIRawForm.Freeze(false);
             }
             Grid0.Columns.Item("Element").Editable = false;
+            Grid0.Columns.Item("Cost").Editable = false;
+            Grid0.Columns.Item("Price").Editable = false;
+            Grid0.Columns.Item("Margin").Editable = false;
+            Grid0.Columns.Item("%").Editable = false;
+            Grid0.Columns.Item("I").Editable = false;
+            Grid0.Columns.Item("II").Editable = false;
+            Grid0.Columns.Item("III").Editable = false;
             Grid0.DataTable.Rows.Remove(Grid0.DataTable.Rows.Count - 1);
         }
 
@@ -255,5 +338,38 @@ namespace BBAPricing.Forms
         private EditText EditText9;
         private ComboBox ComboBox0;
         private StaticText StaticText9;
+
+
+        private StaticText StaticText10;
+        private EditText EditText10;
+        private Button Button1;
+
+        public void UpdateModelFromForm()
+        {
+            for (int i = 0; i < Grid0.Rows.Count; i++)
+            {
+                var finalCustomerPrice = (double)Grid0.DataTable.GetValue("FinalCustomer Price", i);
+                var element = Grid0.DataTable.GetValue("Element", i).ToString();
+                MasterBomModel.Rows.FirstOrDefault(x => x.ElementID == element).FinalCustomerPrice = finalCustomerPrice;
+            }
+            MasterBomModel.TotalSquareMeter = double.Parse(EditText10.Value, CultureInfo.InvariantCulture);
+            MasterBomModel.ReferenceFeePercentage = double.Parse(EditText11.Value, CultureInfo.InvariantCulture);
+        }
+
+        private void Button1_PressedAfter(object sboObject, SBOItemEventArg pVal)
+        {
+            try
+            {
+                UpdateModelFromForm();
+                MasterBomModel.Update();
+            }
+            catch (Exception)
+            {
+                //not added yet
+            }
+        }
+
+        private StaticText StaticText11;
+        private EditText EditText11;
     }
 }

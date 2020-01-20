@@ -29,6 +29,7 @@ namespace BBAPricing.FormControllers
             _OverheadsModel.Clear();
             Recordset rec = (Recordset)DiManager.Company.GetBusinessObject(BoObjectTypes.BoRecordset);
             rec.DoQuery($@"SELECT * FROM [@RSM_OVERHEAD_C]");
+
             while (!rec.EoF)
             {
                 OverheadsModel model = new OverheadsModel();
@@ -86,7 +87,7 @@ namespace BBAPricing.FormControllers
                     OverheadsModel manufacturingModel = _OverheadsModel.First(x => x.ComponentId == "Manufacturing Overhead");
                     model.Corian = manufacturingModel.Corian / manHourModel.Corian;
                     model.Neolith = manufacturingModel.Neolith / manHourModel.Neolith;
-                    model.Furniture = manufacturingModel.Furniture / manHourModel.Corian;
+                    model.Furniture = manufacturingModel.Furniture / manHourModel.Furniture;
                     model.Total = model.Corian + model.Neolith + model.Furniture;
                     model.ChangeDate = DateTime.Now;
                     model.ComponentId = emp;
@@ -99,7 +100,7 @@ namespace BBAPricing.FormControllers
                     OverheadsModel manufacturingModel = _OverheadsModel.First(x => x.ComponentId == "Administrative Overhead");
                     model.Corian = manufacturingModel.Corian / manHourModel.Corian;
                     model.Neolith = manufacturingModel.Neolith / manHourModel.Neolith;
-                    model.Furniture = manufacturingModel.Furniture / manHourModel.Corian;
+                    model.Furniture = manufacturingModel.Furniture / manHourModel.Furniture;
                     model.Total = model.Corian + model.Neolith + model.Furniture;
                     model.ChangeDate = DateTime.Now;
                     model.ComponentId = emp;

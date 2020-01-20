@@ -23,6 +23,8 @@ namespace BBAPricing.Forms
         public override void OnInitializeComponent()
         {
             this.Grid0 = ((SAPbouiCOM.Grid)(this.GetItem("Item_0").Specific));
+            this.Button0 = ((SAPbouiCOM.Button)(this.GetItem("Item_1").Specific));
+            this.Button0.PressedAfter += new SAPbouiCOM._IButtonEvents_PressedAfterEventHandler(this.Button0_PressedAfter);
             this.OnCustomInitialize();
 
         }
@@ -50,6 +52,13 @@ namespace BBAPricing.Forms
             {
                 calculationHumanResourcesController.CalculateResources();
             }
+        }
+
+        private SAPbouiCOM.Button Button0;
+
+        private void Button0_PressedAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
+        {
+            calculationHumanResourcesController.UpdateResources();
         }
     }
 }

@@ -117,6 +117,10 @@
     <Compile Include="Program.cs" />
     <Compile Include="Menu.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Settings.cs" />
+    <Compile Include="System Forms\BillOfMaterials.b1f.cs">
+      <DependentUpon>BillOfMaterials.b1f</DependentUpon>
+    </Compile>
     <Compile Include="System Forms\SalesQuotation.b1f.cs">
       <DependentUpon>SalesQuotation.b1f</DependentUpon>
     </Compile>
@@ -156,6 +160,12 @@
     <None Include="Forms\Settings.b1f">
       <FormCategory>UserForm</FormCategory>
     </None>
+    <None Include="System Forms\BillOfMaterials.b1f">
+      <FormCategory>SystemForm</FormCategory>
+    </None>
+    <None Include="System Forms\BillOfMaterials.b1f__orig_srf">
+      <DependentUpon>BillOfMaterials.b1f</DependentUpon>
+    </None>
     <None Include="System Forms\SalesQuotation.b1f">
       <FormCategory>SystemForm</FormCategory>
     </None>
@@ -169,6 +179,15 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Media\Icon.bmp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Media\m_BBA %281%29.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Media\m_BBA %282%29.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Media\m_BBA.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Media\Sap.bmp">
