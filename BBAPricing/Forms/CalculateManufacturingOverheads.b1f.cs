@@ -68,7 +68,7 @@ namespace BBAPricing.Forms
                 EditText0.Item.Enabled = false;
                 EditText1.Item.Enabled = false;
                 EditText2.Item.Enabled = false;
-                ManufacturingOverheadsController.CalculateAdministrativeOverheads();// TODO Increment Version
+                ManufacturingOverheadsController.CalculateAdministrativeOverheads();
             }
         }
     }

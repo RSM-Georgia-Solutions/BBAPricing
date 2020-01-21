@@ -83,7 +83,7 @@
     <Compile Include="Forms\Settings.b1f.cs">
       <DependentUpon>Settings.b1f</DependentUpon>
     </Compile>
-    <Compile Include="ImportControllers\MaterialsController.cs" />
+    <Compile Include="ImportControllers\ImportMaterialsController.cs" />
     <Compile Include="DiManager.cs" />
     <Compile Include="Forms\CalculationMaterials.b1f.cs">
       <DependentUpon>CalculationMaterials.b1f</DependentUpon>
@@ -113,6 +113,7 @@
     <Compile Include="Models\ResourceModel.cs" />
     <Compile Include="Models\OverheadParamsModel.cs" />
     <Compile Include="Models\OverheadsModel.cs" />
+    <Compile Include="Models\SapBomModel.cs" />
     <Compile Include="Models\SettingsModel.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Menu.cs" />

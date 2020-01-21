@@ -14,6 +14,8 @@ namespace BBAPricing.Initialization
 
 
             DiManager.CreateField("@RSM_BBA_SETTINGS", "WorkingPriceList", "Working Price List", BoFieldTypes.db_Alpha, 250, false);
+            DiManager.CreateField("@RSM_BBA_SETTINGS", "MtrlExcelIndex", "Mtrl Excel Index", BoFieldTypes.db_Numeric, 3, false);
+            DiManager.CreateField("@RSM_BBA_SETTINGS", "ResourceExcelIndex", "ResourceExcelIndex", BoFieldTypes.db_Numeric, 3, false);
             DiManager.CreateField("@RSM_BBA_SETTINGS", "RetailPriceList", "Retail Price List", BoFieldTypes.db_Alpha, 250, false);
             DiManager.CreateField("@RSM_BBA_SETTINGS", "HumanResourceCoefficient", "HumanResource Coefficient", BoFieldTypes.db_Float, 250, false, false, "", "", BoFldSubTypes.st_Sum);
             DiManager.CreateField("@RSM_BBA_SETTINGS", "DailyNormPerPerson", "Daily Norm Per Person", BoFieldTypes.db_Float, 250, false, false, "", "", BoFldSubTypes.st_Sum);

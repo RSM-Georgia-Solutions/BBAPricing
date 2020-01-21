@@ -299,6 +299,8 @@ namespace BBAPricing
             Settings.HumanResourceCoefficient = (double) recSet.Fields.Item($"U_DailyNormPerPerson").Value;
             Settings.RetailPriceList = recSet.Fields.Item($"U_RetailPriceList").Value.ToString();
             Settings.WorkingPriceList = recSet.Fields.Item($"U_WorkingPriceList").Value.ToString();
+            Settings.MtrlExcelIndex = (int)recSet.Fields.Item($"U_MtrlExcelIndex").Value;
+            Settings.ResourceExcelIndex = (int)recSet.Fields.Item($"U_ResourceExcelIndex").Value;
         }
     }
 }

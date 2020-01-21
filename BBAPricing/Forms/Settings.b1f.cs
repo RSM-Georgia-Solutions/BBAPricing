@@ -34,6 +34,10 @@ namespace BBAPricing.Forms
             this.Button0.PressedAfter += new SAPbouiCOM._IButtonEvents_PressedAfterEventHandler(this.Button0_PressedAfter);
             this.StaticText3 = ((SAPbouiCOM.StaticText)(this.GetItem("Item_7").Specific));
             this.EditText3 = ((SAPbouiCOM.EditText)(this.GetItem("Item_8").Specific));
+            this.EditText4 = ((SAPbouiCOM.EditText)(this.GetItem("Item_9").Specific));
+            this.StaticText4 = ((SAPbouiCOM.StaticText)(this.GetItem("Item_10").Specific));
+            this.EditText5 = ((SAPbouiCOM.EditText)(this.GetItem("Item_11").Specific));
+            this.StaticText5 = ((SAPbouiCOM.StaticText)(this.GetItem("Item_12").Specific));
             this.OnCustomInitialize();
 
         }
@@ -73,6 +77,8 @@ namespace BBAPricing.Forms
             ((EditText)UIAPIRawForm.Items.Item("Item_3").Specific).Value = _Model.RetailPriceList.ToString(CultureInfo.InvariantCulture);
             ((EditText)UIAPIRawForm.Items.Item("Item_5").Specific).Value = _Model.HumanResourceCoefficient.ToString(CultureInfo.InvariantCulture);
             ((EditText)UIAPIRawForm.Items.Item("Item_8").Specific).Value = _Model.DailyNormPerPerson.ToString(CultureInfo.InvariantCulture);
+            ((EditText)UIAPIRawForm.Items.Item("Item_9").Specific).Value = _Model.MtrlExcelIndex.ToString(CultureInfo.InvariantCulture);
+            ((EditText)UIAPIRawForm.Items.Item("Item_11").Specific).Value = _Model.ResourceExcelIndex.ToString(CultureInfo.InvariantCulture);
             Application.SBO_Application.Forms.ActiveForm.Freeze(false);
         }
 
@@ -82,6 +88,8 @@ namespace BBAPricing.Forms
             _Model.RetailPriceList = EditText1.Value;
             _Model.HumanResourceCoefficient = double.Parse(EditText2.Value, CultureInfo.InvariantCulture);
             _Model.DailyNormPerPerson = double.Parse(EditText3.Value, CultureInfo.InvariantCulture);
+            _Model.MtrlExcelIndex = int.Parse(EditText4.Value, CultureInfo.InvariantCulture);
+            _Model.ResourceExcelIndex = int.Parse(EditText5.Value, CultureInfo.InvariantCulture);
         }
 
         private void Button0_PressedAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
@@ -119,7 +127,14 @@ namespace BBAPricing.Forms
             _Model.RetailPriceList = recSet.Fields.Item("U_RetailPriceList").Value.ToString();
             _Model.HumanResourceCoefficient = (double)recSet.Fields.Item("U_HumanResourceCoefficient").Value;
             _Model.DailyNormPerPerson = (double)recSet.Fields.Item("U_DailyNormPerPerson").Value;
+            _Model.MtrlExcelIndex = (int)recSet.Fields.Item("U_MtrlExcelIndex").Value;
+            _Model.ResourceExcelIndex = (int)recSet.Fields.Item("U_ResourceExcelIndex").Value;
             return true;
         }
+
+        private EditText EditText4;
+        private SAPbouiCOM.StaticText StaticText4;
+        private EditText EditText5;
+        private SAPbouiCOM.StaticText StaticText5;
     }
 }

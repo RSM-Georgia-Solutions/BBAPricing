@@ -15,6 +15,8 @@ namespace BBAPricing.Models
         public string RetailPriceList { get; set; }
         public double HumanResourceCoefficient { get; set; }
         public double DailyNormPerPerson { get; set; }
+        public int ResourceExcelIndex { get; set; }
+        public int MtrlExcelIndex { get; set; }
         private List<PropertyInfo> Properies { get; }
 
         public SettingsModel()

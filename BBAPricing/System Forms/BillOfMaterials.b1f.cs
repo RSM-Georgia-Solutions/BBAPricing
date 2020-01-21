@@ -1,9 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
+using BBAPricing.Models;
+using SAPbobsCOM;
 using SAPbouiCOM;
 using SAPbouiCOM.Framework;
+using Application = SAPbouiCOM.Application;
 
 namespace BBAPricing.System_Forms
 {
@@ -52,7 +56,36 @@ namespace BBAPricing.System_Forms
 
         private void Button0_PressedAfter(object sboObject, SBOItemEventArg pVal)
         {
-            Import_Form activeForm = new Import_Form();
+            var productNo = UIAPIRawForm.DataSources.DBDataSources.Item("OITT").GetValue("Code", 0);
+            var treeTypeString =  UIAPIRawForm.DataSources.DBDataSources.Item("OITT").GetValue("TreeType", 0);
+            BoItemTreeTypes treeType = BoItemTreeTypes.iProductionTree;
+            switch (treeTypeString)
+            {
+                case "P":
+                    treeType = BoItemTreeTypes.iProductionTree;
+                    break;
+                case "A":
+                    treeType = BoItemTreeTypes.iAssemblyTree;
+                    break;
+                case "S":
+                    treeType = BoItemTreeTypes.iSalesTree;
+                    break;
+                case "T":
+                    treeType = BoItemTreeTypes.iTemplateTree;
+                    break;
+
+            }
+            var quantity = double.Parse(UIAPIRawForm.DataSources.DBDataSources.Item("OITT").GetValue("Qauntity", 0), CultureInfo.InvariantCulture);
+            if (string.IsNullOrWhiteSpace(productNo))
+            {
+                SAPbouiCOM.Framework.Application.SBO_Application.MessageBox("მიუთითეთ BOM - ის კოდი");
+                return;
+            }
+            SapBomModel sapBomModel = new SapBomModel();
+            sapBomModel.BomType = treeType;
+            sapBomModel.ProductNo = productNo;
+            sapBomModel.Quantity = quantity;
+            Import_Form activeForm = new Import_Form(sapBomModel);
             activeForm.Show();
         }
 

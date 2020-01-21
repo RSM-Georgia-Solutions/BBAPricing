@@ -12,5 +12,7 @@ namespace BBAPricing
         public static string RetailPriceList { get; set; }
         public static double HumanResourceCoefficient { get; set; }
         public static double DailyNormPerPerson { get; set; }
+        public static int MtrlExcelIndex { get; set; }
+        public static int ResourceExcelIndex { get; set; }
     }
 }
