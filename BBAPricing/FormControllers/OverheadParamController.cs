@@ -20,52 +20,56 @@ namespace BBAPricing.FormControllers
         {
             get
             {
-                return new OverheadParamsModel
-                {
-                    Version = string.IsNullOrWhiteSpace(Form.DataSources.DBDataSources.Item(0).GetValue("U_Version",
-                        Form.DataSources.DBDataSources.Item(0).Offset))
-                        ? "0"
-                        : Form.DataSources.DBDataSources.Item(0).GetValue("U_Version",
+                OverheadParamsModel model = new OverheadParamsModel();
+                model.Version = string.IsNullOrWhiteSpace(Form.DataSources.DBDataSources.Item(0).GetValue("U_Version",
+                    Form.DataSources.DBDataSources.Item(0).Offset))
+                    ? "1"
+                    : Form.DataSources.DBDataSources.Item(0).GetValue("U_Version",
+                        Form.DataSources.DBDataSources.Item(0).Offset);
+                model.DailyWorkHours = double.Parse(Form.DataSources.DBDataSources.Item(0).GetValue("U_DailyWorkHours",
+                    Form.DataSources.DBDataSources.Item(0).Offset), CultureInfo.InvariantCulture);
+                model.WorkingDaysMonthly = double.Parse(Form.DataSources.DBDataSources.Item(0).GetValue("U_WorkingDaysMonthly",
+                    Form.DataSources.DBDataSources.Item(0).Offset), CultureInfo.InvariantCulture);
+                model.Corian = double.Parse(Form.DataSources.DBDataSources.Item(0).GetValue("U_Corian",
+                    Form.DataSources.DBDataSources.Item(0).Offset), CultureInfo.InvariantCulture);
+                model.Neolith = double.Parse(Form.DataSources.DBDataSources.Item(0).GetValue("U_Neolith",
+                    Form.DataSources.DBDataSources.Item(0).Offset), CultureInfo.InvariantCulture);
+                model.Furniture = double.Parse(Form.DataSources.DBDataSources.Item(0).GetValue("U_Furniture",
+                    Form.DataSources.DBDataSources.Item(0).Offset), CultureInfo.InvariantCulture);
+                model.AdministrativeOverhead = double.Parse(Form.DataSources.DBDataSources.Item(0).GetValue(
+                    "U_AdministrativeOverhead",
+                    Form.DataSources.DBDataSources.Item(0).Offset), CultureInfo.InvariantCulture);
+                model.ManufacuringOverhead = double.Parse(Form.DataSources.DBDataSources.Item(0).GetValue(
+                    "U_ManufacuringOverhead",
+                    Form.DataSources.DBDataSources.Item(0).Offset), CultureInfo.InvariantCulture);
+                model.CorianEmployee = double.Parse(Form.DataSources.DBDataSources.Item(0).GetValue("U_CorianEmployee",
+                    Form.DataSources.DBDataSources.Item(0).Offset), CultureInfo.InvariantCulture);
+                model.FurnitureEmployee = double.Parse(Form.DataSources.DBDataSources.Item(0).GetValue(
+                    "U_FurnitureEmployee",
+                    Form.DataSources.DBDataSources.Item(0).Offset), CultureInfo.InvariantCulture);
+                model.NeolithEmployee = double.Parse(Form.DataSources.DBDataSources.Item(0).GetValue("U_NeolithEmployee",
+                    Form.DataSources.DBDataSources.Item(0).Offset), CultureInfo.InvariantCulture);
+                model.TotalEmps = double.Parse(Form.DataSources.DBDataSources.Item(0).GetValue("U_TotalEmps",
+                    Form.DataSources.DBDataSources.Item(0).Offset), CultureInfo.InvariantCulture);
+                model.ChangeDate = DateTime.ParseExact(string.IsNullOrWhiteSpace(Form.DataSources.DBDataSources.Item(0)
+                        .GetValue("U_ChangeDate",
+                            Form.DataSources.DBDataSources.Item(0).Offset))
+                        ? DateTime.Now.ToString("yyyyMMdd")
+                        : Form.DataSources.DBDataSources.Item(0).GetValue("U_ChangeDate",
                             Form.DataSources.DBDataSources.Item(0).Offset),
-                    DailyWorkHours = double.Parse(Form.DataSources.DBDataSources.Item(0).GetValue("U_DailyWorkHours",
-                        Form.DataSources.DBDataSources.Item(0).Offset)),
-                    WorkingDaysMonthly = double.Parse(Form.DataSources.DBDataSources.Item(0).GetValue("U_WorkingDaysMonthly",
-                        Form.DataSources.DBDataSources.Item(0).Offset)),
-                    Corian = double.Parse(Form.DataSources.DBDataSources.Item(0).GetValue("U_Corian",
-                        Form.DataSources.DBDataSources.Item(0).Offset)),
-                    Neolith = double.Parse(Form.DataSources.DBDataSources.Item(0).GetValue("U_Neolith",
-                        Form.DataSources.DBDataSources.Item(0).Offset)),
-                    Furniture = double.Parse(Form.DataSources.DBDataSources.Item(0).GetValue("U_Furniture",
-                        Form.DataSources.DBDataSources.Item(0).Offset)),
-                    AdministrativeOverhead = double.Parse(Form.DataSources.DBDataSources.Item(0).GetValue(
-                        "U_AdministrativeOverhead",
-                        Form.DataSources.DBDataSources.Item(0).Offset)),
-                    ManufacuringOverhead = double.Parse(Form.DataSources.DBDataSources.Item(0).GetValue(
-                        "U_ManufacuringOverhead",
-                        Form.DataSources.DBDataSources.Item(0).Offset)),
-                    CorianEmployee = double.Parse(Form.DataSources.DBDataSources.Item(0).GetValue("U_CorianEmployee",
-                        Form.DataSources.DBDataSources.Item(0).Offset)),
-                    FurnitureEmployee = double.Parse(Form.DataSources.DBDataSources.Item(0).GetValue(
-                        "U_FurnitureEmployee",
-                        Form.DataSources.DBDataSources.Item(0).Offset)),
-                    NeolithEmployee = double.Parse(Form.DataSources.DBDataSources.Item(0).GetValue("U_NeolithEmployee",
-                        Form.DataSources.DBDataSources.Item(0).Offset)),
-                    TotalEmps = double.Parse(Form.DataSources.DBDataSources.Item(0).GetValue("U_TotalEmps",
-                        Form.DataSources.DBDataSources.Item(0).Offset)),
-                    ChangeDate = DateTime.ParseExact(string.IsNullOrWhiteSpace(Form.DataSources.DBDataSources.Item(0)
-                            .GetValue("U_ChangeDate",
-                                Form.DataSources.DBDataSources.Item(0).Offset))
-                            ? DateTime.Now.ToString("yyyyMMdd")
-                            : Form.DataSources.DBDataSources.Item(0).GetValue("U_ChangeDate",
-                                Form.DataSources.DBDataSources.Item(0).Offset),
-                        "yyyyMMdd",
-                        CultureInfo.InvariantCulture),
-
-                    Code = int.Parse(Form.DataSources.DBDataSources.Item(0).GetValue("Code",
-                        Form.DataSources.DBDataSources.Item(0).Offset)),
-                    Name = Form.DataSources.DBDataSources.Item(0).GetValue("Code",
-                        Form.DataSources.DBDataSources.Item(0).Offset),
-                };
+                    "yyyyMMdd",
+                    CultureInfo.InvariantCulture);
+                try
+                {
+                    model.Code = int.Parse(Form.DataSources.DBDataSources.Item(0).GetValue("Code",
+                              Form.DataSources.DBDataSources.Item(0).Offset), CultureInfo.InvariantCulture);
+                }
+                catch (Exception)
+                { 
+                }
+                model.Name = Form.DataSources.DBDataSources.Item(0).GetValue("Code",
+                    Form.DataSources.DBDataSources.Item(0).Offset);
+                return model;
             }
             set { FormModel = value; }
         }
@@ -94,7 +98,7 @@ namespace BBAPricing.FormControllers
             ((EditText)Form.Items.Item("Item_20").Specific).Value = FormModel.ChangeDate.ToString("yyyyMMdd");
             Application.SBO_Application.Forms.ActiveForm.Freeze(false);
         }
-        public  bool FillModelFromDb()
+        public bool FillModelFromDb()
         {
             Recordset recSet = (Recordset)DiManager.Company.GetBusinessObject(BoObjectTypes.BoRecordset);
             recSet.DoQuery($"SELECT * FROM [@RSM_OVRHD_CLCB] WHERE U_Version = (SELECT MAX(U_Version) FROM [@RSM_OVRHD_CLCB])");
@@ -134,12 +138,35 @@ namespace BBAPricing.FormControllers
         }
         public void HendldeSettings()
         {
-            FillModelFromDb();
+            bool fromdb = FillModelFromDb();
+            if (!fromdb)
+            {
+                FillModelFromForm();
+                FormModel.AddOrUpdate();
+                return;
+            }
             FillFormFromModel();
             CompareDbToForm();
             FormModel.AddOrUpdate();
             Form.DataSources.DBDataSources.Item(0).Query();
-            Form.DataSources.DBDataSources.Item(0).Offset = Form.DataSources.DBDataSources.Item(0).Size -1;
+            Form.DataSources.DBDataSources.Item(0).Offset = Form.DataSources.DBDataSources.Item(0).Size - 1;
+        }
+
+        private void FillModelFromForm()
+        {
+            DbModel.WorkingDaysMonthly = double.Parse(Form.DataSources.DBDataSources.Item(0).GetValue("U_WorkingDaysMonthly", 0),CultureInfo.InvariantCulture);
+            DbModel.DailyWorkHours = double.Parse(Form.DataSources.DBDataSources.Item(0).GetValue("U_DailyWorkHours", 0), CultureInfo.InvariantCulture);
+            DbModel.Corian = double.Parse(Form.DataSources.DBDataSources.Item(0).GetValue("U_Corian", 0), CultureInfo.InvariantCulture);
+            DbModel.Neolith = double.Parse(Form.DataSources.DBDataSources.Item(0).GetValue("U_Neolith", 0), CultureInfo.InvariantCulture);
+            DbModel.Furniture = double.Parse(Form.DataSources.DBDataSources.Item(0).GetValue("U_Furniture", 0), CultureInfo.InvariantCulture);
+            DbModel.AdministrativeOverhead = double.Parse(Form.DataSources.DBDataSources.Item(0).GetValue("U_AdministrativeOverhead", 0), CultureInfo.InvariantCulture);
+            DbModel.ManufacuringOverhead = double.Parse(Form.DataSources.DBDataSources.Item(0).GetValue("U_ManufacuringOverhead", 0), CultureInfo.InvariantCulture);
+            DbModel.CorianEmployee = double.Parse(Form.DataSources.DBDataSources.Item(0).GetValue("U_CorianEmployee", 0), CultureInfo.InvariantCulture);
+            DbModel.FurnitureEmployee = double.Parse(Form.DataSources.DBDataSources.Item(0).GetValue("U_FurnitureEmployee", 0), CultureInfo.InvariantCulture);
+            DbModel.NeolithEmployee = double.Parse(Form.DataSources.DBDataSources.Item(0).GetValue("U_NeolithEmployee", 0), CultureInfo.InvariantCulture);
+            DbModel.TotalEmps = double.Parse(Form.DataSources.DBDataSources.Item(0).GetValue("U_TotalEmps", 0), CultureInfo.InvariantCulture);
+            DbModel.ChangeDate = DateTime.Now;
+            DbModel.Version = "1";
         }
 
         private void CompareDbToForm()
@@ -147,7 +174,7 @@ namespace BBAPricing.FormControllers
             if (!DbModel.Equals(FormModel))
             {
                 var version = (double.Parse(FormModel.Version) + 1).ToString(CultureInfo.InvariantCulture);
-                Form.DataSources.DBDataSources.Item(0).SetValue("U_Version", Form.DataSources.DBDataSources.Item(0).Size-1, version);
+                Form.DataSources.DBDataSources.Item(0).SetValue("U_Version", Form.DataSources.DBDataSources.Item(0).Size - 1, version);
             }
         }
     }

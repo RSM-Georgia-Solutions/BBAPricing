@@ -49,7 +49,7 @@ namespace BBAPricing.Controllers
             }
         }
 
-        public static bool ImportMtrl(SapBomModel sapBomModel)
+        public static string ImportMtrl(SapBomModel sapBomModel)
         {
             var bom = (ProductTrees)DiManager.Company.GetBusinessObject(BoObjectTypes.oProductTrees);
             var updateFlag = bom.GetByKey(sapBomModel.ProductNo);
@@ -73,7 +73,7 @@ namespace BBAPricing.Controllers
                 var err = DiManager.Company.GetLastErrorDescription();
                 throw new Exception(err);
             }
-            return res == 0;
+            return res == 0? DiManager.Company.GetNewObjectKey() : res.ToString();
         }
     }
 }
