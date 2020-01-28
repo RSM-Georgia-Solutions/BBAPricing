@@ -268,7 +268,11 @@ FROM
 
             var bp = (BusinessPartners)DiManager.Company.GetBusinessObject(BoObjectTypes.oBusinessPartners);
             bp.GetByKey(_MasterBomModel.CardCode);
-            var discount = (double)bp.UserFields.Fields.Item("U_SharedDiscount").Value;
+            double discount = 0;
+            if (bp.UserFields.Fields.Item("U_SharedDiscount").Value is double)
+            {
+                discount = (double)bp.UserFields.Fields.Item("U_SharedDiscount").Value;
+            }
             while (!recSet.EoF)
             {
                 MaterialModel materialModel = new MaterialModel();

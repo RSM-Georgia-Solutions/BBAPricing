@@ -6,7 +6,7 @@ namespace BBAPricing.Initialization
     {
         public void Run()
         {
-            DiManager.CreateTable("RSM_MBOM", "მასტერ ბომი", BoUTBTableType.bott_NoObjectAutoIncrement);
+          var xz =  DiManager.CreateTable("RSM_MBOM", "მასტერ ბომი", BoUTBTableType.bott_NoObjectAutoIncrement);
             DiManager.CreateTable("RSM_MBOM_ROWS", "მასტერ ბომი ცხრილური", BoUTBTableType.bott_NoObjectAutoIncrement);
             DiManager.CreateTable("RSM_ELEM", "ელემენტები", BoUTBTableType.bott_NoObjectAutoIncrement);
             DiManager.CreateTable("RSM_MTRL", "მატერიალები", BoUTBTableType.bott_NoObjectAutoIncrement);
