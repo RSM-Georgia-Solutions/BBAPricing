@@ -79,7 +79,8 @@ namespace BBAPricing.FormControllers
             recForCmp.DoQuery($"select * from [@RSM_OVERHEADS_R] WHERE U_ComponentId = N'Manufacturing Overhead 1 კაც/საათზე'");
             Recordset recSet =
                 (Recordset)DiManager.Company.GetBusinessObject(BoObjectTypes.BoRecordset);
-            recSet.DoQuery($"SELECT * FROM [@RSM_RESOURCES] JOIN OITM ON OITM.ItemCode = U_ParentItemCode JOIN ORSC ON ORSC.VisResCode =  [@RSM_RESOURCES].U_resourcecode   WHERE U_Version = (SELECT MAX(U_Version)FROM[@RSM_RESOURCES]GROUP BY U_ParentItemCode) AND U_SalesQuotationDocEntry = {MasterBomModel.SalesQuotationDocEntry} AND U_ParentItemCode  = N'{MasterBomModel.ParentItem}' AND ORSC.ResType = 'L'");
+            string query = $"SELECT * FROM [@RSM_RESOURCES] JOIN OITM ON OITM.ItemCode = U_ParentItemCode JOIN ORSC ON ORSC.VisResCode =  [@RSM_RESOURCES].U_resourcecode   WHERE U_Version = (SELECT MAX(U_Version)FROM[@RSM_RESOURCES]GROUP BY U_ParentItemCode,U_SalesQuotationDocEntry Having U_SalesQuotationDocEntry = {MasterBomModel.SalesQuotationDocEntry} AND U_ParentItemCode = N'{MasterBomModel.ParentItem}') AND U_SalesQuotationDocEntry = {MasterBomModel.SalesQuotationDocEntry} AND U_ParentItemCode  = N'{MasterBomModel.ParentItem}' AND ORSC.ResType = 'L'";
+            recSet.DoQuery(query);
             var type = recSet.Fields.Item("U_SBU").Value.ToString();
             double requiredResource = 0;
             double unitCost = 0;
