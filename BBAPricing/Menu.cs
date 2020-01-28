@@ -75,10 +75,10 @@ namespace BBAPricing
                 oCreationPackage.String = "Pricing";
                 oMenus.AddEx(oCreationPackage);
                 // Create s sub menu
-                oCreationPackage.Type = SAPbouiCOM.BoMenuType.mt_STRING;
-                oCreationPackage.UniqueID = "BBAPricing.Import_Form";
-                oCreationPackage.String = "Import";
-                oMenus.AddEx(oCreationPackage);
+                //oCreationPackage.Type = SAPbouiCOM.BoMenuType.mt_STRING;
+                //oCreationPackage.UniqueID = "BBAPricing.Import_Form";
+                //oCreationPackage.String = "Import";
+                //oMenus.AddEx(oCreationPackage);
                 // Create s sub menu
                 oCreationPackage.Type = SAPbouiCOM.BoMenuType.mt_STRING;
                 oCreationPackage.UniqueID = "BBAPricing.Forms.Initialization";

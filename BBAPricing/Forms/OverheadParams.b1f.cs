@@ -7,6 +7,7 @@ using BBAPricing.Models;
 using SAPbobsCOM;
 using SAPbouiCOM;
 using SAPbouiCOM.Framework;
+using Application = SAPbouiCOM.Application;
 
 namespace BBAPricing.Forms
 {
@@ -104,11 +105,23 @@ namespace BBAPricing.Forms
 
         private void Button0_PressedAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
         {
-            OverheadParamController.HendldeSettings();
-            OverheadParamController.Refresh();
-            OverheadsController = new OverheadsController(UIAPIRawForm,
-                OverheadParamController.FormModel);
-            OverheadsController.CalculateOverheads();
+            try
+            {
+                int max = 1;
+                ProgressBar bar = SAPbouiCOM.Framework.Application.SBO_Application.StatusBar.CreateProgressBar("Saving",
+                    max,
+                    false);
+                OverheadParamController.HendldeSettings();
+                OverheadParamController.Refresh();
+                OverheadsController = new OverheadsController(UIAPIRawForm, OverheadParamController.FormModel);
+                OverheadsController.CalculateOverheads();
+                bar.Stop();
+                SAPbouiCOM.Framework.Application.SBO_Application.StatusBar.SetSystemMessage("Success", BoMessageTime.bmt_Short, BoStatusBarMessageType.smt_Success);
+            }
+            catch (Exception)
+            {
+                //progress bar possible crash
+            }
         }
 
         private void EditText2_ValidateAfter(object sboObject, SBOItemEventArg pVal)

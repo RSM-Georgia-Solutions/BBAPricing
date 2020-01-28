@@ -6,6 +6,8 @@ using System.Text;
 using BBAPricing.Models;
 using SAPbobsCOM;
 using SAPbouiCOM.Framework;
+using BoMessageTime = SAPbouiCOM.BoMessageTime;
+using BoStatusBarMessageType = SAPbouiCOM.BoStatusBarMessageType;
 using EditText = SAPbouiCOM.EditText;
 
 namespace BBAPricing.Forms
@@ -88,8 +90,9 @@ namespace BBAPricing.Forms
             _Model.RetailPriceList = EditText1.Value;
             _Model.HumanResourceCoefficient = double.Parse(EditText2.Value, CultureInfo.InvariantCulture);
             _Model.DailyNormPerPerson = double.Parse(EditText3.Value, CultureInfo.InvariantCulture);
-            _Model.MtrlExcelIndex = int.Parse(EditText4.Value, CultureInfo.InvariantCulture);
-            _Model.ResourceExcelIndex = int.Parse(EditText5.Value, CultureInfo.InvariantCulture);
+            _Model.MtrlExcelIndex = int.Parse(string.IsNullOrWhiteSpace(EditText4.Value) ? "0" : EditText4.Value, CultureInfo.InvariantCulture);
+            _Model.ResourceExcelIndex = int.Parse(string.IsNullOrWhiteSpace(EditText5.Value) ? "0" : EditText5.Value, CultureInfo.InvariantCulture);
+            Application.SBO_Application.StatusBar.SetSystemMessage("Success",BoMessageTime.bmt_Short,BoStatusBarMessageType.smt_Success);
         }
 
         private void Button0_PressedAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
