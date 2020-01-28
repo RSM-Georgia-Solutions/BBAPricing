@@ -23,3 +23,4 @@ C:\Users\gkajaia\Desktop\Code\BBAPricing2.5Code\BBAPricing\BBAPricing\obj\Debug\
 C:\Users\gkajaia\Desktop\Code\BBAPricing2.5Code\BBAPricing\BBAPricing\obj\Debug\BBAPricing.exe
 C:\Users\gkajaia\Desktop\Code\BBAPricing2.5Code\BBAPricing\BBAPricing\obj\Debug\BBAPricing.pdb
 D:\Users\nkurdadze\Documents\Visual Studio 2015\Projects\BBAPricing\BBAPricing\bin\Debug\Appocalypto.dll
+C:\Users\gkajaia\Desktop\Code\BBAPricing2.5Code\BBAPricing\BBAPricing\bin\Debug\Appocalypto.dll

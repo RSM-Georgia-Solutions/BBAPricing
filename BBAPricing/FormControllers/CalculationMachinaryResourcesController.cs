@@ -198,6 +198,11 @@ namespace BBAPricing.FormControllers
                 resourceModel.MarginPercent = (resourceModel.ResourceTotalPrice - resourceModel.TotalStandartCost) / resourceModel.ResourceTotalPrice;
                 resourceModel.AmountOnUnit = resourceModel.ResourceUnitPrice - resourceModel.StandartCost;
                 resourceModel.TotalAmount = resourceModel.ResourceTotalPrice - resourceModel.TotalStandartCost;
+                if (resourceModel.OtherQtyResource == 0)
+                {
+                    SAPbouiCOM.Framework.Application.SBO_Application.SetStatusBarMessage("Qty Of BOM არ არის შევსებული");
+                    return;
+                }
                 resourceModel.CostOfUnit = resourceModel.TotalStandartCost / resourceModel.OtherQtyResource;
                 resourceModel.PriceOfUnit = resourceModel.ResourceTotalPrice / resourceModel.OtherQtyResource;
                 resourceModel.MarginOfUnit = resourceModel.PriceOfUnit - resourceModel.CostOfUnit;
