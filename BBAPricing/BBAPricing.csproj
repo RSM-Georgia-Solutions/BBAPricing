@@ -35,6 +35,10 @@
     <StartupObject>BBAPricing.Program</StartupObject>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Appocalypto, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Appocalypto.1.1.0\lib\net452\Appocalypto.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="ExcelImportDll">
       <HintPath>\\srv-ilia\FileServer\Developers\Add-On Pre Built Forms\Import Form\ExcelImportDll.dll</HintPath>
     </Reference>
@@ -161,6 +165,7 @@
     <None Include="Forms\Settings.b1f">
       <FormCategory>UserForm</FormCategory>
     </None>
+    <None Include="packages.config" />
     <None Include="System Forms\BillOfMaterials.b1f">
       <FormCategory>SystemForm</FormCategory>
     </None>

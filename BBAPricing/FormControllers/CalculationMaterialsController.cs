@@ -270,7 +270,7 @@ FROM
             bp.GetByKey(_MasterBomModel.CardCode);
             double discount = 0;
             var discountstring = bp.UserFields.Fields.Item("U_SharedDiscount").Value.ToString();
-            double.TryParse(discountstring, out discount);      
+            double.TryParse(discountstring, out discount);
 
             while (!recSet.EoF)
             {

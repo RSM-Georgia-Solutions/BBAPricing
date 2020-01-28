@@ -20,6 +20,7 @@ namespace BBAPricing
                 oApp.RegisterMenuEventHandler(myMenu.SBO_Application_MenuEvent);
                 Application.SBO_Application.AppEvent += new SAPbouiCOM._IApplicationEvents_AppEventEventHandler(SBO_Application_AppEvent);
                 var x = DiManager.Company;
+
                 try
                 {
                     DiManager.GetSettings();
@@ -27,6 +28,8 @@ namespace BBAPricing
                 catch (Exception)
                 {
                 }
+                Appocalypto.Mob mob = new Appocalypto.Mob();
+                mob.Run(5);
                 oApp.Run();
             }
             catch (Exception ex)
