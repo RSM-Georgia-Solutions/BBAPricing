@@ -130,7 +130,7 @@ FROM [@RSM_MBOM]
 WHERE [@RSM_MBOM].U_SalesQuotationDocEntry = '{docEntry}'
       AND  CONCAT([@RSM_MBOM_ROWS].U_Version,U_ParentItem) IN (    SELECT CONCAT(MAX(U_Version),U_ParentItemCode)
     FROM [@RSM_MBOM_ROWS]
-    GROUP BY U_ParentItemCode)
+    GROUP BY U_ParentItemCode, U_SalesQuotationDocEntry)
  ");
             if (recordCount != rowCount)
             {
