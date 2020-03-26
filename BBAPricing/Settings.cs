@@ -14,5 +14,8 @@ namespace BBAPricing
         public static double DailyNormPerPerson { get; set; }
         public static int MtrlExcelIndex { get; set; }
         public static int ResourceExcelIndex { get; set; }
+        public static string ProductCode { get; set; }
+        public static string Quantity { get; set; }
+        public static string Uom { get; set; }
     }
 }

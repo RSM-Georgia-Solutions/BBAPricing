@@ -301,6 +301,9 @@ namespace BBAPricing
             Settings.WorkingPriceList = recSet.Fields.Item($"U_WorkingPriceList").Value.ToString();
             Settings.MtrlExcelIndex = (int)recSet.Fields.Item($"U_MtrlExcelIndex").Value;
             Settings.ResourceExcelIndex = (int)recSet.Fields.Item($"U_ResourceExcelIndex").Value;
+            Settings.ProductCode = recSet.Fields.Item($"U_ProductCode").Value.ToString();
+            Settings.Quantity = recSet.Fields.Item($"U_Quantity").Value.ToString();
+            Settings.Uom = recSet.Fields.Item($"U_Uom").Value.ToString();
         }
     }
 }

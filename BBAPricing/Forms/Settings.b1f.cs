@@ -40,6 +40,12 @@ namespace BBAPricing.Forms
             this.StaticText4 = ((SAPbouiCOM.StaticText)(this.GetItem("Item_10").Specific));
             this.EditText5 = ((SAPbouiCOM.EditText)(this.GetItem("Item_11").Specific));
             this.StaticText5 = ((SAPbouiCOM.StaticText)(this.GetItem("Item_12").Specific));
+            this.EditText6 = ((SAPbouiCOM.EditText)(this.GetItem("Item_13").Specific));
+            this.StaticText6 = ((SAPbouiCOM.StaticText)(this.GetItem("Item_14").Specific));
+            this.EditText7 = ((SAPbouiCOM.EditText)(this.GetItem("Item_15").Specific));
+            this.StaticText7 = ((SAPbouiCOM.StaticText)(this.GetItem("Item_16").Specific));
+            this.EditText8 = ((SAPbouiCOM.EditText)(this.GetItem("Item_17").Specific));
+            this.StaticText8 = ((SAPbouiCOM.StaticText)(this.GetItem("Item_18").Specific));
             this.OnCustomInitialize();
 
         }
@@ -81,6 +87,9 @@ namespace BBAPricing.Forms
             ((EditText)UIAPIRawForm.Items.Item("Item_8").Specific).Value = _Model.DailyNormPerPerson.ToString(CultureInfo.InvariantCulture);
             ((EditText)UIAPIRawForm.Items.Item("Item_9").Specific).Value = _Model.MtrlExcelIndex.ToString(CultureInfo.InvariantCulture);
             ((EditText)UIAPIRawForm.Items.Item("Item_11").Specific).Value = _Model.ResourceExcelIndex.ToString(CultureInfo.InvariantCulture);
+            ((EditText)UIAPIRawForm.Items.Item("Item_13").Specific).Value = _Model.ProductCode.ToString(CultureInfo.InvariantCulture);
+            ((EditText)UIAPIRawForm.Items.Item("Item_15").Specific).Value = _Model.Quantity.ToString(CultureInfo.InvariantCulture);
+            ((EditText)UIAPIRawForm.Items.Item("Item_17").Specific).Value = _Model.Uom.ToString(CultureInfo.InvariantCulture);
             Application.SBO_Application.Forms.ActiveForm.Freeze(false);
         }
 
@@ -88,6 +97,9 @@ namespace BBAPricing.Forms
         {
             _Model.WorkingPriceList = EditText0.Value;
             _Model.RetailPriceList = EditText1.Value;
+            _Model.ProductCode = EditText6.Value;
+            _Model.Quantity = EditText7.Value;
+            _Model.Uom = EditText8.Value;
             _Model.HumanResourceCoefficient = double.Parse(EditText2.Value, CultureInfo.InvariantCulture);
             _Model.DailyNormPerPerson = double.Parse(EditText3.Value, CultureInfo.InvariantCulture);
             _Model.MtrlExcelIndex = int.Parse(string.IsNullOrWhiteSpace(EditText4.Value) ? "0" : EditText4.Value, CultureInfo.InvariantCulture);
@@ -127,6 +139,9 @@ namespace BBAPricing.Forms
                 return false;
             }
             _Model.WorkingPriceList = recSet.Fields.Item("U_WorkingPriceList").Value.ToString();
+            _Model.ProductCode = recSet.Fields.Item("U_ProductCode").Value.ToString();
+            _Model.Quantity = recSet.Fields.Item("U_Quantity").Value.ToString();
+            _Model.Uom = recSet.Fields.Item("U_Uom").Value.ToString();
             _Model.RetailPriceList = recSet.Fields.Item("U_RetailPriceList").Value.ToString();
             _Model.HumanResourceCoefficient = (double)recSet.Fields.Item("U_HumanResourceCoefficient").Value;
             _Model.DailyNormPerPerson = (double)recSet.Fields.Item("U_DailyNormPerPerson").Value;
@@ -139,5 +154,11 @@ namespace BBAPricing.Forms
         private SAPbouiCOM.StaticText StaticText4;
         private EditText EditText5;
         private SAPbouiCOM.StaticText StaticText5;
+        private EditText EditText6;
+        private SAPbouiCOM.StaticText StaticText6;
+        private EditText EditText7;
+        private SAPbouiCOM.StaticText StaticText7;
+        private EditText EditText8;
+        private SAPbouiCOM.StaticText StaticText8;
     }
 }

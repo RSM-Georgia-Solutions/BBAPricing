@@ -8,11 +8,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using BBAPricing.Iterfaces;
+using Application = SAPbouiCOM.Framework.Application;
 
 namespace BBAPricing.FormControllers
 {
     public class CalculationMachinaryResourcesController : IFormController
     {
+        public bool HasErrors { get; set; }
         private MasterBomModel MasterBomModel;
         private List<ResourceModel> _MachinaryResourceModelsList;
         private readonly IForm _form;
@@ -169,7 +171,18 @@ namespace BBAPricing.FormControllers
                                     AND ORSC.ResType = 'M'
                                     AND U_ResourceType = 'M'";
             recSet.DoQuery(query);
-
+            if (recSet.EoF)
+            {
+                Application.SBO_Application.SetStatusBarMessage(
+                    "Unit Retail Price გაწერილი არ არის " +
+                    " ან რესურსის ტიპი არაა მანქანა-დანადგარის" +
+                    " ან ოპერაციის კოდი არ არის გაწერილი",
+                    BoMessageTime.bmt_Short,
+                    true);
+                HasErrors = true;
+                return;
+            }
+            HasErrors = false;
             while (!recSet.EoF)
             {
                 ResourceModel resourceModel = new ResourceModel();
@@ -273,6 +286,10 @@ namespace BBAPricing.FormControllers
             if (!fromDb)
             {
                 GenerateModel();
+                if (HasErrors)
+                {
+                    return;
+                }
                 FillGridFromModel(_grid);
                 InsertMachinarLyistToDb();
                 RefreshBom.Invoke();

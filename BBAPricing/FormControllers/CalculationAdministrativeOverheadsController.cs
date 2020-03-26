@@ -7,11 +7,13 @@ using System.Threading.Tasks;
 using BBAPricing.Models;
 using SAPbobsCOM;
 using SAPbouiCOM;
+using Application = SAPbouiCOM.Framework.Application;
 
 namespace BBAPricing.FormControllers
 {
     public class CalculationAdministrativeOverheadsController
     {
+        public bool HasErrors { get; set; }
         private readonly MasterBomModel MasterBomModel;
         private OverheadModel OverheadModel;
         private OverheadModel OverheadModelDb;
@@ -30,6 +32,10 @@ namespace BBAPricing.FormControllers
         {
             bool fromDb = FillModelFromDb();
             GenerateModel();
+            if (HasErrors)
+            {
+                return;
+            }
             bool isChanged = CompareVersions();
             OverheadModel.AddOrUpdate();
             FillGridFromModel(Form);
@@ -88,6 +94,16 @@ namespace BBAPricing.FormControllers
             var type = recSet.Fields.Item("U_SBU").Value.ToString();
             double requiredResource = 0;
             double unitCost = 0;
+            if (string.IsNullOrWhiteSpace(type))
+            {
+                Application.SBO_Application.SetStatusBarMessage($"SBU არ არის არჩეული საქონელი - {MasterBomModel.ParentItem}",
+                    BoMessageTime.bmt_Short,
+                    true);
+                HasErrors = true;
+                return;
+            }
+            HasErrors = false;
+
             switch (type)
             {
                 case "01":
@@ -100,6 +116,15 @@ namespace BBAPricing.FormControllers
                     unitCost = (double)recForCmp.Fields.Item("U_Furniture").Value;
                     break;
             }
+            if (unitCost <= 0)
+            {
+                Application.SBO_Application.SetStatusBarMessage("შეავსეთ Overhead-ის პარამეტრები",
+                    BoMessageTime.bmt_Short,
+                    true);
+                HasErrors = true;
+                return;
+            }
+            HasErrors = false;
             while (!recSet.EoF)
             {
                 // var timeRequired = (double)recSet.Fields.Item("U_TimeRequired").Value;

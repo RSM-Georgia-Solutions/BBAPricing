@@ -8,12 +8,14 @@ using BBAPricing.Models;
 using SAPbouiCOM;
 using BBAPricing.FormControllers;
 using System.Globalization;
+using Application = SAPbouiCOM.Framework.Application;
 
 namespace BBAPricing.Forms
 {
     [FormAttribute("BBAPricing.Forms.Pricing", "Forms/Pricing.b1f")]
     class Pricing : UserFormBase
     {
+        public bool HasErrors { get; set; }
         PricingController _pricingConroller;
         public Pricing()
         {
@@ -221,6 +223,14 @@ namespace BBAPricing.Forms
                                   $"AND U_ParentItemCode  = N'{MasterBomModel.ParentItem}' AND ORSC.ResType = 'L'";
                 recSet.DoQuery(queryStr);
                 var type = recSet.Fields.Item("U_SBU").Value.ToString();
+                if (string.IsNullOrWhiteSpace(type))
+                {
+                    Application.SBO_Application.SetStatusBarMessage($"SBU არ არის არჩეული საქონელი - {MasterBomModel.ParentItem}",
+                        BoMessageTime.bmt_Short,
+                        true);
+                    HasErrors = true;
+                    return;
+                }
                 double requiredResource = 0;
                 double unitCost = 0;
                 switch (type)
@@ -235,7 +245,23 @@ namespace BBAPricing.Forms
                         unitCost = (double)recForCmp.Fields.Item("U_Furniture").Value;
                         break;
                 }
-
+                if (unitCost <= 0)
+                {
+                    Application.SBO_Application.SetStatusBarMessage("შეავსეთ Overhead-ის პარამეტრები",
+                         BoMessageTime.bmt_Short,
+                         true);
+                    HasErrors = true;
+                    return;
+                }
+                if (MasterBomModel.TotalSquareMeter <= 0)
+                {
+                    Application.SBO_Application.SetStatusBarMessage("TotalSquareMeter არავალიდურია",
+                        BoMessageTime.bmt_Short,
+                        true);
+                    HasErrors = true;
+                    return;
+                }
+                HasErrors = false;
                 var materialOverheadsCost = unitCost * MasterBomModel.TotalSquareMeter * MasterBomModel.Quantity;
                 var mtrlLine = MasterBomModel.Rows.First(x => x.ElementID == "Material OverHeads");
                 if (MasterBomModel.Currency != "GEL")

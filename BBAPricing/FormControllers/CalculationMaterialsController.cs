@@ -8,11 +8,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using BBAPricing.Iterfaces;
+using Application = SAPbouiCOM.Framework.Application;
 
 namespace BBAPricing.FormControllers
 {
     public class CalculationMaterialsController : IFormController
     {
+        public bool HasErrors { get; set; }
         private MasterBomModel _MasterBomModel;
         private readonly List<MaterialModel> _materialModelsList;
         private readonly IForm _form;
@@ -284,7 +286,16 @@ FROM
                 materialModel.Currency = recSet.Fields.Item("Currency").Value.ToString();
                 materialModel.UnitRetailPrice = (double)recSet.Fields.Item("Retail Price").Value;
                 materialModel.UnitWorkingPrice = (double)recSet.Fields.Item("Working Price").Value;
+                if (string.IsNullOrWhiteSpace(materialModel.Currency) || materialModel.UnitRetailPrice == 0 || materialModel.UnitWorkingPrice == 0)
+                {
+                    Application.SBO_Application.SetStatusBarMessage($"ფასი არ არის გაწერილი : საქონელი - {materialModel.ComponentCode } ",
+                        BoMessageTime.bmt_Short,
+                        true);
+                    HasErrors = true;
+                    return;
+                }
 
+                HasErrors = false;
                 if (_MasterBomModel.Currency == "GEL")
                 {
                     if (_MasterBomModel.Currency != materialModel.Currency)
@@ -349,6 +360,10 @@ FROM
             if (!fromDb)
             {
                 GenerateModel();
+                if (HasErrors)
+                {
+                    return;
+                }
                 FillGridFromModel(_grid);
                 InsertMaterialsListToDb();
                 RefreshBom.Invoke();

@@ -10,7 +10,6 @@ D:\Users\nkurdadze\Documents\Visual Studio 2015\Projects\BBAPricing\BBAPricing\b
 D:\Users\nkurdadze\Documents\Visual Studio 2015\Projects\BBAPricing\BBAPricing\bin\Debug\Media\m_BBA.jpg
 D:\Users\nkurdadze\Documents\Visual Studio 2015\Projects\BBAPricing\BBAPricing\bin\Debug\Media\m_BBA (1).jpg
 D:\Users\nkurdadze\Documents\Visual Studio 2015\Projects\BBAPricing\BBAPricing\bin\Debug\Media\m_BBA (2).jpg
-D:\Users\nkurdadze\Documents\Visual Studio 2015\Projects\BBAPricing\BBAPricing\obj\Debug\BBAPricing.csprojResolveAssemblyReference.cache
 C:\Users\gkajaia\Desktop\Code\BBAPricing2.5Code\BBAPricing\BBAPricing\bin\Debug\Media\c9.bmp
 C:\Users\gkajaia\Desktop\Code\BBAPricing2.5Code\BBAPricing\BBAPricing\bin\Debug\Media\Icon.bmp
 C:\Users\gkajaia\Desktop\Code\BBAPricing2.5Code\BBAPricing\BBAPricing\bin\Debug\Media\m_BBA (1).jpg

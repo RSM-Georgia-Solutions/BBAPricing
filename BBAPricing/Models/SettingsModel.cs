@@ -17,6 +17,9 @@ namespace BBAPricing.Models
         public double DailyNormPerPerson { get; set; }
         public int ResourceExcelIndex { get; set; }
         public int MtrlExcelIndex { get; set; }
+        public  string ProductCode { get; set; }
+        public  string Quantity { get; set; }
+        public  string Uom { get; set; }
         private List<PropertyInfo> Properies { get; }
 
         public SettingsModel()

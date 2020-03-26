@@ -36,9 +36,9 @@ namespace BBAPricing.Controllers
 
             foreach (DataRow row in rows.Skip(Settings.MtrlExcelIndex))
             {
-                string productCode = row[excelIndexes["Article"]].ToString();
-                var quantity = double.Parse(row[excelIndexes["Quantity in a product"]].ToString(), CultureInfo.InvariantCulture);
-                string uom = row[excelIndexes["Meas. unit"]].ToString();
+                string productCode = row[excelIndexes[Settings.ProductCode]].ToString();
+                var quantity = double.Parse(row[excelIndexes[Settings.Quantity]].ToString(), CultureInfo.CurrentCulture);
+                string uom = row[excelIndexes[Settings.Uom]].ToString();
                 sapBomModel.Rows.Add(new SapBomModelRow
                 {
                     ChildItem = productCode,

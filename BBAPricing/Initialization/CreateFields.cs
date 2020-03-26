@@ -19,6 +19,9 @@ namespace BBAPricing.Initialization
             DiManager.CreateField("@RSM_BBA_SETTINGS", "RetailPriceList", "Retail Price List", BoFieldTypes.db_Alpha, 250, false);
             DiManager.CreateField("@RSM_BBA_SETTINGS", "HumanResourceCoefficient", "HumanResource Coefficient", BoFieldTypes.db_Float, 250, false, false, "", "", BoFldSubTypes.st_Sum);
             DiManager.CreateField("@RSM_BBA_SETTINGS", "DailyNormPerPerson", "Daily Norm Per Person", BoFieldTypes.db_Float, 250, false, false, "", "", BoFldSubTypes.st_Sum);
+            DiManager.CreateField("@RSM_BBA_SETTINGS", "ProductCode", "ProductCode", BoFieldTypes.db_Alpha, 250, false);
+            DiManager.CreateField("@RSM_BBA_SETTINGS", "Quantity", "Quantity", BoFieldTypes.db_Alpha, 250, false);
+            DiManager.CreateField("@RSM_BBA_SETTINGS", "Uom", "Unit Of Measure", BoFieldTypes.db_Alpha, 250, false);
 
             DiManager.CreateField("@RSM_MBOM_ROWS", "ElementID", "Element ID", BoFieldTypes.db_Alpha, 250, false);
             DiManager.CreateField("@RSM_MBOM_ROWS", "Element", "Element", BoFieldTypes.db_Alpha, 250, false);

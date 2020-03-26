@@ -216,11 +216,11 @@ namespace BBAPricing.FormControllers
                 resourceModel.OtherQtyResource = (double)recSet.Fields.Item("OtherQtyResource").Value;
                 resourceModel.Uom = recSet.Fields.Item("Uom").Value.ToString();
                 resourceModel.Quantity = (double)recSet.Fields.Item("Quantity").Value;
+                resourceModel.StandartCost = (double)recSet.Fields.Item("StandartCost").Value;
                 if (resourceModel.StandartCost == 0)
                 {
                     SAPbouiCOM.Framework.Application.SBO_Application.SetStatusBarMessage("რესურსების Standard Cost N1 არ არის შევსებული");
                 }
-                resourceModel.StandartCost = (double)recSet.Fields.Item("StandartCost").Value;
                 resourceModel.TotalStandartCost = (double)recSet.Fields.Item("TotalStandartCost").Value;
                 resourceModel.ResourceUnitPrice = resourceModel.StandartCost * Settings.HumanResourceCoefficient;
                 resourceModel.ResourceTotalPrice = resourceModel.ResourceUnitPrice * resourceModel.Quantity;
