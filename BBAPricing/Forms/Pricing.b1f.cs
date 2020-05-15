@@ -92,7 +92,14 @@ namespace BBAPricing.Forms
             EditText10.Value = MasterBomModel.TotalSquareMeter.ToString(CultureInfo.InvariantCulture);
             EditText11.Value = MasterBomModel.ReferenceFeePercentage.ToString(CultureInfo.InvariantCulture);
             EditText6.Value = MasterBomModel.PriceForSquareMeter.ToString(CultureInfo.InvariantCulture);
-            ComboBox0.Select(MasterBomModel.Currency);
+            if (string.IsNullOrWhiteSpace(MasterBomModel.Currency))
+            {
+                ComboBox0.Select("GEL", BoSearchKey.psk_ByDescription);
+            }
+            else
+            {
+                ComboBox0.Select(MasterBomModel.Currency);
+            }
             EditText3.Value = MasterBomModel.SalesQuotationDocEntry;
             EditText0.Item.Enabled = false;
             EditText1.Item.Enabled = false;

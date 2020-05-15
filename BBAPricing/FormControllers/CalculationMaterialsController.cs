@@ -18,7 +18,8 @@ namespace BBAPricing.FormControllers
         private MasterBomModel _MasterBomModel;
         private readonly List<MaterialModel> _materialModelsList;
         private readonly IForm _form;
-        public Grid _grid { get { return (Grid)_form.Items.Item("Item_0").Specific; } }
+        public Grid _grid => (Grid)_form.Items.Item("Item_0").Specific;
+
         public CalculationMaterialsController(MasterBomModel masterBomModel, IForm form) : base(form)
         {
             _MasterBomModel = masterBomModel;
@@ -69,8 +70,8 @@ namespace BBAPricing.FormControllers
             _grid.Columns.Item("Converted Currency").Editable = false;
             _grid.Columns.Item("Discount Percentage").Editable = false;
             _grid.Columns.Item("Margin Percentage").Editable = false;
-            _grid.Columns.Item("Shared Percentage").Editable = false;
-            _grid.Columns.Item("Unit Working Price").Editable = false;
+            _grid.Columns.Item("Shared Percentage").Editable = true;
+            _grid.Columns.Item("Unit Working Price").Editable = true;
             SAPbouiCOM.Framework.Application.SBO_Application.Forms.ActiveForm.Freeze(false);
         }
         public override void GetGridColumns()
@@ -109,6 +110,13 @@ FROM [@RSM_MTRL]";
             _MasterBomModel.Update();
         }
 
+        private void InsertMaterialsListToDbNewForUpateButton()
+        {
+            foreach (var item in _materialModelsList)
+            {
+                var res = item.Add();
+            }
+        }
         public override bool FillModelFromDb()
         {
             Recordset recSet2 = (Recordset)DiManager.Company.GetBusinessObject(BoObjectTypes.BoRecordset);
@@ -201,10 +209,15 @@ FROM [@RSM_MTRL]";
                 materialModel.SalesQuotationDocEntry = _MasterBomModel.SalesQuotationDocEntry;
                 materialModel.ParentItemCode = _MasterBomModel.ParentItem;
                 _materialModelsList.Add(materialModel);
-                totalCost = totalCost += materialModel.TotalCost;
-                totalFinalCustomerPrice = totalFinalCustomerPrice += materialModel.FinalCustomerPriceTotal;
-                totalMargin = totalMargin += materialModel.MarginAmount;
-                totalPrice = totalPrice += materialModel.UnitWorkingPrice;
+                totalCost += materialModel.TotalCost;
+                totalFinalCustomerPrice += materialModel.FinalCustomerPriceTotal;
+                totalMargin += materialModel.MarginAmount;
+                totalPrice += materialModel.UnitWorkingPrice;
+                var mtrlLine = _MasterBomModel.Rows.First(x => x.ElementID == "MTRLs");
+                mtrlLine.Cost = totalCost;
+                mtrlLine.Price = totalPrice;
+                mtrlLine.Margin = totalMargin;
+                mtrlLine.FinalCustomerPrice = totalFinalCustomerPrice;
             }
 
         }
@@ -273,7 +286,7 @@ FROM
             double discount = 0;
             var discountstring = bp.UserFields.Fields.Item("U_SharedDiscount").Value.ToString();
             double.TryParse(discountstring, out discount);
-
+            int i = 0;
             while (!recSet.EoF)
             {
                 MaterialModel materialModel = new MaterialModel();
@@ -326,6 +339,7 @@ FROM
                 totalPrice = totalPrice += materialModel.UnitWorkingPrice * materialModel.Quantity;
                 totalMargin = totalMargin += materialModel.MarginAmount;
                 totalFinalCustomerPrice = totalFinalCustomerPrice += materialModel.FinalCustomerPriceTotal;
+                i++;
                 recSet.MoveNext();
             }
             var mtrlLine = _MasterBomModel.Rows.First(x => x.ElementID == "MTRLs");
@@ -381,6 +395,21 @@ FROM
             string version = (int.Parse(_materialModelsList.First().Version, CultureInfo.InvariantCulture) + 1).ToString();
             _materialModelsList.Clear();
             _MasterBomModel.Version = version;
+            FillModelFromGrid();
+            foreach (var row in _MasterBomModel.Rows)
+            {
+                row.Version = version;
+            }
+            InsertMaterialsListToDbNewForUpateButton();
+            _MasterBomModel.Add();
+            FillGridFromModel(_grid);
+            RefreshBom.Invoke();
+        }
+        public void UpdateMaterialsFormFromPriceList()
+        {
+            string version = (int.Parse(_materialModelsList.First().Version, CultureInfo.InvariantCulture) + 1).ToString();
+            _materialModelsList.Clear();
+            _MasterBomModel.Version = version;
             GenerateModel();
             foreach (var row in _MasterBomModel.Rows)
             {
@@ -390,12 +419,6 @@ FROM
             _MasterBomModel.Add();
             FillGridFromModel(_grid);
             RefreshBom.Invoke();
-        }
-        public void UpdateMaterialsFormFromPriceList()
-        {
-            _materialModelsList.Clear();
-            GenerateModel();
-            FillGridFromModel(_grid);
         }
     }
 }
