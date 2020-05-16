@@ -31,7 +31,7 @@ namespace BBAPricing.Models
         public bool AddOrUpdate()
         {
             Recordset recSet = (Recordset)DiManager.Company.GetBusinessObject(BoObjectTypes.BoRecordset);
-            recSet.DoQuery($"SELECT * FROM [@RSM_COMMON_ELEM]");
+            recSet.DoQuery($"SELECT * FROM [@RSM_COMMON_ELEM] where U_SalesQuotationDocEntry = {SalesQuotationDocEntry}");
             bool updateFlag = recSet.RecordCount > 0;
 
             UserTable userTable = DiManager.Company.UserTables.Item("RSM_COMMON_ELEM");

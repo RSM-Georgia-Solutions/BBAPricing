@@ -60,7 +60,7 @@ namespace BBAPricing.FormControllers
             _grid.Columns.Item("Quantity").Editable = false;
             _grid.Columns.Item("StandartCost").Editable = false;
             _grid.Columns.Item("TotalStandartCost").Editable = false;
-            _grid.Columns.Item("ResourceUnitPrice").Editable = false;
+            _grid.Columns.Item("ResourceUnitPrice").Editable = true;
             _grid.Columns.Item("ResourceTotalPrice").Editable = false;
             _grid.Columns.Item("OperationCode").Editable = false;
             _grid.Columns.Item("OperationName").Editable = false;
@@ -123,7 +123,6 @@ namespace BBAPricing.FormControllers
 
         public override void GenerateModel()
         {
-            GetGridColumns();
             Recordset recSet = (Recordset)DiManager.Company.GetBusinessObject(BoObjectTypes.BoRecordset);
             double totalCost = 0;
             double totalPrice = 0;
@@ -134,8 +133,8 @@ namespace BBAPricing.FormControllers
        OUGP.UgpName as [UomResourceMain],   
                                    ITT1.U_QtyOfBom as [OtherQtyResource],                                 
                                    ITT1.Quantity,
-                            	   ORSC.StdCost1 as [StandartCost],
-                            	   ORSC.StdCost1 * ITT1.Quantity as [TotalStandartCost],
+                                    ORSC.StdCost1 + StdCost2 + StdCost3 + StdCost4 + StdCost5 + StdCost6 + StdCost7 + StdCost8 + StdCost9 + StdCost10  as [StandartCost],
+                            	   (ORSC.StdCost1 + StdCost2 + StdCost3 + StdCost4 + StdCost5 + StdCost6 + StdCost7 + StdCost8 + StdCost9 + StdCost10) * ITT1.Quantity as [TotalStandartCost],
                             	   CASE
                    WHEN ITM1.Price = 0
                    THEN CASE
@@ -167,7 +166,7 @@ namespace BBAPricing.FormControllers
                                  JOIN OPLN on ITM1.PriceList = OPLN.ListNum
    JOIN OUGP on OUGP.UgpEntry = OITM.UgpEntry
                             	 JOIN ORSC ON ORSC.VisResCode =  ITT1.Code WHERE Father = '{MasterBomModel.ParentItem}' 
-                                    AND OPLN.ListName = '{Settings.RetailPriceList}' 
+                                    AND OPLN.ListName = '{Settings.RetailPriceList}'
                                     AND ORSC.ResType = 'M'
                                     AND U_ResourceType = 'M'";
             recSet.DoQuery(query);
@@ -183,6 +182,7 @@ namespace BBAPricing.FormControllers
                 return;
             }
             HasErrors = false;
+
             while (!recSet.EoF)
             {
                 ResourceModel resourceModel = new ResourceModel();
@@ -224,9 +224,9 @@ namespace BBAPricing.FormControllers
                 resourceModel.Currency = recSet.Fields.Item("Currency").Value.ToString();
                 _MachinaryResourceModelsList.Add(resourceModel);
                 totalCost += resourceModel.TotalStandartCost;
-                totalPrice += resourceModel.ResourceUnitPrice;
+                totalPrice += resourceModel.ResourceTotalPrice;
                 totalMargin += resourceModel.MarginOfUnit;
-                totalFinalCustomerPrice += resourceModel.AmountOnUnit;
+                totalFinalCustomerPrice += resourceModel.ResourceTotalPrice;
                 recSet.MoveNext();
             }
             var mtrlLine = MasterBomModel.Rows.First(x => x.ElementID == "Machinery Resources");
@@ -241,6 +241,14 @@ namespace BBAPricing.FormControllers
             foreach (var item in _MachinaryResourceModelsList)
             {
                 var res = item.Add();
+            }
+            MasterBomModel.Update();
+        }
+        private void UpdateMachinarLyistToDb()
+        {
+            foreach (var item in _MachinaryResourceModelsList)
+            {
+                var res = item.Update();
             }
             MasterBomModel.Update();
         }
@@ -310,10 +318,19 @@ namespace BBAPricing.FormControllers
             {
                 row.Version = version;
             }
+            FillResourceUnitPriceFromGrid();
             FillGridFromModel(_grid);
-            MasterBomModel.Add();
-            InsertMachinarLyistToDb();
+            MasterBomModel.Update();
+            UpdateMachinarLyistToDb();
             RefreshBom.Invoke();
+        }
+        public void FillResourceUnitPriceFromGrid()
+        {
+            for (int i = 0; i < _grid.DataTable.Rows.Count - 1; i++)
+            {
+                _MachinaryResourceModelsList[0].ResourceUnitPrice = (double)_grid.DataTable.GetValue("ResourceUnitPrice", i);
+                _MachinaryResourceModelsList[0].ResourceTotalPrice = _MachinaryResourceModelsList[0].ResourceUnitPrice * _MachinaryResourceModelsList[0].Quantity;
+            }
         }
         public void FillModelFromGrid()
         {

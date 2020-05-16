@@ -25,7 +25,7 @@ namespace BBAPricing.FormControllers
         public bool FillModelFromDb()
         {
             Recordset recSet = (Recordset)DiManager.Company.GetBusinessObject(BoObjectTypes.BoRecordset);
-            recSet.DoQuery("SELECT * FROM [@RSM_COMMON_ELEM]");
+            recSet.DoQuery($"SELECT * FROM [@RSM_COMMON_ELEM] WHERE U_SalesQuotationDocEntry = {MasterBomModel.First().SalesQuotationDocEntry}");
             if (recSet.EoF)
             {
                 return false;
@@ -102,6 +102,7 @@ namespace BBAPricing.FormControllers
             Model.ChangeDate = DateTime.Now;
             Model.ProjectCode = MasterBomModel.First().ProjectCode;
             Model.SalesQuotationDocEntry = MasterBomModel.First().SalesQuotationDocEntry;
+            Model.DailyNormPerPerson = Settings.DailyNormPerPerson;
         }
 
         public void UpdateMbom()
@@ -113,7 +114,7 @@ namespace BBAPricing.FormControllers
                               $" AND [@RSM_MBOM].U_ParentItem = [@RSM_MBOM_ROWS].U_ParentItemCode " +
                               $" AND [@RSM_MBOM].U_Version = [@RSM_MBOM_ROWS].U_Version" +
                               $" WHERE [@RSM_MBOM_ROWS].U_SalesQuotationDocentry = '{MasterBomModel.First().SalesQuotationDocEntry}'" +
-                              $" AND [@RSM_MBOM_ROWS].U_Version in (SELECT MAX(U_Version)FROM[@RSM_MBOM_ROWS]GROUP BY U_ParentItemCode) " +
+                              $" AND [@RSM_MBOM_ROWS].U_Version in (SELECT MAX(U_Version) FROM [@RSM_MBOM_ROWS]  where  U_SalesQuotationDocentry = '{MasterBomModel.First().SalesQuotationDocEntry}' GROUP BY U_ParentItemCode) " +
                               $" AND U_ElementID in" +
                               $" (N'Administrative Overheads',N'Human Resources',N'Machinery Resources',N'Manufacturing Overheads',N'MTRLs', N'Material OverHeads')" +
                               $" Group By U_ParentItemCode";
@@ -132,8 +133,14 @@ namespace BBAPricing.FormControllers
             int lineId = 0;
             foreach (MasterBomModel masterBomModel in MasterBomModel)
             {
-                var trip = Math.Round(Model.TotalCost / totalCostForCommonElems * parentItemsAndSums[masterBomModel.ParentItem], 4);
-                var transport = Math.Round(Model.TransportationAmount / totalCostForCommonElems * parentItemsAndSums[masterBomModel.ParentItem], 4);
+                double trip = 0;
+                double transport = 0;
+                if (parentItemsAndSums.Count != 0)
+                {
+                    trip = Math.Round(Model.TotalCost / totalCostForCommonElems * parentItemsAndSums[masterBomModel.ParentItem], 4);
+                    transport = Math.Round(Model.TransportationAmount / totalCostForCommonElems * parentItemsAndSums[masterBomModel.ParentItem], 4);
+                }
+                
                 var mBomTripRow = masterBomModel.Rows.First(x => x.ElementID == "Business Trip" && x.ParentItemCode == masterBomModel.ParentItem);
                 var mBomTransportRow = masterBomModel.Rows.First(x => x.ElementID == "Transportation" && x.ParentItemCode == masterBomModel.ParentItem);
                 mBomTripRow.Cost = Math.Round(trip, 4);

@@ -160,44 +160,45 @@ namespace BBAPricing.FormControllers
             double totalPrice = 0;
             double totalMargin = 0;
             double totalFinalCustomerPrice = 0;
-            string query = $@"SELECT  Itt1.Code as [ResourceCode], 
-                                   OITM.itemName as [ResourceName],   
-       OUGP.UgpName as [UomResourceMain],   
-                                   ITT1.U_QtyOfBom as [OtherQtyResource],                                 
-                                   ITT1.Quantity,
-                            	   ORSC.StdCost1 as [StandartCost],
-                            	   ORSC.StdCost1 * ITT1.Quantity as [TotalStandartCost],
-                            	   CASE
-                   WHEN ITM1.Price = 0
-                   THEN CASE
-                            WHEN ITM1.AddPrice1 = 0
-                            THEN ITM1.AddPrice2
-                            ELSE ITM1.AddPrice1
-                        END
-                   ELSE ITM1.Price
-               END as [ResourceUnitPrice],
-                            	   CASE
-                   WHEN ITM1.Price = 0
-                   THEN CASE
-                            WHEN ITM1.AddPrice1 = 0
-                            THEN ITM1.AddPrice2
-                            ELSE ITM1.AddPrice1
-                        END
-                   ELSE ITM1.Price
-               END * ITT1.Quantity as [ResourceTotalPrice] ,	    
- ITT1.Currency,                           
-	                               [@RSM_OPERATIONS].U_UOM as [Uom],
-	                                   [@RSM_OPERATIONS].U_ResourceCode AS [ResourceCode], 
+            string query = $@"SELECT Itt1.Code AS [ResourceCode], 
+       OITM.itemName AS [ResourceName], 
+       OUGP.UgpName AS [UomResourceMain], 
+       ITT1.U_QtyOfBom AS [OtherQtyResource], 
+       ITT1.Quantity, 
+       ORSC.StdCost1 + StdCost2 + StdCost3 + StdCost4 + StdCost5 + StdCost6 + StdCost7 + StdCost8 + StdCost9 + StdCost10 AS [StandartCost], 
+       (ORSC.StdCost1 + StdCost2 + StdCost3 + StdCost4 + StdCost5 + StdCost6 + StdCost7 + StdCost8 + StdCost9 + StdCost10) * ITT1.Quantity AS [TotalStandartCost],
+       CASE
+           WHEN ITM1.Price = 0
+           THEN CASE
+                    WHEN ITM1.AddPrice1 = 0
+                    THEN ITM1.AddPrice2
+                    ELSE ITM1.AddPrice1
+                END
+           ELSE ITM1.Price
+       END AS [ResourceUnitPrice],
+       CASE
+           WHEN ITM1.Price = 0
+           THEN CASE
+                    WHEN ITM1.AddPrice1 = 0
+                    THEN ITM1.AddPrice2
+                    ELSE ITM1.AddPrice1
+                END
+           ELSE ITM1.Price
+       END * ITT1.Quantity AS [ResourceTotalPrice], 
+       ITT1.Currency, 
+       [@RSM_OPERATIONS].U_UOM AS [Uom], 
+       [@RSM_OPERATIONS].U_ResourceCode AS [ResourceCode], 
        [@RSM_OPERATIONS].U_OperationCode AS [OperationCode], 
        [@RSM_OPERATIONS].U_OperationName AS [OperationName], 
-       [@RSM_OPERATIONS].U_ResourceName AS [ResourceName]                            
-                            FROM ITT1
-                                 JOIN [@RSM_OPERATIONS] on [@RSM_OPERATIONS].U_OperationCode = ITT1.U_Operation AND [@RSM_OPERATIONS].U_ResourceCode = ITT1.code
-                                 JOIN OITM ON OITM.LinkRsc = ITT1.Code
-                                 JOIN ITM1 ON OITM.ItemCode = ITM1.ItemCode   
-                                 JOIN OPLN on ITM1.PriceList = OPLN.ListNum
-   JOIN OUGP on OUGP.UgpEntry = OITM.UgpEntry
-                            	 JOIN ORSC ON ORSC.VisResCode =  ITT1.Code WHERE Father = '{MasterBomModel.ParentItem}' 
+       [@RSM_OPERATIONS].U_ResourceName AS [ResourceName]
+FROM ITT1
+     JOIN [@RSM_OPERATIONS] ON [@RSM_OPERATIONS].U_OperationCode = ITT1.U_Operation
+                               AND [@RSM_OPERATIONS].U_ResourceCode = ITT1.code
+     JOIN OITM ON OITM.LinkRsc = ITT1.Code
+     JOIN ITM1 ON OITM.ItemCode = ITM1.ItemCode
+     JOIN OPLN ON ITM1.PriceList = OPLN.ListNum
+     JOIN OUGP ON OUGP.UgpEntry = OITM.UgpEntry
+     JOIN ORSC ON ORSC.VisResCode = ITT1.Code WHERE Father = '{MasterBomModel.ParentItem}' 
                                     AND OPLN.ListName = '{Settings.RetailPriceList}' 
                                     AND ORSC.ResType = 'L'
                                     AND U_ResourceType = 'L'";
@@ -222,7 +223,7 @@ namespace BBAPricing.FormControllers
                     SAPbouiCOM.Framework.Application.SBO_Application.SetStatusBarMessage("რესურსების Standard Cost N1 არ არის შევსებული");
                 }
                 resourceModel.TotalStandartCost = (double)recSet.Fields.Item("TotalStandartCost").Value;
-                resourceModel.ResourceUnitPrice = resourceModel.StandartCost * Settings.HumanResourceCoefficient;
+                resourceModel.ResourceUnitPrice = (double)recSet.Fields.Item("ResourceUnitPrice").Value;
                 resourceModel.ResourceTotalPrice = resourceModel.ResourceUnitPrice * resourceModel.Quantity;
                 resourceModel.CostOfUnit = resourceModel.TotalStandartCost / resourceModel.OtherQtyResource;
                 resourceModel.TotalAmount = resourceModel.ResourceTotalPrice - resourceModel.TotalStandartCost;
@@ -243,8 +244,8 @@ namespace BBAPricing.FormControllers
                 HoumanResources.Add(resourceModel);
                 totalCost += resourceModel.TotalStandartCost;
                 totalPrice += resourceModel.ResourceTotalPrice;
-                totalMargin += resourceModel.MarginOfUnit * resourceModel.Quantity;
-                totalFinalCustomerPrice += resourceModel.AmountOnUnit;
+                totalMargin += resourceModel.MarginOfUnit;
+                totalFinalCustomerPrice += resourceModel.ResourceTotalPrice;
                 recSet.MoveNext();
             }
             var mtrlLine = MasterBomModel.Rows.First(x => x.ElementID == "Human Resources");
