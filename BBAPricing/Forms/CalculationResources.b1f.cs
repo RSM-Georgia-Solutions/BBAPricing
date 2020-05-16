@@ -30,6 +30,8 @@ namespace BBAPricing.Forms
             this.Grid0 = ((SAPbouiCOM.Grid)(this.GetItem("Item_0").Specific));
             this.Button0 = ((SAPbouiCOM.Button)(this.GetItem("Item_1").Specific));
             this.Button0.PressedAfter += new SAPbouiCOM._IButtonEvents_PressedAfterEventHandler(this.Button0_PressedAfter);
+            this.Button1 = ((SAPbouiCOM.Button)(this.GetItem("Item_2").Specific));
+            this.Button1.PressedAfter += new SAPbouiCOM._IButtonEvents_PressedAfterEventHandler(this.Button1_PressedAfter);
             this.OnCustomInitialize();
 
         }
@@ -64,6 +66,13 @@ namespace BBAPricing.Forms
         private void Button0_PressedAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
         {
            _calculateResourcesController.UpdateResources();
+        }
+
+        private SAPbouiCOM.Button Button1;
+
+        private void Button1_PressedAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
+        {
+            _calculateResourcesController.UpdateMachinaryResourcesFromForm();
         }
     }
 }

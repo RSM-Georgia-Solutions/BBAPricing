@@ -83,27 +83,27 @@ namespace BBAPricing.FormControllers
                 U_InfoPercent           as InfoPercent
                     FROM [@RSM_RESOURCES]";
             Grid.DataTable.ExecuteQuery(queryData);
-           Grid.Columns.Item("ResourceCode").Editable = false;
-           Grid.Columns.Item("ResourceName").Editable = false;
-           Grid.Columns.Item("Uom").Editable = false;
-           Grid.Columns.Item("OtherQtyResource").Editable = false;
-           Grid.Columns.Item("UomResourceMain").Editable = false;
-           Grid.Columns.Item("Quantity").Editable = false;
-           Grid.Columns.Item("StandartCost").Editable = false;
-           Grid.Columns.Item("TotalStandartCost").Editable = false;
-           Grid.Columns.Item("ResourceUnitPrice").Editable = false;
-           Grid.Columns.Item("ResourceTotalPrice").Editable = false;
-           Grid.Columns.Item("OperationCode").Editable = false;
-           Grid.Columns.Item("OperationName").Editable = false;
-           Grid.Columns.Item("Currency").Editable = false;
-           Grid.Columns.Item("MarginPercent").Editable = false;
-           Grid.Columns.Item("AmountOnUnit").Editable = false;
-           Grid.Columns.Item("TotalAmount").Editable = false;
-           Grid.Columns.Item("CostOfUnit").Editable = false;
-           Grid.Columns.Item("PriceOfUnit").Editable = false;
-           Grid.Columns.Item("MarginOfUnit").Editable = false;
-           Grid.Columns.Item("InfoPercent").Editable = false;
-           Form.Freeze(false);
+            Grid.Columns.Item("ResourceCode").Editable = false;
+            Grid.Columns.Item("ResourceName").Editable = false;
+            Grid.Columns.Item("Uom").Editable = false;
+            Grid.Columns.Item("OtherQtyResource").Editable = false;
+            Grid.Columns.Item("UomResourceMain").Editable = false;
+            Grid.Columns.Item("Quantity").Editable = false;
+            Grid.Columns.Item("StandartCost").Editable = false;
+            Grid.Columns.Item("TotalStandartCost").Editable = false;
+            Grid.Columns.Item("ResourceUnitPrice").Editable = false;
+            Grid.Columns.Item("ResourceTotalPrice").Editable = false;
+            Grid.Columns.Item("OperationCode").Editable = false;
+            Grid.Columns.Item("OperationName").Editable = false;
+            Grid.Columns.Item("Currency").Editable = false;
+            Grid.Columns.Item("MarginPercent").Editable = false;
+            Grid.Columns.Item("AmountOnUnit").Editable = false;
+            Grid.Columns.Item("TotalAmount").Editable = false;
+            Grid.Columns.Item("CostOfUnit").Editable = false;
+            Grid.Columns.Item("PriceOfUnit").Editable = false;
+            Grid.Columns.Item("MarginOfUnit").Editable = false;
+            Grid.Columns.Item("InfoPercent").Editable = false;
+            Form.Freeze(false);
         }
 
         public override bool FillModelFromDb()
@@ -232,9 +232,9 @@ FROM ITT1
 
                 if (MasterBomModel.Currency != "GEL")
                 {
-                        resourceModel.TotalStandartCost /= MasterBomModel.Rate;
-                        resourceModel.ResourceTotalPrice /= MasterBomModel.Rate;
-                        resourceModel.ResourceUnitPrice /= MasterBomModel.Rate;
+                    resourceModel.TotalStandartCost /= MasterBomModel.Rate;
+                    resourceModel.ResourceTotalPrice /= MasterBomModel.Rate;
+                    resourceModel.ResourceUnitPrice /= MasterBomModel.Rate;
                 }
 
                 resourceModel.PriceOfUnit = resourceModel.ResourceTotalPrice / resourceModel.OtherQtyResource;
@@ -255,6 +255,8 @@ FROM ITT1
             mtrlLine.FinalCustomerPrice = totalFinalCustomerPrice;
         }
         public static Action RefreshBom;
+     
+
         public void CalculateResources()
         {
             GetGridColumns();
@@ -296,6 +298,54 @@ FROM ITT1
             MasterBomModel.Add();
             InsertMaterialsListToDb();
             RefreshBom.Invoke();
+        }
+
+        public void UpdateHumanResourcesFromForm()
+        {
+            string version = (int.Parse(HoumanResources.First().Version, CultureInfo.InvariantCulture) + 1).ToString();
+            HoumanResources.Clear();
+            MasterBomModel.Version = version;
+            FillModelFromGrid();
+            foreach (var row in MasterBomModel.Rows)
+            {
+                row.Version = version;
+            }
+            InsertMaterialsListToDbNewForUpateButton();
+            MasterBomModel.Add();
+            FillGridFromModel(Grid);
+            RefreshBom.Invoke();
+        }
+
+        private void FillModelFromGrid()
+        {
+
+            for (int i = 0; i < Grid.DataTable.Rows.Count; i++)
+            {
+                ResourceModel resourceModel = new ResourceModel();
+                resourceModel.ResourceCode = Grid.DataTable.GetValue("ResourceCode", i).ToString();
+                resourceModel.ResourceName = Grid.DataTable.GetValue("ResourceName", i).ToString();
+                resourceModel.Uom = Grid.DataTable.GetValue("Uom", i).ToString();
+                resourceModel.Quantity = (double)Grid.DataTable.GetValue("Quantity", i);
+                resourceModel.StandartCost = (double)Grid.DataTable.GetValue("StandartCost", i);
+                resourceModel.TotalStandartCost = (double)Grid.DataTable.GetValue("TotalStandartCost", i);
+                resourceModel.ResourceUnitPrice = (double)Grid.DataTable.GetValue("ResourceUnitPrice", i);
+                resourceModel.ResourceTotalPrice = (double)Grid.DataTable.GetValue("ResourceTotalPrice", i);
+                resourceModel.OperationCode = Grid.DataTable.GetValue("OperationCode", i).ToString();
+                resourceModel.OperationName = Grid.DataTable.GetValue("OperationName", i).ToString();
+                resourceModel.SalesQuotationDocEntry = MasterBomModel.SalesQuotationDocEntry;
+                resourceModel.ParentItemCode = MasterBomModel.ParentItem;
+                HoumanResources.Add(resourceModel);
+                SAPbouiCOM.Framework.Application.SBO_Application.Forms.ActiveForm.Freeze(false);
+            }
+
+        }
+
+        private void InsertMaterialsListToDbNewForUpateButton()
+        {
+            foreach (var item in HoumanResources)
+            {
+                var res = item.Add();
+            }
         }
     }
 }

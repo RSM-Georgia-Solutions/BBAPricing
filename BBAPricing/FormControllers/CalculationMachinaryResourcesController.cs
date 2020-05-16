@@ -353,5 +353,29 @@ namespace BBAPricing.FormControllers
                 SAPbouiCOM.Framework.Application.SBO_Application.Forms.ActiveForm.Freeze(false);
             }
         }
+
+        public void UpdateMachinaryResourcesFromForm()
+        {
+            string version = (int.Parse(_MachinaryResourceModelsList.First().Version, CultureInfo.InvariantCulture) + 1).ToString();
+            _MachinaryResourceModelsList.Clear();
+            MasterBomModel.Version = version;
+            FillModelFromGrid();
+            foreach (var row in MasterBomModel.Rows)
+            {
+                row.Version = version;
+            }
+            InsertMaterialsListToDbNewForUpateButton();
+            MasterBomModel.Add();
+            FillGridFromModel(_grid);
+            RefreshBom.Invoke();
+        }
+
+        private void InsertMaterialsListToDbNewForUpateButton()
+        {
+            foreach (var item in _MachinaryResourceModelsList)
+            {
+                var res = item.Add();
+            }
+        }
     }
 }
