@@ -312,17 +312,17 @@ namespace BBAPricing.FormControllers
         {
             string version = (int.Parse(_MachinaryResourceModelsList.First().Version, CultureInfo.InvariantCulture) + 1).ToString();
             _MachinaryResourceModelsList.Clear();
-            GenerateModel();
             MasterBomModel.Version = version;
             foreach (var row in MasterBomModel.Rows)
             {
                 row.Version = version;
             }
-            FillResourceUnitPriceFromGrid();
+            GenerateModel();
             FillGridFromModel(_grid);
-            MasterBomModel.Update();
-            UpdateMachinarLyistToDb();
+            MasterBomModel.Add();
+            InsertMaterialsListToDbNewForUpateButton();
             RefreshBom.Invoke();
+       
         }
         public void FillResourceUnitPriceFromGrid()
         {
@@ -339,14 +339,25 @@ namespace BBAPricing.FormControllers
                 ResourceModel resourceModel = new ResourceModel();
                 resourceModel.ResourceCode = _grid.DataTable.GetValue("ResourceCode", i).ToString();
                 resourceModel.ResourceName = _grid.DataTable.GetValue("ResourceName", i).ToString();
+                resourceModel.OtherQtyResource = (double)_grid.DataTable.GetValue("OtherQtyResource", i); 
                 resourceModel.Uom = _grid.DataTable.GetValue("Uom", i).ToString();
                 resourceModel.Quantity = (double)_grid.DataTable.GetValue("Quantity", i);
                 resourceModel.StandartCost = (double)_grid.DataTable.GetValue("StandartCost", i);
                 resourceModel.TotalStandartCost = (double)_grid.DataTable.GetValue("TotalStandartCost", i);
                 resourceModel.ResourceUnitPrice = (double)_grid.DataTable.GetValue("ResourceUnitPrice", i);
-                resourceModel.ResourceTotalPrice = (double)_grid.DataTable.GetValue("ResourceTotalPrice", i);
+                resourceModel.ResourceTotalPrice = resourceModel.ResourceUnitPrice  * resourceModel.Quantity;
                 resourceModel.OperationCode = _grid.DataTable.GetValue("OperationCode", i).ToString();
                 resourceModel.OperationName = _grid.DataTable.GetValue("OperationName", i).ToString();
+                resourceModel.Currency = _grid.DataTable.GetValue("Currency", i).ToString();
+                resourceModel.CostOfUnit = (double)_grid.DataTable.GetValue("CostOfUnit", i);
+                resourceModel.PriceOfUnit = (double)_grid.DataTable.GetValue("PriceOfUnit", i);
+                resourceModel.MarginOfUnit = (double)_grid.DataTable.GetValue("MarginOfUnit", i);
+                resourceModel.InfoPercent = (double)_grid.DataTable.GetValue("InfoPercent", i);                
+                resourceModel.UomResourceMain = _grid.DataTable.GetValue("UomResourceMain", i).ToString();
+                resourceModel.MarginPercent = (resourceModel.ResourceTotalPrice - resourceModel.TotalStandartCost) / resourceModel.ResourceTotalPrice;
+                resourceModel.AmountOnUnit = resourceModel.ResourceUnitPrice - resourceModel.StandartCost;
+                resourceModel.TotalAmount = resourceModel.ResourceTotalPrice - resourceModel.TotalStandartCost;
+                resourceModel.Version = MasterBomModel.Version;
                 resourceModel.SalesQuotationDocEntry = MasterBomModel.SalesQuotationDocEntry;
                 resourceModel.ParentItemCode = MasterBomModel.ParentItem;
                 _MachinaryResourceModelsList.Add(resourceModel);

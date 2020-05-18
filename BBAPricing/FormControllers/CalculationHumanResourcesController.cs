@@ -15,22 +15,22 @@ namespace BBAPricing.FormControllers
     {
         private readonly MasterBomModel MasterBomModel;
         private new readonly IForm Form;
-        private readonly List<ResourceModel> HoumanResources;
+        private readonly List<ResourceModel> HumanResources;
         private Grid Grid => (Grid)Form.Items.Item("Item_0").Specific;
 
         public CalculationHumanResourcesController(MasterBomModel masterBomModel, IForm form) : base(form)
         {
             MasterBomModel = masterBomModel;
             Form = form;
-            HoumanResources = new List<ResourceModel>();
+            HumanResources = new List<ResourceModel>();
         }
 
         public override void FillGridFromModel(Grid grid)
         {
             SAPbouiCOM.Framework.Application.SBO_Application.Forms.ActiveForm.Freeze(true);
-            for (int i = 0; i < HoumanResources.Count; i++)
+            for (int i = 0; i < HumanResources.Count; i++)
             {
-                var machinaryResource = HoumanResources[i];
+                var machinaryResource = HumanResources[i];
                 grid.DataTable.Rows.Add();
                 grid.DataTable.SetValue("ResourceCode", i, machinaryResource.ResourceCode);
                 grid.DataTable.SetValue("ResourceName", i, machinaryResource.ResourceName);
@@ -91,7 +91,7 @@ namespace BBAPricing.FormControllers
             Grid.Columns.Item("Quantity").Editable = false;
             Grid.Columns.Item("StandartCost").Editable = false;
             Grid.Columns.Item("TotalStandartCost").Editable = false;
-            Grid.Columns.Item("ResourceUnitPrice").Editable = false;
+            Grid.Columns.Item("ResourceUnitPrice").Editable = true;
             Grid.Columns.Item("ResourceTotalPrice").Editable = false;
             Grid.Columns.Item("OperationCode").Editable = false;
             Grid.Columns.Item("OperationName").Editable = false;
@@ -144,7 +144,7 @@ namespace BBAPricing.FormControllers
                     model.OtherQtyResource = (double)recSet.Fields.Item("U_OtherQtyResource").Value;
                     model.UomResourceMain = recSet.Fields.Item("U_UomResourceMain").Value.ToString();
                     model.Version = recSet.Fields.Item("U_Version").Value.ToString();
-                    HoumanResources.Add(model);
+                    HumanResources.Add(model);
                     recSet.MoveNext();
                 }
                 return true;
@@ -241,7 +241,7 @@ FROM ITT1
                 resourceModel.MarginOfUnit = resourceModel.PriceOfUnit - resourceModel.CostOfUnit;
                 resourceModel.InfoPercent = resourceModel.MarginOfUnit / resourceModel.PriceOfUnit;
                 resourceModel.Version = MasterBomModel.Version;
-                HoumanResources.Add(resourceModel);
+                HumanResources.Add(resourceModel);
                 totalCost += resourceModel.TotalStandartCost;
                 totalPrice += resourceModel.ResourceTotalPrice;
                 totalMargin += resourceModel.MarginOfUnit;
@@ -276,7 +276,7 @@ FROM ITT1
 
         private void InsertMaterialsListToDb()
         {
-            foreach (var item in HoumanResources)
+            foreach (var item in HumanResources)
             {
                 var res = item.Add();
             }
@@ -286,8 +286,8 @@ FROM ITT1
 
         public void UpdateResources()
         {
-            string version = (int.Parse(HoumanResources.First().Version, CultureInfo.InvariantCulture) + 1).ToString();
-            HoumanResources.Clear();
+            string version = (int.Parse(HumanResources.First().Version, CultureInfo.InvariantCulture) + 1).ToString();
+            HumanResources.Clear();
             MasterBomModel.Version = version;
             foreach (var row in MasterBomModel.Rows)
             {
@@ -302,8 +302,8 @@ FROM ITT1
 
         public void UpdateHumanResourcesFromForm()
         {
-            string version = (int.Parse(HoumanResources.First().Version, CultureInfo.InvariantCulture) + 1).ToString();
-            HoumanResources.Clear();
+            string version = (int.Parse(HumanResources.First().Version, CultureInfo.InvariantCulture) + 1).ToString();
+            HumanResources.Clear();
             MasterBomModel.Version = version;
             FillModelFromGrid();
             foreach (var row in MasterBomModel.Rows)
@@ -324,17 +324,28 @@ FROM ITT1
                 ResourceModel resourceModel = new ResourceModel();
                 resourceModel.ResourceCode = Grid.DataTable.GetValue("ResourceCode", i).ToString();
                 resourceModel.ResourceName = Grid.DataTable.GetValue("ResourceName", i).ToString();
+                resourceModel.OtherQtyResource = (double)Grid.DataTable.GetValue("OtherQtyResource", i);
                 resourceModel.Uom = Grid.DataTable.GetValue("Uom", i).ToString();
                 resourceModel.Quantity = (double)Grid.DataTable.GetValue("Quantity", i);
                 resourceModel.StandartCost = (double)Grid.DataTable.GetValue("StandartCost", i);
                 resourceModel.TotalStandartCost = (double)Grid.DataTable.GetValue("TotalStandartCost", i);
                 resourceModel.ResourceUnitPrice = (double)Grid.DataTable.GetValue("ResourceUnitPrice", i);
-                resourceModel.ResourceTotalPrice = (double)Grid.DataTable.GetValue("ResourceTotalPrice", i);
+                resourceModel.ResourceTotalPrice = resourceModel.ResourceUnitPrice * resourceModel.Quantity;
                 resourceModel.OperationCode = Grid.DataTable.GetValue("OperationCode", i).ToString();
                 resourceModel.OperationName = Grid.DataTable.GetValue("OperationName", i).ToString();
+                resourceModel.Currency = Grid.DataTable.GetValue("Currency", i).ToString();
+                resourceModel.CostOfUnit = (double)Grid.DataTable.GetValue("CostOfUnit", i);
+                resourceModel.PriceOfUnit = (double)Grid.DataTable.GetValue("PriceOfUnit", i);
+                resourceModel.MarginOfUnit = (double)Grid.DataTable.GetValue("MarginOfUnit", i);
+                resourceModel.InfoPercent = (double)Grid.DataTable.GetValue("InfoPercent", i);
+                resourceModel.UomResourceMain = Grid.DataTable.GetValue("UomResourceMain", i).ToString();
+                resourceModel.MarginPercent = (resourceModel.ResourceTotalPrice - resourceModel.TotalStandartCost) / resourceModel.ResourceTotalPrice;
+                resourceModel.AmountOnUnit = resourceModel.ResourceUnitPrice - resourceModel.StandartCost;
+                resourceModel.TotalAmount = resourceModel.ResourceTotalPrice - resourceModel.TotalStandartCost;
+                resourceModel.Version = MasterBomModel.Version;
                 resourceModel.SalesQuotationDocEntry = MasterBomModel.SalesQuotationDocEntry;
                 resourceModel.ParentItemCode = MasterBomModel.ParentItem;
-                HoumanResources.Add(resourceModel);
+                HumanResources.Add(resourceModel);
                 SAPbouiCOM.Framework.Application.SBO_Application.Forms.ActiveForm.Freeze(false);
             }
 
@@ -342,7 +353,7 @@ FROM ITT1
 
         private void InsertMaterialsListToDbNewForUpateButton()
         {
-            foreach (var item in HoumanResources)
+            foreach (var item in HumanResources)
             {
                 var res = item.Add();
             }
