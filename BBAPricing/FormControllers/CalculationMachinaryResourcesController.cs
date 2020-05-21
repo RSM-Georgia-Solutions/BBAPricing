@@ -322,7 +322,7 @@ namespace BBAPricing.FormControllers
             MasterBomModel.Add();
             InsertMaterialsListToDbNewForUpateButton();
             RefreshBom.Invoke();
-       
+
         }
         public void FillResourceUnitPriceFromGrid()
         {
@@ -339,21 +339,21 @@ namespace BBAPricing.FormControllers
                 ResourceModel resourceModel = new ResourceModel();
                 resourceModel.ResourceCode = _grid.DataTable.GetValue("ResourceCode", i).ToString();
                 resourceModel.ResourceName = _grid.DataTable.GetValue("ResourceName", i).ToString();
-                resourceModel.OtherQtyResource = (double)_grid.DataTable.GetValue("OtherQtyResource", i); 
+                resourceModel.OtherQtyResource = (double)_grid.DataTable.GetValue("OtherQtyResource", i);
                 resourceModel.Uom = _grid.DataTable.GetValue("Uom", i).ToString();
                 resourceModel.Quantity = (double)_grid.DataTable.GetValue("Quantity", i);
                 resourceModel.StandartCost = (double)_grid.DataTable.GetValue("StandartCost", i);
                 resourceModel.TotalStandartCost = (double)_grid.DataTable.GetValue("TotalStandartCost", i);
                 resourceModel.ResourceUnitPrice = (double)_grid.DataTable.GetValue("ResourceUnitPrice", i);
-                resourceModel.ResourceTotalPrice = resourceModel.ResourceUnitPrice  * resourceModel.Quantity;
+                resourceModel.ResourceTotalPrice = resourceModel.ResourceUnitPrice * resourceModel.Quantity;
                 resourceModel.OperationCode = _grid.DataTable.GetValue("OperationCode", i).ToString();
                 resourceModel.OperationName = _grid.DataTable.GetValue("OperationName", i).ToString();
                 resourceModel.Currency = _grid.DataTable.GetValue("Currency", i).ToString();
                 resourceModel.CostOfUnit = (double)_grid.DataTable.GetValue("CostOfUnit", i);
-                resourceModel.PriceOfUnit = (double)_grid.DataTable.GetValue("PriceOfUnit", i);
-                resourceModel.MarginOfUnit = (double)_grid.DataTable.GetValue("MarginOfUnit", i);
-                resourceModel.InfoPercent = (double)_grid.DataTable.GetValue("InfoPercent", i);                
                 resourceModel.UomResourceMain = _grid.DataTable.GetValue("UomResourceMain", i).ToString();
+                resourceModel.PriceOfUnit = resourceModel.ResourceTotalPrice / resourceModel.Quantity;
+                resourceModel.MarginOfUnit = resourceModel.PriceOfUnit - resourceModel.CostOfUnit;
+                resourceModel.InfoPercent = resourceModel.MarginOfUnit / resourceModel.PriceOfUnit;
                 resourceModel.MarginPercent = (resourceModel.ResourceTotalPrice - resourceModel.TotalStandartCost) / resourceModel.ResourceTotalPrice;
                 resourceModel.AmountOnUnit = resourceModel.ResourceUnitPrice - resourceModel.StandartCost;
                 resourceModel.TotalAmount = resourceModel.ResourceTotalPrice - resourceModel.TotalStandartCost;
@@ -371,14 +371,36 @@ namespace BBAPricing.FormControllers
             _MachinaryResourceModelsList.Clear();
             MasterBomModel.Version = version;
             FillModelFromGrid();
+            UpdateMasterBomRowTotals();
             foreach (var row in MasterBomModel.Rows)
             {
                 row.Version = version;
             }
             InsertMaterialsListToDbNewForUpateButton();
             MasterBomModel.Add();
+            GetGridColumns();
             FillGridFromModel(_grid);
             RefreshBom.Invoke();
+        }
+
+        private void UpdateMasterBomRowTotals()
+        {
+            double totalCost = 0;
+            double totalPrice = 0;
+            double totalMargin = 0;
+            double totalFinalCustomerPrice = 0;
+            foreach (var item in _MachinaryResourceModelsList)
+            {
+                totalCost += item.TotalStandartCost;
+                totalPrice += item.ResourceTotalPrice;
+                totalMargin += item.MarginOfUnit;
+                totalFinalCustomerPrice += item.ResourceTotalPrice;
+            }
+            var mtrlLine = MasterBomModel.Rows.First(x => x.ElementID == "Machinery Resources");
+            mtrlLine.Cost = totalCost;
+            mtrlLine.Price = totalPrice;
+            mtrlLine.Margin = totalMargin;
+            mtrlLine.FinalCustomerPrice = totalFinalCustomerPrice;
         }
 
         private void InsertMaterialsListToDbNewForUpateButton()

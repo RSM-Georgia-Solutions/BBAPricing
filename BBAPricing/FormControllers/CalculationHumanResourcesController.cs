@@ -30,28 +30,28 @@ namespace BBAPricing.FormControllers
             SAPbouiCOM.Framework.Application.SBO_Application.Forms.ActiveForm.Freeze(true);
             for (int i = 0; i < HumanResources.Count; i++)
             {
-                var machinaryResource = HumanResources[i];
+                var humanResource = HumanResources[i];
                 grid.DataTable.Rows.Add();
-                grid.DataTable.SetValue("ResourceCode", i, machinaryResource.ResourceCode);
-                grid.DataTable.SetValue("ResourceName", i, machinaryResource.ResourceName);
-                grid.DataTable.SetValue("Uom", i, machinaryResource.Uom);
-                grid.DataTable.SetValue("Quantity", i, machinaryResource.Quantity);
-                grid.DataTable.SetValue("StandartCost", i, machinaryResource.StandartCost);
-                grid.DataTable.SetValue("TotalStandartCost", i, machinaryResource.TotalStandartCost);
-                grid.DataTable.SetValue("ResourceUnitPrice", i, machinaryResource.ResourceUnitPrice);
-                grid.DataTable.SetValue("ResourceTotalPrice", i, machinaryResource.ResourceTotalPrice);
-                grid.DataTable.SetValue("OperationCode", i, machinaryResource.OperationCode);
-                grid.DataTable.SetValue("OperationName", i, machinaryResource.OperationName);
+                grid.DataTable.SetValue("ResourceCode", i, humanResource.ResourceCode);
+                grid.DataTable.SetValue("ResourceName", i, humanResource.ResourceName);
+                grid.DataTable.SetValue("Uom", i, humanResource.Uom);
+                grid.DataTable.SetValue("Quantity", i, humanResource.Quantity);
+                grid.DataTable.SetValue("StandartCost", i, humanResource.StandartCost);
+                grid.DataTable.SetValue("TotalStandartCost", i, humanResource.TotalStandartCost);
+                grid.DataTable.SetValue("ResourceUnitPrice", i, humanResource.ResourceUnitPrice);
+                grid.DataTable.SetValue("ResourceTotalPrice", i, humanResource.ResourceTotalPrice);
+                grid.DataTable.SetValue("OperationCode", i, humanResource.OperationCode);
+                grid.DataTable.SetValue("OperationName", i, humanResource.OperationName);
                 grid.DataTable.SetValue("Currency", i, MasterBomModel.Currency);
-                grid.DataTable.SetValue("MarginPercent", i, machinaryResource.MarginPercent * 100);
-                grid.DataTable.SetValue("AmountOnUnit", i, machinaryResource.AmountOnUnit);
-                grid.DataTable.SetValue("TotalAmount", i, machinaryResource.TotalAmount);
-                grid.DataTable.SetValue("CostOfUnit", i, machinaryResource.CostOfUnit);
-                grid.DataTable.SetValue("PriceOfUnit", i, machinaryResource.PriceOfUnit);
-                grid.DataTable.SetValue("MarginOfUnit", i, machinaryResource.MarginOfUnit);
-                grid.DataTable.SetValue("InfoPercent", i, machinaryResource.InfoPercent * 100);
-                grid.DataTable.SetValue("OtherQtyResource", i, machinaryResource.OtherQtyResource);
-                grid.DataTable.SetValue("UomResourceMain", i, machinaryResource.UomResourceMain);
+                grid.DataTable.SetValue("MarginPercent", i, humanResource.MarginPercent * 100);
+                grid.DataTable.SetValue("AmountOnUnit", i, humanResource.AmountOnUnit);
+                grid.DataTable.SetValue("TotalAmount", i, humanResource.TotalAmount);
+                grid.DataTable.SetValue("CostOfUnit", i, humanResource.CostOfUnit);
+                grid.DataTable.SetValue("PriceOfUnit", i, humanResource.PriceOfUnit);
+                grid.DataTable.SetValue("MarginOfUnit", i, humanResource.MarginOfUnit);
+                grid.DataTable.SetValue("InfoPercent", i, humanResource.InfoPercent * 100);
+                grid.DataTable.SetValue("OtherQtyResource", i, humanResource.OtherQtyResource);
+                grid.DataTable.SetValue("UomResourceMain", i, humanResource.UomResourceMain);
             }
             Grid.DataTable.Rows.Remove(Grid.DataTable.Rows.Count - 1);
             SAPbouiCOM.Framework.Application.SBO_Application.Forms.ActiveForm.Freeze(false);
@@ -255,7 +255,7 @@ FROM ITT1
             mtrlLine.FinalCustomerPrice = totalFinalCustomerPrice;
         }
         public static Action RefreshBom;
-     
+
 
         public void CalculateResources()
         {
@@ -306,14 +306,35 @@ FROM ITT1
             HumanResources.Clear();
             MasterBomModel.Version = version;
             FillModelFromGrid();
+            UpdateMasterBomRowTotals();
             foreach (var row in MasterBomModel.Rows)
             {
                 row.Version = version;
             }
             InsertMaterialsListToDbNewForUpateButton();
             MasterBomModel.Add();
+            GetGridColumns();
             FillGridFromModel(Grid);
             RefreshBom.Invoke();
+        }
+        private void UpdateMasterBomRowTotals()
+        {
+            double totalCost = 0;
+            double totalPrice = 0;
+            double totalMargin = 0;
+            double totalFinalCustomerPrice = 0;
+            foreach (var item in HumanResources)
+            {
+                totalCost += item.TotalStandartCost;
+                totalPrice += item.ResourceTotalPrice;
+                totalMargin += item.MarginOfUnit;
+                totalFinalCustomerPrice += item.ResourceTotalPrice;
+            }
+            var mtrlLine = MasterBomModel.Rows.First(x => x.ElementID == "Human Resources");
+            mtrlLine.Cost = totalCost;
+            mtrlLine.Price = totalPrice;
+            mtrlLine.Margin = totalMargin;
+            mtrlLine.FinalCustomerPrice = totalFinalCustomerPrice;
         }
 
         private void FillModelFromGrid()
@@ -335,13 +356,14 @@ FROM ITT1
                 resourceModel.OperationName = Grid.DataTable.GetValue("OperationName", i).ToString();
                 resourceModel.Currency = Grid.DataTable.GetValue("Currency", i).ToString();
                 resourceModel.CostOfUnit = (double)Grid.DataTable.GetValue("CostOfUnit", i);
-                resourceModel.PriceOfUnit = (double)Grid.DataTable.GetValue("PriceOfUnit", i);
-                resourceModel.MarginOfUnit = (double)Grid.DataTable.GetValue("MarginOfUnit", i);
-                resourceModel.InfoPercent = (double)Grid.DataTable.GetValue("InfoPercent", i);
                 resourceModel.UomResourceMain = Grid.DataTable.GetValue("UomResourceMain", i).ToString();
+                resourceModel.PriceOfUnit = resourceModel.ResourceTotalPrice / resourceModel.Quantity;
+                resourceModel.MarginOfUnit = resourceModel.PriceOfUnit - resourceModel.CostOfUnit;
+                resourceModel.InfoPercent = resourceModel.MarginOfUnit / resourceModel.PriceOfUnit;
                 resourceModel.MarginPercent = (resourceModel.ResourceTotalPrice - resourceModel.TotalStandartCost) / resourceModel.ResourceTotalPrice;
                 resourceModel.AmountOnUnit = resourceModel.ResourceUnitPrice - resourceModel.StandartCost;
                 resourceModel.TotalAmount = resourceModel.ResourceTotalPrice - resourceModel.TotalStandartCost;
+
                 resourceModel.Version = MasterBomModel.Version;
                 resourceModel.SalesQuotationDocEntry = MasterBomModel.SalesQuotationDocEntry;
                 resourceModel.ParentItemCode = MasterBomModel.ParentItem;
