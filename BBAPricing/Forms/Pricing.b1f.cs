@@ -232,7 +232,7 @@ namespace BBAPricing.Forms
                 var type = recSet.Fields.Item("U_SBU").Value.ToString();
                 if (string.IsNullOrWhiteSpace(type))
                 {
-                    Application.SBO_Application.SetStatusBarMessage($"SBU არ არის არჩეული საქონელი - {MasterBomModel.ParentItem}",
+                    Application.SBO_Application.SetStatusBarMessage($"SBU არ არის არჩეული საქონელი - N'{MasterBomModel.ParentItem}'",
                         BoMessageTime.bmt_Short,
                         true);
                     HasErrors = true;
@@ -318,14 +318,14 @@ namespace BBAPricing.Forms
                U_II AS [II], 
                U_III AS [III]
         FROM [@RSM_MBOM_ROWS]
-        WHERE U_ParentItemCode = '{MasterBomModel.ParentItem}'
+        WHERE U_ParentItemCode = N'{MasterBomModel.ParentItem}'
               AND U_SalesQuotationDocEntry = '{MasterBomModel.SalesQuotationDocEntry}'
               AND U_Version =
         (
             SELECT MAX(U_Version)
             FROM [@RSM_MBOM]
-            WHERE U_ParentItem = '{MasterBomModel.ParentItem}'
-                  AND U_SalesQuotationDocEntry = '{MasterBomModel.ParentItem}'
+            WHERE U_ParentItem = N'{MasterBomModel.ParentItem}'
+                  AND U_SalesQuotationDocEntry = N'{MasterBomModel.ParentItem}'
         )";
             Grid0.DataTable.ExecuteQuery(query);
         }

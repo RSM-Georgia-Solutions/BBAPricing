@@ -29,7 +29,7 @@ namespace BBAPricing.Models
             Recordset recSet = (Recordset)DiManager.Company.GetBusinessObject(BoObjectTypes.BoRecordset);
 
             recSet.DoQuery($"select Code from [@RSM_OVERHEADS_SQ] Where U_ParentItemCode = N'{ParentItemCode}' " +
-                           $"AND U_SalesQuotationDocEntry = {SalesQuotationDocEntry} AND U_Version = '{Version}' AND U_OverheadType = '{OverheadType}'");
+                           $"AND U_SalesQuotationDocEntry = {SalesQuotationDocEntry} AND U_Version = '{Version}' AND U_OverheadType = N'{OverheadType}'");
             string code = recSet.Fields.Item("Code").Value.ToString();
             bool updateFlag = recSet.RecordCount > 0;
 

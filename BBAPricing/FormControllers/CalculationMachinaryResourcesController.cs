@@ -82,7 +82,7 @@ namespace BBAPricing.FormControllers
             recSet.DoQuery($@"SELECT  * FROM [@RSM_RESOURCES]
                                 JOIN [@RSM_OPERATIONS] ON [@RSM_RESOURCES].U_ResourceCode = [@RSM_OPERATIONS].U_ResourceCode 
                                 AND [@RSM_OPERATIONS].U_OperationCode  = [@RSM_RESOURCES].U_OperationCode
-                                WHERE U_ParentItemCode = '{MasterBomModel.ParentItem}' 
+                                WHERE U_ParentItemCode = N'{MasterBomModel.ParentItem}' 
                                     AND U_SalesQuotationDocEntry = '{MasterBomModel.SalesQuotationDocEntry}'
                                     AND U_Version = '{MasterBomModel.Version}' 
                                     AND U_ResourceType = 'M'");
@@ -165,8 +165,8 @@ namespace BBAPricing.FormControllers
                                  JOIN ITM1 ON OITM.ItemCode = ITM1.ItemCode   
                                  JOIN OPLN on ITM1.PriceList = OPLN.ListNum
    JOIN OUGP on OUGP.UgpEntry = OITM.UgpEntry
-                            	 JOIN ORSC ON ORSC.VisResCode =  ITT1.Code WHERE Father = '{MasterBomModel.ParentItem}' 
-                                    AND OPLN.ListName = '{Settings.RetailPriceList}'
+                            	 JOIN ORSC ON ORSC.VisResCode =  ITT1.Code WHERE Father = N'{MasterBomModel.ParentItem}' 
+                                    AND OPLN.ListName = N'{Settings.RetailPriceList}'
                                     AND ORSC.ResType = 'M'
                                     AND U_ResourceType = 'M'";
             recSet.DoQuery(query);

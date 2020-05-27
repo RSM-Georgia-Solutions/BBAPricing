@@ -16,7 +16,7 @@ namespace BBAPricing.FormControllers
     {
         public bool HasErrors { get; set; }
         private MasterBomModel _MasterBomModel;
-        private readonly List<MaterialModel> _materialModelsList;
+        private List<MaterialModel> _materialModelsList;
         private readonly IForm _form;
         public Grid _grid => (Grid)_form.Items.Item("Item_0").Specific;
 
@@ -120,7 +120,7 @@ FROM [@RSM_MTRL]";
         public override bool FillModelFromDb()
         {
             Recordset recSet2 = (Recordset)DiManager.Company.GetBusinessObject(BoObjectTypes.BoRecordset);
-            recSet2.DoQuery($@"SELECT * FROM [@RSM_MTRL]  WHERE U_ParentItemCode = '{_MasterBomModel.ParentItem}' AND U_SalesQuotationDocEntry = '{_MasterBomModel.SalesQuotationDocEntry}' AND U_Version = '{_MasterBomModel.Version}'");
+            recSet2.DoQuery($@"SELECT * FROM [@RSM_MTRL]  WHERE U_ParentItemCode = N'{_MasterBomModel.ParentItem}' AND U_SalesQuotationDocEntry = N'{_MasterBomModel.SalesQuotationDocEntry}' AND U_Version = '{_MasterBomModel.Version}'");
 
             if (!recSet2.EoF)
             {
@@ -265,7 +265,7 @@ FROM
          JOIN OITM ON OITM.ItemCode = ITT1.Code
          JOIN ITM1 ON OITM.ItemCode = ITM1.ItemCode
          JOIN OPLN ON ITM1.PriceList = OPLN.ListNum
-            WHERE Father = '{_MasterBomModel.ParentItem}' AND OPLN.ListName = '{Settings.WorkingPriceList}') Working INNER JOIN
+            WHERE Father = N'{_MasterBomModel.ParentItem}' AND OPLN.ListName = N'{Settings.WorkingPriceList}') Working INNER JOIN
                 (SELECT CASE
                WHEN ITM1.Price = 0
                THEN CASE
@@ -278,7 +278,7 @@ FROM
                 JOIN OITM on OITM.ItemCode = ITT1.Code
             JOIN ITM1 on OITM.ItemCode = ITM1.ItemCode
             JOIN OPLN on ITM1.PriceList = OPLN.ListNum
-            WHERE Father = '{_MasterBomModel.ParentItem}' AND OPLN.ListName = '{Settings.RetailPriceList}') Retail on Working.Code = Retail.Code and type = 4";
+            WHERE Father = N'{_MasterBomModel.ParentItem}' AND OPLN.ListName = N'{Settings.RetailPriceList}') Retail on Working.Code = Retail.Code and type = 4";
             recSet.DoQuery(queryData);
 
             var bp = (BusinessPartners)DiManager.Company.GetBusinessObject(BoObjectTypes.oBusinessPartners);
