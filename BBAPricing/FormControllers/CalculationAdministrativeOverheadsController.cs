@@ -86,7 +86,7 @@ namespace BBAPricing.FormControllers
                 (Recordset)DiManager.Company.GetBusinessObject(BoObjectTypes.BoRecordset);
             string query = $"SELECT * FROM [@RSM_RESOURCES] JOIN OITM ON OITM.ItemCode = U_ParentItemCode " +
                            $"JOIN ORSC ON ORSC.VisResCode =  [@RSM_RESOURCES].U_resourcecode " +
-                           $" WHERE U_Version =  (SELECT MAX(U_Version)FROM[@RSM_RESOURCES]GROUP BY U_ParentItemCode,U_SalesQuotationDocEntry having U_SalesQuotationDocEntry = {MasterBomModel.SalesQuotationDocEntry} " +
+                           $" WHERE U_Version =  (SELECT MAX(convert (int, U_Version))FROM[@RSM_RESOURCES]GROUP BY U_ParentItemCode,U_SalesQuotationDocEntry having U_SalesQuotationDocEntry = {MasterBomModel.SalesQuotationDocEntry} " +
                            $"AND U_ParentItemCode  = N'{MasterBomModel.ParentItem}' AND ORSC.ResType = 'L') " +
                            $"AND U_SalesQuotationDocEntry = {MasterBomModel.SalesQuotationDocEntry} " +
                            $"AND U_ParentItemCode  = N'{MasterBomModel.ParentItem}' AND ORSC.ResType = 'L'";

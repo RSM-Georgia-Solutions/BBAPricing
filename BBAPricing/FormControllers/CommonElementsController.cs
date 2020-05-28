@@ -114,7 +114,7 @@ namespace BBAPricing.FormControllers
                               $" AND [@RSM_MBOM].U_ParentItem = [@RSM_MBOM_ROWS].U_ParentItemCode " +
                               $" AND [@RSM_MBOM].U_Version = [@RSM_MBOM_ROWS].U_Version" +
                               $" WHERE [@RSM_MBOM_ROWS].U_SalesQuotationDocentry = '{MasterBomModel.First().SalesQuotationDocEntry}'" +
-                              $" AND [@RSM_MBOM_ROWS].U_Version in (SELECT MAX(U_Version) FROM [@RSM_MBOM_ROWS]  where  U_SalesQuotationDocentry = '{MasterBomModel.First().SalesQuotationDocEntry}' GROUP BY U_ParentItemCode) " +
+                              $" AND [@RSM_MBOM_ROWS].U_Version in (SELECT MAX(convert (int, U_Version)) FROM [@RSM_MBOM_ROWS]  where  U_SalesQuotationDocentry = '{MasterBomModel.First().SalesQuotationDocEntry}' GROUP BY U_ParentItemCode) " +
                               $" AND U_ElementID in" +
                               $" (N'Administrative Overheads',N'Human Resources',N'Machinery Resources',N'Manufacturing Overheads',N'MTRLs', N'Material OverHeads')" +
                               $" Group By U_ParentItemCode";

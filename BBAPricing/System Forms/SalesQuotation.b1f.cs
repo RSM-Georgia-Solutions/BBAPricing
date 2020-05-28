@@ -60,7 +60,7 @@ namespace BBAPricing.System_Forms
             Recordset rec = (Recordset)DiManager.Company.GetBusinessObject(BoObjectTypes.BoRecordset);
             rec.DoQuery($@"SELECT [@RSM_MBOM].Code [MBOMCode],[@RSM_MBOM_ROWS].Code [MBOMRowCode], [@RSM_MBOM].U_SalesQuotationDocEntry [SalesQuotationDocEntry], * FROM [@RSM_MBOM] 
 JOIN[@RSM_MBOM_ROWS] on[@RSM_MBOM].U_SalesQuotationDocEntry = [@RSM_MBOM_ROWS].U_SalesQuotationDocEntry AND[@RSM_MBOM].U_ParentItem = [@RSM_MBOM_ROWS].U_ParentItemCode AND [@RSM_MBOM_ROWS].U_Version = [@RSM_MBOM].U_Version 
- WHERE [@RSM_MBOM].U_SalesQuotationDocEntry = '{docEntry}' AND U_ParentItem = N'{itemCode}' AND [@RSM_MBOM].U_Version = (SELECT MAX(U_Version)
+ WHERE [@RSM_MBOM].U_SalesQuotationDocEntry = '{docEntry}' AND U_ParentItem = N'{itemCode}' AND [@RSM_MBOM].U_Version = (SELECT MAX(convert (int, U_Version))
                       FROM [@RSM_MBOM]
                       WHERE U_ParentItem = N'{itemCode}'
                             AND U_SalesQuotationDocEntry = '{docEntry}') ");
@@ -128,7 +128,7 @@ FROM [@RSM_MBOM]
                               AND [@RSM_MBOM].U_ParentItem = [@RSM_MBOM_ROWS].U_ParentItemCode
                               AND [@RSM_MBOM_ROWS].U_Version = [@RSM_MBOM].U_Version
 WHERE [@RSM_MBOM].U_SalesQuotationDocEntry = '{docEntry}'
-      AND  CONCAT([@RSM_MBOM_ROWS].U_Version,U_ParentItem) IN (    SELECT CONCAT(MAX(U_Version),U_ParentItemCode)
+      AND  CONCAT([@RSM_MBOM_ROWS].U_Version,U_ParentItem) IN (    SELECT CONCAT(MAX(convert (int, U_Version)),U_ParentItemCode)
     FROM [@RSM_MBOM_ROWS]
     GROUP BY U_ParentItemCode, U_SalesQuotationDocEntry)
  ");
@@ -194,7 +194,7 @@ WHERE [@RSM_MBOM].U_SalesQuotationDocEntry = '{docEntry}'
             Recordset rec = (Recordset)DiManager.Company.GetBusinessObject(BoObjectTypes.BoRecordset);
             rec.DoQuery($@"SELECT [@RSM_MBOM].Code [MBOMCode],[@RSM_MBOM_ROWS].Code [MBOMRowCode], [@RSM_MBOM].U_SalesQuotationDocEntry [SalesQuotationDocEntry], * FROM [@RSM_MBOM] 
 JOIN[@RSM_MBOM_ROWS] on[@RSM_MBOM].U_SalesQuotationDocEntry = [@RSM_MBOM_ROWS].U_SalesQuotationDocEntry AND[@RSM_MBOM].U_ParentItem = [@RSM_MBOM_ROWS].U_ParentItemCode AND [@RSM_MBOM_ROWS].U_Version = [@RSM_MBOM].U_Version 
- WHERE [@RSM_MBOM].U_SalesQuotationDocEntry = '{docEntry}' AND U_ParentItem = N'{itemCode}' AND [@RSM_MBOM].U_Version = (SELECT MAX(U_Version)
+ WHERE [@RSM_MBOM].U_SalesQuotationDocEntry = '{docEntry}' AND U_ParentItem = N'{itemCode}' AND [@RSM_MBOM].U_Version = (SELECT  MAX(convert (int, U_Version))
                       FROM [@RSM_MBOM]
                       WHERE U_ParentItem = N'{itemCode}'
                             AND U_SalesQuotationDocEntry = '{docEntry}') ");

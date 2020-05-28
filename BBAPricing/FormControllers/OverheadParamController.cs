@@ -101,7 +101,7 @@ namespace BBAPricing.FormControllers
         public bool FillModelFromDb()
         {
             Recordset recSet = (Recordset)DiManager.Company.GetBusinessObject(BoObjectTypes.BoRecordset);
-            recSet.DoQuery($"SELECT * FROM [@RSM_OVRHD_CLCB] WHERE U_Version = (SELECT MAX(U_Version) FROM [@RSM_OVRHD_CLCB])");
+            recSet.DoQuery($"SELECT * FROM [@RSM_OVRHD_CLCB] WHERE U_Version = (SELECT MAX(convert (int, U_Version)) FROM [@RSM_OVRHD_CLCB])");
             if (recSet.EoF)
             {
                 return false;
