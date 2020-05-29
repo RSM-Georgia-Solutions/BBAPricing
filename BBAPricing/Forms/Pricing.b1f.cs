@@ -298,6 +298,27 @@ namespace BBAPricing.Forms
                     FillForm();
                 }
             }
+
+            if (res == "SalaryFund")
+            {
+                Recordset recSet =
+                     (Recordset)DiManager.Company.GetBusinessObject(BoObjectTypes.BoRecordset);
+                recSet.DoQuery($"select U_SalaryFundPercent from OITM WHERE ItemCode = N'{MasterBomModel.ParentItem}'");
+                double salaryFundPercent = (double)recSet.Fields.Item("U_SalaryFundPercent").Value;
+
+                var SalaryFundlLine = MasterBomModel.Rows.First(x => x.ElementID == "SalaryFund");
+                var humanResourcelLine = MasterBomModel.Rows.First(x => x.ElementID == "Human Resources");
+                SalaryFundlLine.Cost = salaryFundPercent / 100 * humanResourcelLine.Cost;
+                SalaryFundlLine.Margin = salaryFundPercent / 100 * humanResourcelLine.Margin;
+                SalaryFundlLine.FinalCustomerPrice = salaryFundPercent / 100 * humanResourcelLine.FinalCustomerPrice;
+                SalaryFundlLine.Price = salaryFundPercent / 100 * humanResourcelLine.Price;
+                SalaryFundlLine.I = salaryFundPercent / 100 * humanResourcelLine.I;
+                SalaryFundlLine.II = salaryFundPercent / 100 * humanResourcelLine.II;
+                SalaryFundlLine.III = salaryFundPercent / 100 * humanResourcelLine.III;
+                SalaryFundlLine.Percent = salaryFundPercent / 100 * humanResourcelLine.Percent;
+                MasterBomModel.Update();
+                FillForm();
+            }
         }
 
         private EditText EditText4;

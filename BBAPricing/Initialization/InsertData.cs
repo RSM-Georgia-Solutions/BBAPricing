@@ -16,6 +16,7 @@ namespace BBAPricing.Initialization
             DiManager.DbInsert("RSM_ELEM",new Dictionary<string, dynamic> { { "Element", "Transportation" } },DiManager.Company);
             DiManager.DbInsert("RSM_ELEM",new Dictionary<string, dynamic> { { "Element", "Material OverHeads" } },DiManager.Company);
             DiManager.DbInsert("RSM_ELEM",new Dictionary<string, dynamic> { { "Element", "Reference Fee" } },DiManager.Company);
+            DiManager.DbInsert("RSM_ELEM",new Dictionary<string, dynamic> { { "Element", "SalaryFund" } },DiManager.Company);
             DiManager.DbInsert("RSM_ELEM",new Dictionary<string, dynamic> { { "Element", "Totals" } },DiManager.Company);
 
             DiManager.DbInsert("RSM_OVERHEAD_C", new Dictionary<string, dynamic> { { "Component", "კაც/საათი" } }, DiManager.Company);

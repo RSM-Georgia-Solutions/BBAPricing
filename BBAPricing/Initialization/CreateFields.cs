@@ -189,6 +189,7 @@ namespace BBAPricing.Initialization
             DiManager.CreateField("ITT1", "Operation", "Operation", BoFieldTypes.db_Alpha, 250, false);
             DiManager.CreateField("ITT1", "QtyOfBom", "Qty Of Bom", BoFieldTypes.db_Float, 222, false, true, "", "", BoFldSubTypes.st_Sum);
             DiManager.CreateField("OITM", "SBU", "SBU", BoFieldTypes.db_Alpha, 250, false, false,"","",BoFldSubTypes.st_None, new Dictionary<dynamic, dynamic>() { {"01","Corian"}, {"02","Neolith"}, { "03", "Furniture" } });
+            DiManager.CreateField("OITM", "SalaryFundPercent", "Salary Fund Percent", BoFieldTypes.db_Float, 222, false, true, "", "", BoFldSubTypes.st_Percentage);
             DiManager.CreateField("OCRD", "SharedDiscount", "Shared Discount", BoFieldTypes.db_Float, 222, false, true, "", "", BoFldSubTypes.st_Percentage);
         }
     }
