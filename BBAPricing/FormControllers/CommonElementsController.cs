@@ -170,6 +170,9 @@ namespace BBAPricing.FormControllers
                 var mBomMtrlRow = masterBomModel.Rows.First(x => x.ElementID == "MTRLs" && x.ParentItemCode == masterBomModel.ParentItem);
                 mBomMtrlRow.Percent = Math.Round(mBomMtrlRow.Cost / mBomTotals.Cost * 100, 4);
 
+                var mBomSalaryFundRow = masterBomModel.Rows.First(x => x.ElementID == "SalaryFund" && x.ParentItemCode == masterBomModel.ParentItem);
+                mBomSalaryFundRow.Percent = Math.Round(mBomSalaryFundRow.Cost / mBomTotals.Cost * 100, 4);
+
                 var mBomMachinaryRow = masterBomModel.Rows.First(x => x.ElementID == "Machinery Resources" && x.ParentItemCode == masterBomModel.ParentItem);
                 mBomMachinaryRow.Percent = Math.Round(mBomMachinaryRow.Cost / mBomTotals.Cost * 100, 4);
 
@@ -198,6 +201,7 @@ namespace BBAPricing.FormControllers
                 masterBomModel.PriceForSquareMeter = sumFinalCustomerPrice / masterBomModel.TotalSquareMeter;
 
                 mBomMtrlRow.I = mBomMtrlRow.Margin / mBomTotals.Margin * 100;
+                mBomSalaryFundRow.I = mBomSalaryFundRow.Margin / mBomTotals.Margin * 100;
                 mBomMachinaryRow.I = mBomMachinaryRow.Margin / mBomTotals.Margin * 100;
                 mBomHumanRow.I = mBomHumanRow.Margin / mBomTotals.Margin * 100;
                 mBomAdministrativeRow.I = mBomAdministrativeRow.Margin / mBomTotals.Margin * 100;
@@ -210,6 +214,7 @@ namespace BBAPricing.FormControllers
                 mBomTotals.I = sumI;
 
                 mBomMtrlRow.II = mBomMtrlRow.Margin / mBomMtrlRow.FinalCustomerPrice * 100;
+                mBomSalaryFundRow.II = mBomSalaryFundRow.Margin / mBomSalaryFundRow.FinalCustomerPrice * 100;                
                 mBomMachinaryRow.II = mBomMachinaryRow.Margin / mBomMachinaryRow.FinalCustomerPrice * 100;
                 mBomHumanRow.II = mBomHumanRow.Margin / mBomHumanRow.FinalCustomerPrice * 100;
                 mBomAdministrativeRow.II = mBomAdministrativeRow.Margin / mBomAdministrativeRow.FinalCustomerPrice * 100;
@@ -222,6 +227,7 @@ namespace BBAPricing.FormControllers
                 mBomTotals.II = sumII;
 
                 mBomMtrlRow.III = mBomMtrlRow.Margin / mBomTotals.FinalCustomerPrice * 100;
+                mBomSalaryFundRow.III = mBomSalaryFundRow.Margin / mBomTotals.FinalCustomerPrice * 100;
                 mBomMachinaryRow.III = mBomMachinaryRow.Margin / mBomTotals.FinalCustomerPrice * 100;
                 mBomHumanRow.III = mBomHumanRow.Margin / mBomTotals.FinalCustomerPrice * 100;
                 mBomAdministrativeRow.III = mBomAdministrativeRow.Margin / mBomTotals.FinalCustomerPrice * 100;

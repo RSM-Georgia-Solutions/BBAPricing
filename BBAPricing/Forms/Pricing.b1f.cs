@@ -312,10 +312,6 @@ namespace BBAPricing.Forms
                 SalaryFundlLine.Margin = salaryFundPercent / 100 * humanResourcelLine.Margin;
                 SalaryFundlLine.FinalCustomerPrice = salaryFundPercent / 100 * humanResourcelLine.FinalCustomerPrice;
                 SalaryFundlLine.Price = salaryFundPercent / 100 * humanResourcelLine.Price;
-                SalaryFundlLine.I = salaryFundPercent / 100 * humanResourcelLine.I;
-                SalaryFundlLine.II = salaryFundPercent / 100 * humanResourcelLine.II;
-                SalaryFundlLine.III = salaryFundPercent / 100 * humanResourcelLine.III;
-                SalaryFundlLine.Percent = salaryFundPercent / 100 * humanResourcelLine.Percent;
                 MasterBomModel.Update();
                 FillForm();
             }
