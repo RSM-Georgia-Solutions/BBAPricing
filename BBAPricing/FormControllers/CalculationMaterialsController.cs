@@ -212,7 +212,7 @@ FROM [@RSM_MTRL]";
                 totalCost += materialModel.TotalCost;
                 totalFinalCustomerPrice += materialModel.FinalCustomerPriceTotal;
                 totalMargin += materialModel.MarginAmount;
-                totalPrice += materialModel.UnitWorkingPrice;
+                totalPrice += materialModel.UnitWorkingPrice * materialModel.Quantity;
                 var mtrlLine = _MasterBomModel.Rows.First(x => x.ElementID == "MTRLs");
                 mtrlLine.Cost = totalCost;
                 mtrlLine.Price = totalPrice;
