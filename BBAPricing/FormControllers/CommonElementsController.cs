@@ -109,7 +109,7 @@ namespace BBAPricing.FormControllers
         {
             Recordset recSet =
                 (Recordset)DiManager.Company.GetBusinessObject(BoObjectTypes.BoRecordset);
-            string queryStr = $"SELECT SUM(U_Cost* U_Quantity) as [Sum], U_ParentItemCode FROM [@RSM_MBOM_ROWS]  join [@RSM_MBOM] on " +
+            string queryStr = $"SELECT SUM(U_Cost* U_Quantity) as [Sum], U_ParentItemCode, [@RSM_MBOM_ROWS].U_Version FROM [@RSM_MBOM_ROWS]  join [@RSM_MBOM] on " +
                               $"[@RSM_MBOM].U_SalesQuotationDocEntry = [@RSM_MBOM_ROWS].U_SalesQuotationDocEntry" +
                               $" AND [@RSM_MBOM].U_ParentItem = [@RSM_MBOM_ROWS].U_ParentItemCode " +
                               $" AND [@RSM_MBOM].U_Version = [@RSM_MBOM_ROWS].U_Version" +
@@ -117,18 +117,43 @@ namespace BBAPricing.FormControllers
                               $" AND [@RSM_MBOM_ROWS].U_Version in (SELECT MAX(convert (int, U_Version)) FROM [@RSM_MBOM_ROWS]  where  U_SalesQuotationDocentry = '{MasterBomModel.First().SalesQuotationDocEntry}' GROUP BY U_ParentItemCode) " +
                               $" AND U_ElementID in" +
                               $" (N'Administrative Overheads',N'Human Resources',N'Machinery Resources',N'Manufacturing Overheads',N'MTRLs', N'Material OverHeads', N'SalaryFund')" +
-                              $" Group By U_ParentItemCode";
+                              $" Group By U_ParentItemCode, [@RSM_MBOM_ROWS].U_Version";
             recSet.DoQuery(queryStr);
+
+            int versionCheck = 0;
+            string item = string.Empty;
+            while (!recSet.EoF)
+            {
+                string vrs = recSet.Fields.Item("U_Version").Value.ToString();
+                string itm = recSet.Fields.Item("U_ParentItemCode").Value.ToString();
+                int vrs2 = int.Parse(vrs);
+                if (vrs2 > versionCheck)
+                {
+                    versionCheck = vrs2;
+                    item = itm;
+                }
+                recSet.MoveNext();
+            }
+
             double totalCostForCommonElems = 0;
             Dictionary<string, double> parentItemsAndSums = new Dictionary<string, double>();
+            recSet.MoveFirst();
             while (!recSet.EoF)
             {
                 var totalCostPerItem = (double)recSet.Fields.Item("Sum").Value;
                 string parentItem = recSet.Fields.Item("U_ParentItemCode").Value.ToString();
+                string versionXz = recSet.Fields.Item("U_Version").Value.ToString();
+                int versionXzInt = int.Parse(versionXz);
+                if (parentItem == item && versionXzInt != versionCheck)
+                {
+                    recSet.MoveNext();
+                    continue;
+                }
                 parentItemsAndSums.Add(parentItem, totalCostPerItem);
                 totalCostForCommonElems += totalCostPerItem;
                 recSet.MoveNext();
             }
+
             recSet.MoveFirst();
             int lineId = 0;
             foreach (MasterBomModel masterBomModel in MasterBomModel)
@@ -140,7 +165,7 @@ namespace BBAPricing.FormControllers
                     trip = Math.Round(Model.TotalCost / totalCostForCommonElems * parentItemsAndSums[masterBomModel.ParentItem], 4);
                     transport = Math.Round(Model.TransportationAmount / totalCostForCommonElems * parentItemsAndSums[masterBomModel.ParentItem], 4);
                 }
-                
+
                 var mBomTripRow = masterBomModel.Rows.First(x => x.ElementID == "Business Trip" && x.ParentItemCode == masterBomModel.ParentItem);
                 var mBomTransportRow = masterBomModel.Rows.First(x => x.ElementID == "Transportation" && x.ParentItemCode == masterBomModel.ParentItem);
                 mBomTripRow.Cost = Math.Round(trip, 4);
@@ -214,7 +239,7 @@ namespace BBAPricing.FormControllers
                 mBomTotals.I = sumI;
 
                 mBomMtrlRow.II = mBomMtrlRow.Margin / mBomMtrlRow.FinalCustomerPrice * 100;
-                mBomSalaryFundRow.II = mBomSalaryFundRow.Margin / mBomSalaryFundRow.FinalCustomerPrice * 100;                
+                mBomSalaryFundRow.II = mBomSalaryFundRow.Margin / mBomSalaryFundRow.FinalCustomerPrice * 100;
                 mBomMachinaryRow.II = mBomMachinaryRow.Margin / mBomMachinaryRow.FinalCustomerPrice * 100;
                 mBomHumanRow.II = mBomHumanRow.Margin / mBomHumanRow.FinalCustomerPrice * 100;
                 mBomAdministrativeRow.II = mBomAdministrativeRow.Margin / mBomAdministrativeRow.FinalCustomerPrice * 100;
@@ -242,7 +267,7 @@ namespace BBAPricing.FormControllers
                 salesQuotation.GetByKey(int.Parse(masterBomModel.SalesQuotationDocEntry));
                 salesQuotation.Lines.SetCurrentLine(lineId);
                 salesQuotation.Lines.UnitPrice = Math.Round(MasterBomModel
-                    .First(i => i.ParentItem == salesQuotation.Lines.ItemCode).PriceForSquareMeter / 1.18,4);
+                    .First(i => i.ParentItem == salesQuotation.Lines.ItemCode).PriceForSquareMeter / 1.18, 4);
                 salesQuotation.Update();
                 lineId++;
                 string version = (int.Parse(masterBomModel.Version, CultureInfo.InvariantCulture) + 1).ToString();
