@@ -60,6 +60,7 @@ namespace BBAPricing.Forms
             this.Button1.PressedAfter += new SAPbouiCOM._IButtonEvents_PressedAfterEventHandler(this.Button1_PressedAfter);
             this.StaticText11 = ((SAPbouiCOM.StaticText)(this.GetItem("Item_27").Specific));
             this.EditText11 = ((SAPbouiCOM.EditText)(this.GetItem("Item_28").Specific));
+            this.Button2 = ((SAPbouiCOM.Button)(this.GetItem("Item_29").Specific));
             this.OnCustomInitialize();
 
         }
@@ -422,5 +423,6 @@ namespace BBAPricing.Forms
 
         private StaticText StaticText11;
         private EditText EditText11;
+        private Button Button2;
     }
 }

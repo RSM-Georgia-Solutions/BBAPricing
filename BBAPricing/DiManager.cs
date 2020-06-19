@@ -304,6 +304,7 @@ namespace BBAPricing
             Settings.ProductCode = recSet.Fields.Item($"U_ProductCode").Value.ToString();
             Settings.Quantity = recSet.Fields.Item($"U_Quantity").Value.ToString();
             Settings.Uom = recSet.Fields.Item($"U_Uom").Value.ToString();
+            System.Runtime.InteropServices.Marshal.ReleaseComObject(recSet);
         }
     }
 }
