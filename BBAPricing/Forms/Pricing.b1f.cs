@@ -323,7 +323,7 @@ namespace BBAPricing.Forms
                 var sumCostsExceptReferenceFee = MasterBomModel.Rows.Where(x => x.ElementID != "Reference Fee" && x.ElementID != "Totals" && x.ParentItemCode == MasterBomModel.ParentItem).Sum(x => x.Cost);
                 mBomReferenceFeeRow.Cost = Math.Round(sumCostsExceptReferenceFee * MasterBomModel.ReferenceFeePercentage / 100, 4);
                 var mBomTotals = MasterBomModel.Rows.First(x => x.ElementID == "Totals" && x.ParentItemCode == MasterBomModel.ParentItem);
-                mBomTotals.Cost = Math.Round(MasterBomModel.Rows.Where(y => y.ElementID != "Totals").Sum(x => x.Cost), 4);
+                mBomTotals.Cost = Math.Round(MasterBomModel.Rows.Where(y => y.ElementID != "Totals").Sum(x => x.Price), 4);
                 mBomReferenceFeeRow.Price = 0;
                 mBomReferenceFeeRow.Margin = 0;
                 mBomReferenceFeeRow.FinalCustomerPrice = 0;
