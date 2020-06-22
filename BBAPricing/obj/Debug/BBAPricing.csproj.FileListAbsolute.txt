@@ -35,3 +35,15 @@ C:\Users\gkajaia\Desktop\bba\BBAPricing\BBAPricing\bin\Debug\BBAPricing.exe
 C:\Users\gkajaia\Desktop\bba\BBAPricing\BBAPricing\bin\Debug\BBAPricing.pdb
 C:\Users\gkajaia\Desktop\bba\BBAPricing\BBAPricing\bin\Debug\Appocalypto.dll
 C:\Users\gkajaia\Desktop\bba\BBAPricing\BBAPricing\obj\Debug\BBAPricing.csprojResolveAssemblyReference.cache
+C:\Users\gkajaia\Desktop\New folder\BBAPricing\BBAPricing\bin\Debug\Media\c9.bmp
+C:\Users\gkajaia\Desktop\New folder\BBAPricing\BBAPricing\bin\Debug\Media\Icon.bmp
+C:\Users\gkajaia\Desktop\New folder\BBAPricing\BBAPricing\bin\Debug\Media\m_BBA (1).jpg
+C:\Users\gkajaia\Desktop\New folder\BBAPricing\BBAPricing\bin\Debug\Media\m_BBA (2).jpg
+C:\Users\gkajaia\Desktop\New folder\BBAPricing\BBAPricing\bin\Debug\Media\m_BBA.jpg
+C:\Users\gkajaia\Desktop\New folder\BBAPricing\BBAPricing\bin\Debug\Media\Sap.bmp
+C:\Users\gkajaia\Desktop\New folder\BBAPricing\BBAPricing\bin\Debug\BBAPricing.exe
+C:\Users\gkajaia\Desktop\New folder\BBAPricing\BBAPricing\bin\Debug\BBAPricing.pdb
+C:\Users\gkajaia\Desktop\New folder\BBAPricing\BBAPricing\bin\Debug\Appocalypto.dll
+C:\Users\gkajaia\Desktop\New folder\BBAPricing\BBAPricing\obj\Debug\BBAPricing.csprojResolveAssemblyReference.cache
+C:\Users\gkajaia\Desktop\New folder\BBAPricing\BBAPricing\obj\Debug\BBAPricing.exe
+C:\Users\gkajaia\Desktop\New folder\BBAPricing\BBAPricing\obj\Debug\BBAPricing.pdb

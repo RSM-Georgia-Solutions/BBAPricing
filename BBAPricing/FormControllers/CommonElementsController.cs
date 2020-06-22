@@ -180,26 +180,13 @@ namespace BBAPricing.FormControllers
                 mBomTransportRow.FinalCustomerPrice = Math.Round(transport, 4);
 
 
-                mBomTripRow.Percent = Math.Round(mBomTripRow.Cost / mBomTotals.Cost * 100, 4);
-                mBomTransportRow.Percent = Math.Round(mBomTransportRow.Cost / mBomTotals.Cost * 100, 4);
+       
 
 
                 recSet.MoveNext();
 
 
 
-                mBomTripRow.I = mBomTripRow.Margin / mBomTotals.Margin * 100;
-                mBomTransportRow.I = mBomTransportRow.Margin / mBomTotals.Margin * 100;
-
-
-
-                mBomTripRow.II = mBomTripRow.Margin / mBomTripRow.FinalCustomerPrice * 100;
-                mBomTransportRow.II = mBomTransportRow.Margin / mBomTransportRow.FinalCustomerPrice * 100;
-
-
-
-                mBomTripRow.III = mBomTripRow.Margin / mBomTotals.FinalCustomerPrice * 100;
-                mBomTransportRow.III = mBomTransportRow.Margin / mBomTotals.FinalCustomerPrice * 100;
 
                 var salesQuotation = (Documents)DiManager.Company.GetBusinessObject(BoObjectTypes.oQuotations);
                 salesQuotation.GetByKey(int.Parse(masterBomModel.SalesQuotationDocEntry));
