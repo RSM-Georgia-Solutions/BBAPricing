@@ -281,7 +281,7 @@ namespace BBAPricing.Forms
                 {
                     mtrlLine.Cost = materialOverheadsCost;
                     mtrlLine.Price = materialOverheadsCost;
-                    mtrlLine.Margin = materialOverheadsCost;
+                    mtrlLine.Margin = 0;
                     mtrlLine.FinalCustomerPrice = materialOverheadsCost;
                     if (mtrlLine.Cost == 0)
                     {
@@ -311,7 +311,7 @@ namespace BBAPricing.Forms
                 var SalaryFundlLine = MasterBomModel.Rows.First(x => x.ElementID == "SalaryFund");
                 var humanResourcelLine = MasterBomModel.Rows.First(x => x.ElementID == "Human Resources");
                 SalaryFundlLine.Cost = salaryFundPercent / 100 * humanResourcelLine.Cost;
-                SalaryFundlLine.Margin = salaryFundPercent / 100 * humanResourcelLine.Margin;
+                SalaryFundlLine.Margin = 0;
                 SalaryFundlLine.FinalCustomerPrice = salaryFundPercent / 100 * humanResourcelLine.FinalCustomerPrice;
                 SalaryFundlLine.Price = salaryFundPercent / 100 * humanResourcelLine.Price;
                 MasterBomModel.Update();

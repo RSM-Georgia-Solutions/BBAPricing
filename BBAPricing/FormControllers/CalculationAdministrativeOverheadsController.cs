@@ -157,7 +157,7 @@ namespace BBAPricing.FormControllers
             var mtrlLine = MasterBomModel.Rows.First(x => x.ElementID == "Administrative Overheads");
             mtrlLine.Cost = totalCost;
             mtrlLine.Price = totalCost;
-            mtrlLine.Margin = totalCost;
+            mtrlLine.Margin = 0;
             mtrlLine.FinalCustomerPrice = totalCost;
         }
 

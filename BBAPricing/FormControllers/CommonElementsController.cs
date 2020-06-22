@@ -172,11 +172,11 @@ namespace BBAPricing.FormControllers
 
                 mBomTripRow.Cost = Math.Round(trip, 4);
                 mBomTripRow.Price = Math.Round(trip, 4);
-                mBomTripRow.Margin = Math.Round(trip, 4);
+                mBomTripRow.Margin = 0;
                 mBomTripRow.FinalCustomerPrice = Math.Round(trip, 4);
                 mBomTransportRow.Cost = Math.Round(transport, 4);
                 mBomTransportRow.Price = Math.Round(transport, 4);
-                mBomTransportRow.Margin = Math.Round(transport, 4);
+                mBomTransportRow.Margin = 0;
                 mBomTransportRow.FinalCustomerPrice = Math.Round(transport, 4);
 
 
