@@ -362,7 +362,7 @@ FROM
                                                          materialModel.DiscountAmount - materialModel.SharedDiscountAmount) * 100, 4);
             materialModel.MarginAmount = Math.Round(materialModel.TotalCost / (1 - Math.Round(materialModel.MarginPercentage / 100, 4)),
                                              4) * Math.Round(materialModel.MarginPercentage / 100, 4);
-            materialModel.FinalCustomerPriceTotal = materialModel.TotalCost + materialModel.MarginAmount;
+            materialModel.FinalCustomerPriceTotal = materialModel.UnitRetailPrice * materialModel.Quantity - materialModel.SharedDiscountAmount;
             materialModel.FinalCustomerPrice = materialModel.FinalCustomerPriceTotal / materialModel.Quantity;
 
         }

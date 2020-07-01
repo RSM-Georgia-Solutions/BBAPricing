@@ -312,8 +312,8 @@ namespace BBAPricing.Forms
                 var humanResourcelLine = MasterBomModel.Rows.First(x => x.ElementID == "Human Resources");
                 SalaryFundlLine.Cost = salaryFundPercent / 100 * humanResourcelLine.Cost;
                 SalaryFundlLine.Margin = 0;
-                SalaryFundlLine.FinalCustomerPrice = salaryFundPercent / 100 * humanResourcelLine.FinalCustomerPrice;
-                SalaryFundlLine.Price = salaryFundPercent / 100 * humanResourcelLine.Price;
+                SalaryFundlLine.FinalCustomerPrice = salaryFundPercent / 100 * humanResourcelLine.Cost;
+                SalaryFundlLine.Price = salaryFundPercent / 100 * humanResourcelLine.Cost;
                 MasterBomModel.Update();
                 FillForm();
             }

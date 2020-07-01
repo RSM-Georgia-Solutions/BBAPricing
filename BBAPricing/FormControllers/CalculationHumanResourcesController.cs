@@ -215,6 +215,12 @@ FROM ITT1
                 resourceModel.OperationName = recSet.Fields.Item("OperationName").Value.ToString();
                 resourceModel.UomResourceMain = recSet.Fields.Item("UomResourceMain").Value.ToString();
                 resourceModel.OtherQtyResource = (double)recSet.Fields.Item("OtherQtyResource").Value;
+                if (resourceModel.OtherQtyResource == 0)
+                {
+                    SAPbouiCOM.Framework.Application.SBO_Application.MessageBox("ოპერაციის  რაოდენობა 0 ის ტოლია");
+                    generateMethodSucces = false;
+                    return;
+                }
                 resourceModel.Uom = recSet.Fields.Item("Uom").Value.ToString();
                 resourceModel.Quantity = (double)recSet.Fields.Item("Quantity").Value;
                 resourceModel.StandartCost = (double)recSet.Fields.Item("StandartCost").Value;
@@ -253,10 +259,11 @@ FROM ITT1
             mtrlLine.Price = totalPrice;
             mtrlLine.Margin = totalMargin;
             mtrlLine.FinalCustomerPrice = totalFinalCustomerPrice;
+            generateMethodSucces = true;
         }
         public static Action RefreshBom;
 
-
+        bool generateMethodSucces;
         public void CalculateResources()
         {
             GetGridColumns();
@@ -264,6 +271,10 @@ FROM ITT1
             if (!fromDb)
             {
                 GenerateModel();
+                if (!generateMethodSucces)
+                {
+                    return;
+                }
                 FillGridFromModel(Grid);
                 InsertMaterialsListToDb();
                 RefreshBom.Invoke();
@@ -357,7 +368,7 @@ FROM ITT1
                 resourceModel.Currency = Grid.DataTable.GetValue("Currency", i).ToString();
                 resourceModel.CostOfUnit = (double)Grid.DataTable.GetValue("CostOfUnit", i);
                 resourceModel.UomResourceMain = Grid.DataTable.GetValue("UomResourceMain", i).ToString();
-                resourceModel.PriceOfUnit = resourceModel.ResourceTotalPrice / resourceModel.Quantity;
+                resourceModel.PriceOfUnit = resourceModel.ResourceTotalPrice / resourceModel.OtherQtyResource;
                 resourceModel.MarginOfUnit = resourceModel.PriceOfUnit - resourceModel.CostOfUnit;
                 resourceModel.InfoPercent = resourceModel.MarginOfUnit / resourceModel.PriceOfUnit;
                 resourceModel.MarginPercent = (resourceModel.ResourceTotalPrice - resourceModel.TotalStandartCost) / resourceModel.ResourceTotalPrice;
@@ -380,5 +391,6 @@ FROM ITT1
                 var res = item.Add();
             }
         }
+
     }
 }

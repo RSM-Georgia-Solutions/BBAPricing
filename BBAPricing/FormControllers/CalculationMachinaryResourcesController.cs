@@ -213,7 +213,8 @@ namespace BBAPricing.FormControllers
                 resourceModel.TotalAmount = resourceModel.ResourceTotalPrice - resourceModel.TotalStandartCost;
                 if (resourceModel.OtherQtyResource == 0)
                 {
-                    SAPbouiCOM.Framework.Application.SBO_Application.SetStatusBarMessage("Qty Of BOM არ არის შევსებული");
+                    SAPbouiCOM.Framework.Application.SBO_Application.MessageBox("ოპერაციის  რაოდენობა 0 ის ტოლია");
+                    generateMethodSucces = false;
                     return;
                 }
                 resourceModel.CostOfUnit = resourceModel.TotalStandartCost / resourceModel.OtherQtyResource;
@@ -234,6 +235,7 @@ namespace BBAPricing.FormControllers
             mtrlLine.Price = totalPrice;
             mtrlLine.Margin = totalMargin;
             mtrlLine.FinalCustomerPrice = totalFinalCustomerPrice;
+            generateMethodSucces = true;
         }
 
         private void InsertMachinarLyistToDb()
@@ -286,7 +288,7 @@ namespace BBAPricing.FormControllers
         }
         public static Action RefreshBom;
 
-
+        bool generateMethodSucces;
         public void CalculateResources()
         {
             bool fromDb = FillModelFromDb();
@@ -294,6 +296,10 @@ namespace BBAPricing.FormControllers
             if (!fromDb)
             {
                 GenerateModel();
+                if (!generateMethodSucces)
+                {
+                    return;
+                }
                 if (HasErrors)
                 {
                     return;
@@ -351,7 +357,7 @@ namespace BBAPricing.FormControllers
                 resourceModel.Currency = _grid.DataTable.GetValue("Currency", i).ToString();
                 resourceModel.CostOfUnit = (double)_grid.DataTable.GetValue("CostOfUnit", i);
                 resourceModel.UomResourceMain = _grid.DataTable.GetValue("UomResourceMain", i).ToString();
-                resourceModel.PriceOfUnit = resourceModel.ResourceTotalPrice / resourceModel.Quantity;
+                resourceModel.PriceOfUnit = resourceModel.ResourceTotalPrice / resourceModel.OtherQtyResource;
                 resourceModel.MarginOfUnit = resourceModel.PriceOfUnit - resourceModel.CostOfUnit;
                 resourceModel.InfoPercent = resourceModel.MarginOfUnit / resourceModel.PriceOfUnit;
                 resourceModel.MarginPercent = (resourceModel.ResourceTotalPrice - resourceModel.TotalStandartCost) / resourceModel.ResourceTotalPrice;
