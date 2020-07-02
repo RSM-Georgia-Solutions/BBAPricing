@@ -479,6 +479,11 @@ namespace BBAPricing.Forms
             mBomReferenceFeeRow.Percent = Math.Round(mBomReferenceFeeRow.Cost / mBomTotals.Cost * 100, 4);
 
             mBomTripRow.II = mBomTripRow.Margin / mBomTripRow.FinalCustomerPrice * 100;
+            if (mBomTransportRow.FinalCustomerPrice == 0)
+            {
+                Application.SBO_Application.MessageBox("Business Trip ხარჯები 0 ის ტოლია");
+                return;
+            }
             mBomTransportRow.II = mBomTransportRow.Margin / mBomTransportRow.FinalCustomerPrice * 100;
 
 
