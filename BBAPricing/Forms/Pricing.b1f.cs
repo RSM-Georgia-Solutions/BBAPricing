@@ -452,109 +452,141 @@ namespace BBAPricing.Forms
 
         private void Button2_PressedAfter(object sboObject, SBOItemEventArg pVal)
         {
-            var mBomTotals = MasterBomModel.Rows.First(x => x.ElementID == "Totals" && x.ParentItemCode == MasterBomModel.ParentItem);
-            var sumPrice = Math.Round(MasterBomModel.Rows.Where(y => y.ElementID != "Totals").Sum(x => x.Price), 4);
-            var sumMargin = Math.Round(MasterBomModel.Rows.Where(y => y.ElementID != "Totals").Sum(x => x.Margin), 4);
-            var sumCost = Math.Round(MasterBomModel.Rows.Where(y => y.ElementID != "Totals").Sum(x => x.Cost), 4);
-            var sumFinalCustomerPrice = Math.Round(MasterBomModel.Rows.Where(y => y.ElementID != "Totals").Sum(x => x.FinalCustomerPrice), 4);
-
-
-            mBomTotals.Price = Math.Round(sumPrice, 4);
-            mBomTotals.FinalCustomerPrice = Math.Round(sumFinalCustomerPrice, 4);
-            mBomTotals.Margin = Math.Round(sumMargin, 4);
-            mBomTotals.Cost = Math.Round(sumCost, 4);
-
-            var mBomMtrlRow = MasterBomModel.Rows.First(x => x.ElementID == "MTRLs" && x.ParentItemCode == MasterBomModel.ParentItem);
-            mBomMtrlRow.Percent = Math.Round(mBomMtrlRow.Cost / mBomTotals.Cost * 100, 4);
-
-            var mBomSalaryFundRow = MasterBomModel.Rows.First(x => x.ElementID == "SalaryFund" && x.ParentItemCode == MasterBomModel.ParentItem);
-            mBomSalaryFundRow.Percent = Math.Round(mBomSalaryFundRow.Cost / mBomTotals.Cost * 100, 4);
-
-            var mBomMachinaryRow = MasterBomModel.Rows.First(x => x.ElementID == "Machinery Resources" && x.ParentItemCode == MasterBomModel.ParentItem);
-            mBomMachinaryRow.Percent = Math.Round(mBomMachinaryRow.Cost / mBomTotals.Cost * 100, 4);
-
-            var mBomHumanRow = MasterBomModel.Rows.First(x => x.ElementID == "Human Resources" && x.ParentItemCode == MasterBomModel.ParentItem);
-            mBomHumanRow.Percent = Math.Round(mBomHumanRow.Cost / mBomTotals.Cost * 100, 4);
-
-            var mBomManufacturingRow = MasterBomModel.Rows.First(x => x.ElementID == "Manufacturing Overheads" && x.ParentItemCode == MasterBomModel.ParentItem);
-            mBomManufacturingRow.Percent = Math.Round(mBomManufacturingRow.Cost / mBomTotals.Cost * 100, 4);
-
-            var mBomAdministrativeRow = MasterBomModel.Rows.First(x => x.ElementID == "Administrative Overheads" && x.ParentItemCode == MasterBomModel.ParentItem);
-            mBomAdministrativeRow.Percent = Math.Round(mBomAdministrativeRow.Cost / mBomTotals.Cost * 100, 4);
-
-            var mBomTripRow = MasterBomModel.Rows.First(x => x.ElementID == "Business Trip" && x.ParentItemCode == MasterBomModel.ParentItem);
-            var mBomTransportRow = MasterBomModel.Rows.First(x => x.ElementID == "Transportation" && x.ParentItemCode == MasterBomModel.ParentItem);
-
-            mBomTripRow.I = mBomTripRow.Margin / mBomTotals.Margin * 100;
-            mBomTransportRow.I = mBomTransportRow.Margin / mBomTotals.Margin * 100;
-
-            var mBomReferenceFeeRow = MasterBomModel.Rows.First(x => x.ElementID == "Reference Fee" && x.ParentItemCode == MasterBomModel.ParentItem);
-            mBomReferenceFeeRow.Percent = Math.Round(mBomReferenceFeeRow.Cost / mBomTotals.Cost * 100, 4);
-
-            mBomTripRow.II = mBomTripRow.Margin / mBomTripRow.FinalCustomerPrice * 100;
-            if (mBomTransportRow.FinalCustomerPrice == 0)
+            try
             {
-                Application.SBO_Application.MessageBox("Business Trip ხარჯები 0 ის ტოლია");
-                return;
+                var mBomTotals = MasterBomModel.Rows.First(x => x.ElementID == "Totals" && x.ParentItemCode == MasterBomModel.ParentItem);
+                var sumPrice = Math.Round(MasterBomModel.Rows.Where(y => y.ElementID != "Totals").Sum(x => x.Price), 4);
+                var sumMargin = Math.Round(MasterBomModel.Rows.Where(y => y.ElementID != "Totals").Sum(x => x.Margin), 4);
+                var sumCost = Math.Round(MasterBomModel.Rows.Where(y => y.ElementID != "Totals").Sum(x => x.Cost), 4);
+                var sumFinalCustomerPrice = Math.Round(MasterBomModel.Rows.Where(y => y.ElementID != "Totals").Sum(x => x.FinalCustomerPrice), 4);
+
+
+                mBomTotals.Price = Math.Round(sumPrice, 4);
+                mBomTotals.FinalCustomerPrice = Math.Round(sumFinalCustomerPrice, 4);
+                mBomTotals.Margin = Math.Round(sumMargin, 4);
+                mBomTotals.Cost = Math.Round(sumCost, 4);
+
+                var mBomMtrlRow = MasterBomModel.Rows.First(x => x.ElementID == "MTRLs" && x.ParentItemCode == MasterBomModel.ParentItem);
+                mBomMtrlRow.Percent = Math.Round(mBomMtrlRow.Cost / mBomTotals.Cost * 100, 4);
+
+                var mBomSalaryFundRow = MasterBomModel.Rows.First(x => x.ElementID == "SalaryFund" && x.ParentItemCode == MasterBomModel.ParentItem);
+                mBomSalaryFundRow.Percent = Math.Round(mBomSalaryFundRow.Cost / mBomTotals.Cost * 100, 4);
+
+                var mBomMachinaryRow = MasterBomModel.Rows.First(x => x.ElementID == "Machinery Resources" && x.ParentItemCode == MasterBomModel.ParentItem);
+                mBomMachinaryRow.Percent = Math.Round(mBomMachinaryRow.Cost / mBomTotals.Cost * 100, 4);
+
+                var mBomHumanRow = MasterBomModel.Rows.First(x => x.ElementID == "Human Resources" && x.ParentItemCode == MasterBomModel.ParentItem);
+                mBomHumanRow.Percent = Math.Round(mBomHumanRow.Cost / mBomTotals.Cost * 100, 4);
+
+                var mBomManufacturingRow = MasterBomModel.Rows.First(x => x.ElementID == "Manufacturing Overheads" && x.ParentItemCode == MasterBomModel.ParentItem);
+                mBomManufacturingRow.Percent = Math.Round(mBomManufacturingRow.Cost / mBomTotals.Cost * 100, 4);
+
+                var mBomAdministrativeRow = MasterBomModel.Rows.First(x => x.ElementID == "Administrative Overheads" && x.ParentItemCode == MasterBomModel.ParentItem);
+                mBomAdministrativeRow.Percent = Math.Round(mBomAdministrativeRow.Cost / mBomTotals.Cost * 100, 4);
+
+                var mBomTripRow = MasterBomModel.Rows.First(x => x.ElementID == "Business Trip" && x.ParentItemCode == MasterBomModel.ParentItem);
+                var mBomTransportRow = MasterBomModel.Rows.First(x => x.ElementID == "Transportation" && x.ParentItemCode == MasterBomModel.ParentItem);
+
+                mBomTripRow.I = mBomTripRow.Margin / mBomTotals.Margin * 100;
+                mBomTransportRow.I = mBomTransportRow.Margin / mBomTotals.Margin * 100;
+
+                var mBomReferenceFeeRow = MasterBomModel.Rows.First(x => x.ElementID == "Reference Fee" && x.ParentItemCode == MasterBomModel.ParentItem);
+                mBomReferenceFeeRow.Percent = Math.Round(mBomReferenceFeeRow.Cost / mBomTotals.Cost * 100, 4);
+
+                if (mBomTransportRow.FinalCustomerPrice == 0)
+                {
+                    mBomTransportRow.II = 0;
+                    mBomTripRow.III = 0;
+                    mBomTransportRow.III = 0;
+                    mBomTripRow.II = 0;
+                }
+                else
+                {
+                    mBomTransportRow.II = mBomTransportRow.Margin / mBomTransportRow.FinalCustomerPrice * 100;
+                    mBomTripRow.III = mBomTripRow.Margin / mBomTotals.FinalCustomerPrice * 100;
+                    mBomTransportRow.III = mBomTransportRow.Margin / mBomTotals.FinalCustomerPrice * 100;
+                    mBomTripRow.II = mBomTripRow.Margin / mBomTripRow.FinalCustomerPrice * 100;
+                }
+
+                mBomTripRow.Percent = Math.Round(mBomTripRow.Cost / mBomTotals.Cost * 100, 4);
+                mBomTransportRow.Percent = Math.Round(mBomTransportRow.Cost / mBomTotals.Cost * 100, 4);
+
+
+                var mBomMaterialOverHeadsRow = MasterBomModel.Rows.First(x => x.ElementID == "Material OverHeads" && x.ParentItemCode == MasterBomModel.ParentItem);
+                mBomMaterialOverHeadsRow.Percent = Math.Round(mBomMaterialOverHeadsRow.Cost / mBomTotals.Cost * 100, 4);
+
+
+                mBomTotals.Percent = MasterBomModel.Rows.Where(x => x.ElementID != "Totals" && x.ParentItemCode == MasterBomModel.ParentItem).Sum(x => x.Percent);
+                var sumCosts = Math.Round(MasterBomModel.Rows.Where(y => y.ElementID != "Totals").Sum(x => x.Cost), 4);
+                mBomTotals.Cost = Math.Round(sumCosts, 4);
+                MasterBomModel.PriceForSquareMeter = sumFinalCustomerPrice / MasterBomModel.TotalSquareMeter;
+
+                mBomMtrlRow.I = mBomMtrlRow.Margin / mBomTotals.Margin * 100;
+                mBomSalaryFundRow.I = mBomSalaryFundRow.Margin / mBomTotals.Margin * 100;
+                mBomMachinaryRow.I = mBomMachinaryRow.Margin / mBomTotals.Margin * 100;
+                mBomHumanRow.I = mBomHumanRow.Margin / mBomTotals.Margin * 100;
+                mBomAdministrativeRow.I = mBomAdministrativeRow.Margin / mBomTotals.Margin * 100;
+                mBomMaterialOverHeadsRow.I = mBomMaterialOverHeadsRow.Margin / mBomTotals.Margin * 100;
+
+                mBomManufacturingRow.I = mBomManufacturingRow.Margin / mBomTotals.Margin * 100;
+
+                var sumI = Math.Round(MasterBomModel.Rows.Where(y => y.ElementID != "Totals").Sum(x => x.I), 4);
+                mBomTotals.I = sumI;
+                if (mBomTransportRow.FinalCustomerPrice == 0)
+                {
+                    mBomMtrlRow.II = 0;
+                    mBomSalaryFundRow.II = 0;
+                    mBomMachinaryRow.II = 0;
+                    mBomHumanRow.II = 0;
+                    mBomAdministrativeRow.II = 0;
+                    mBomMaterialOverHeadsRow.II = 0;
+                    mBomManufacturingRow.II = 0;
+                    var sumII = Math.Round(MasterBomModel.Rows.Where(y => y.ElementID != "Totals").Sum(x => x.II), 4);
+                    mBomTotals.II = sumII;
+                    mBomMtrlRow.III = 0;
+                    mBomSalaryFundRow.III = 0;
+                    mBomMachinaryRow.III = 0;
+                    mBomHumanRow.III = 0;
+                    mBomAdministrativeRow.III = 0;
+                    mBomMaterialOverHeadsRow.III = 0;
+                    mBomManufacturingRow.III = 0;
+                }
+                else
+                {
+                    mBomMtrlRow.II = mBomMtrlRow.Margin / mBomMtrlRow.FinalCustomerPrice * 100;
+                    mBomSalaryFundRow.II = mBomSalaryFundRow.Margin / mBomSalaryFundRow.FinalCustomerPrice * 100;
+                    mBomMachinaryRow.II = mBomMachinaryRow.Margin / mBomMachinaryRow.FinalCustomerPrice * 100;
+                    mBomHumanRow.II = mBomHumanRow.Margin / mBomHumanRow.FinalCustomerPrice * 100;
+                    mBomAdministrativeRow.II = mBomAdministrativeRow.Margin / mBomAdministrativeRow.FinalCustomerPrice * 100;
+
+                    mBomMaterialOverHeadsRow.II = mBomMaterialOverHeadsRow.Margin / mBomMaterialOverHeadsRow.FinalCustomerPrice * 100;
+                    mBomManufacturingRow.II = mBomManufacturingRow.Margin / mBomManufacturingRow.FinalCustomerPrice * 100;
+                    var sumII = Math.Round(MasterBomModel.Rows.Where(y => y.ElementID != "Totals").Sum(x => x.II), 4);
+                    mBomTotals.II = sumII;
+                    mBomMtrlRow.III = mBomMtrlRow.Margin / mBomTotals.FinalCustomerPrice * 100;
+                    mBomSalaryFundRow.III = mBomSalaryFundRow.Margin / mBomTotals.FinalCustomerPrice * 100;
+                    mBomMachinaryRow.III = mBomMachinaryRow.Margin / mBomTotals.FinalCustomerPrice * 100;
+                    mBomHumanRow.III = mBomHumanRow.Margin / mBomTotals.FinalCustomerPrice * 100;
+                    mBomAdministrativeRow.III = mBomAdministrativeRow.Margin / mBomTotals.FinalCustomerPrice * 100;
+                    mBomMaterialOverHeadsRow.III = mBomMaterialOverHeadsRow.Margin / mBomTotals.FinalCustomerPrice * 100;
+                    mBomManufacturingRow.III = mBomManufacturingRow.Margin / mBomTotals.FinalCustomerPrice * 100;
+                }
+
+                var sumIII = Math.Round(MasterBomModel.Rows.Where(y => y.ElementID != "Totals").Sum(x => x.III), 4);
+                mBomTotals.III = sumIII;
+                string version = (int.Parse(MasterBomModel.Version, CultureInfo.InvariantCulture) + 1).ToString();
+                MasterBomModel.Version = version;
+                foreach (var row in MasterBomModel.Rows)
+                {
+                    row.Version = version;
+                }
+                MasterBomModel.Add();
+                FillForm();
             }
-            mBomTransportRow.II = mBomTransportRow.Margin / mBomTransportRow.FinalCustomerPrice * 100;
-
-
-
-            mBomTripRow.III = mBomTripRow.Margin / mBomTotals.FinalCustomerPrice * 100;
-            mBomTransportRow.III = mBomTransportRow.Margin / mBomTotals.FinalCustomerPrice * 100;
-
-            mBomTripRow.Percent = Math.Round(mBomTripRow.Cost / mBomTotals.Cost * 100, 4);
-            mBomTransportRow.Percent = Math.Round(mBomTransportRow.Cost / mBomTotals.Cost * 100, 4);
-
-
-            var mBomMaterialOverHeadsRow = MasterBomModel.Rows.First(x => x.ElementID == "Material OverHeads" && x.ParentItemCode == MasterBomModel.ParentItem);
-            mBomMaterialOverHeadsRow.Percent = Math.Round(mBomMaterialOverHeadsRow.Cost / mBomTotals.Cost * 100, 4);
-
-
-            mBomTotals.Percent = MasterBomModel.Rows.Where(x => x.ElementID != "Totals" && x.ParentItemCode == MasterBomModel.ParentItem).Sum(x => x.Percent);
-            var sumCosts = Math.Round(MasterBomModel.Rows.Where(y => y.ElementID != "Totals").Sum(x => x.Cost), 4);
-            mBomTotals.Cost = Math.Round(sumCosts, 4);
-            MasterBomModel.PriceForSquareMeter = sumFinalCustomerPrice / MasterBomModel.TotalSquareMeter;
-
-            mBomMtrlRow.I = mBomMtrlRow.Margin / mBomTotals.Margin * 100;
-            mBomSalaryFundRow.I = mBomSalaryFundRow.Margin / mBomTotals.Margin * 100;
-            mBomMachinaryRow.I = mBomMachinaryRow.Margin / mBomTotals.Margin * 100;
-            mBomHumanRow.I = mBomHumanRow.Margin / mBomTotals.Margin * 100;
-            mBomAdministrativeRow.I = mBomAdministrativeRow.Margin / mBomTotals.Margin * 100;
-            mBomMaterialOverHeadsRow.I = mBomMaterialOverHeadsRow.Margin / mBomTotals.Margin * 100;
-
-            mBomManufacturingRow.I = mBomManufacturingRow.Margin / mBomTotals.Margin * 100;
-
-            var sumI = Math.Round(MasterBomModel.Rows.Where(y => y.ElementID != "Totals").Sum(x => x.I), 4);
-            mBomTotals.I = sumI;
-            mBomMtrlRow.II = mBomMtrlRow.Margin / mBomMtrlRow.FinalCustomerPrice * 100;
-            mBomSalaryFundRow.II = mBomSalaryFundRow.Margin / mBomSalaryFundRow.FinalCustomerPrice * 100;
-            mBomMachinaryRow.II = mBomMachinaryRow.Margin / mBomMachinaryRow.FinalCustomerPrice * 100;
-            mBomHumanRow.II = mBomHumanRow.Margin / mBomHumanRow.FinalCustomerPrice * 100;
-            mBomAdministrativeRow.II = mBomAdministrativeRow.Margin / mBomAdministrativeRow.FinalCustomerPrice * 100;
-
-            mBomMaterialOverHeadsRow.II = mBomMaterialOverHeadsRow.Margin / mBomMaterialOverHeadsRow.FinalCustomerPrice * 100;
-            mBomManufacturingRow.II = mBomManufacturingRow.Margin / mBomManufacturingRow.FinalCustomerPrice * 100;
-            var sumII = Math.Round(MasterBomModel.Rows.Where(y => y.ElementID != "Totals").Sum(x => x.II), 4);
-            mBomTotals.II = sumII;
-            mBomMtrlRow.III = mBomMtrlRow.Margin / mBomTotals.FinalCustomerPrice * 100;
-            mBomSalaryFundRow.III = mBomSalaryFundRow.Margin / mBomTotals.FinalCustomerPrice * 100;
-            mBomMachinaryRow.III = mBomMachinaryRow.Margin / mBomTotals.FinalCustomerPrice * 100;
-            mBomHumanRow.III = mBomHumanRow.Margin / mBomTotals.FinalCustomerPrice * 100;
-            mBomAdministrativeRow.III = mBomAdministrativeRow.Margin / mBomTotals.FinalCustomerPrice * 100;
-            mBomMaterialOverHeadsRow.III = mBomMaterialOverHeadsRow.Margin / mBomTotals.FinalCustomerPrice * 100;
-            mBomManufacturingRow.III = mBomManufacturingRow.Margin / mBomTotals.FinalCustomerPrice * 100;
-            var sumIII = Math.Round(MasterBomModel.Rows.Where(y => y.ElementID != "Totals").Sum(x => x.III), 4);
-            mBomTotals.III = sumIII;
-            string version = (int.Parse(MasterBomModel.Version, CultureInfo.InvariantCulture) + 1).ToString();
-            MasterBomModel.Version = version;
-            foreach (var row in MasterBomModel.Rows)
+            catch (Exception e)
             {
-                row.Version = version;
+                Application.SBO_Application.MessageBox(e.Message);
             }
-            MasterBomModel.Add();
-            FillForm();
         }
     }
 }
