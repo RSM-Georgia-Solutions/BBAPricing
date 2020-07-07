@@ -231,6 +231,14 @@ namespace BBAPricing.Forms
                                   $"AND U_SalesQuotationDocEntry = {MasterBomModel.SalesQuotationDocEntry} " +
                                   $"AND U_ParentItemCode  = N'{MasterBomModel.ParentItem}' AND ORSC.ResType = 'L'";
                 recSet.DoQuery(queryStr);
+                if (recSet.RecordCount < 1)
+                {
+                    Application.SBO_Application.SetStatusBarMessage($"რესურსები არ არის დათვლილი",
+                      BoMessageTime.bmt_Short,
+                      true);
+                    HasErrors = true;
+                    return;
+                }
                 var type = recSet.Fields.Item("U_SBU").Value.ToString();
                 if (string.IsNullOrWhiteSpace(type))
                 {
@@ -310,6 +318,11 @@ namespace BBAPricing.Forms
 
                 var SalaryFundlLine = MasterBomModel.Rows.First(x => x.ElementID == "SalaryFund");
                 var humanResourcelLine = MasterBomModel.Rows.First(x => x.ElementID == "Human Resources");
+                if (humanResourcelLine.Cost == 0)
+                {
+                    SAPbouiCOM.Framework.Application.SBO_Application.MessageBox("human Resource თვითღირებულება 0 ის ტოლია");
+                    return;
+                }
                 SalaryFundlLine.Cost = salaryFundPercent / 100 * humanResourcelLine.Cost;
                 SalaryFundlLine.Margin = 0;
                 SalaryFundlLine.FinalCustomerPrice = salaryFundPercent / 100 * humanResourcelLine.Cost;
@@ -321,11 +334,11 @@ namespace BBAPricing.Forms
             {
                 var mBomReferenceFeeRow = MasterBomModel.Rows.First(x => x.ElementID == "Reference Fee" && x.ParentItemCode == MasterBomModel.ParentItem);
                 var sumCostsExceptReferenceFee = MasterBomModel.Rows.Where(x => x.ElementID != "Reference Fee" && x.ElementID != "Totals" && x.ParentItemCode == MasterBomModel.ParentItem).Sum(x => x.FinalCustomerPrice);
-                mBomReferenceFeeRow.Cost = Math.Round(sumCostsExceptReferenceFee * MasterBomModel.ReferenceFeePercentage / 100, 4); 
+                mBomReferenceFeeRow.Cost = Math.Round(sumCostsExceptReferenceFee * MasterBomModel.ReferenceFeePercentage / 100, 4);
                 mBomReferenceFeeRow.Price = 0;
                 mBomReferenceFeeRow.Margin = 0;
                 mBomReferenceFeeRow.FinalCustomerPrice = 0;
-               
+
                 FillForm();
             }
         }
@@ -510,7 +523,7 @@ namespace BBAPricing.Forms
             mBomHumanRow.I = mBomHumanRow.Margin / mBomTotals.Margin * 100;
             mBomAdministrativeRow.I = mBomAdministrativeRow.Margin / mBomTotals.Margin * 100;
             mBomMaterialOverHeadsRow.I = mBomMaterialOverHeadsRow.Margin / mBomTotals.Margin * 100;
-           
+
             mBomManufacturingRow.I = mBomManufacturingRow.Margin / mBomTotals.Margin * 100;
 
             var sumI = Math.Round(MasterBomModel.Rows.Where(y => y.ElementID != "Totals").Sum(x => x.I), 4);
@@ -530,7 +543,7 @@ namespace BBAPricing.Forms
             mBomMachinaryRow.III = mBomMachinaryRow.Margin / mBomTotals.FinalCustomerPrice * 100;
             mBomHumanRow.III = mBomHumanRow.Margin / mBomTotals.FinalCustomerPrice * 100;
             mBomAdministrativeRow.III = mBomAdministrativeRow.Margin / mBomTotals.FinalCustomerPrice * 100;
-            mBomMaterialOverHeadsRow.III = mBomMaterialOverHeadsRow.Margin / mBomTotals.FinalCustomerPrice * 100;            
+            mBomMaterialOverHeadsRow.III = mBomMaterialOverHeadsRow.Margin / mBomTotals.FinalCustomerPrice * 100;
             mBomManufacturingRow.III = mBomManufacturingRow.Margin / mBomTotals.FinalCustomerPrice * 100;
             var sumIII = Math.Round(MasterBomModel.Rows.Where(y => y.ElementID != "Totals").Sum(x => x.III), 4);
             mBomTotals.III = sumIII;

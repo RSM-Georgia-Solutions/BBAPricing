@@ -91,6 +91,14 @@ namespace BBAPricing.FormControllers
                            $"AND U_SalesQuotationDocEntry = {MasterBomModel.SalesQuotationDocEntry} " +
                            $"AND U_ParentItemCode  = N'{MasterBomModel.ParentItem}' AND ORSC.ResType = 'L'";
             recSet.DoQuery(query);
+            if (recSet.RecordCount < 1)
+            {
+                Application.SBO_Application.SetStatusBarMessage($"რესურსები არ არის დათვლილი",
+                  BoMessageTime.bmt_Short,
+                  true);
+                HasErrors = true;
+                return;
+            }
             var type = recSet.Fields.Item("U_SBU").Value.ToString();
             double requiredResource = 0;
             double unitCost = 0;

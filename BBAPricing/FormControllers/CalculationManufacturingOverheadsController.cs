@@ -87,6 +87,14 @@ namespace BBAPricing.FormControllers
                 (Recordset)DiManager.Company.GetBusinessObject(BoObjectTypes.BoRecordset);
             string query = $"SELECT * FROM [@RSM_RESOURCES] JOIN OITM ON OITM.ItemCode = U_ParentItemCode JOIN ORSC ON ORSC.VisResCode =  [@RSM_RESOURCES].U_resourcecode   WHERE U_Version = (SELECT MAX(convert (int, U_Version))FROM[@RSM_RESOURCES]GROUP BY U_ParentItemCode,U_SalesQuotationDocEntry Having U_SalesQuotationDocEntry = {MasterBomModel.SalesQuotationDocEntry} AND U_ParentItemCode = N'{MasterBomModel.ParentItem}') AND U_SalesQuotationDocEntry = {MasterBomModel.SalesQuotationDocEntry} AND U_ParentItemCode  = N'{MasterBomModel.ParentItem}' AND ORSC.ResType = 'L'";
             recSet.DoQuery(query);
+            if (recSet.RecordCount < 1)
+            {
+                Application.SBO_Application.SetStatusBarMessage($"რესურსები არ არის დათვლილი",
+                  BoMessageTime.bmt_Short,
+                  true);
+                HasErrors = true;
+                return;
+            }
             var type = recSet.Fields.Item("U_SBU").Value.ToString();
             double requiredResource = 0;
             double unitCost = 0;
