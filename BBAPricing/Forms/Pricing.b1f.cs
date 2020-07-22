@@ -532,45 +532,25 @@ namespace BBAPricing.Forms
 
                 var sumI = Math.Round(MasterBomModel.Rows.Where(y => y.ElementID != "Totals").Sum(x => x.I), 4);
                 mBomTotals.I = sumI;
-                if (mBomTransportRow.FinalCustomerPrice == 0)
-                {
-                    mBomMtrlRow.II = 0;
-                    mBomSalaryFundRow.II = 0;
-                    mBomMachinaryRow.II = 0;
-                    mBomHumanRow.II = 0;
-                    mBomAdministrativeRow.II = 0;
-                    mBomMaterialOverHeadsRow.II = 0;
-                    mBomManufacturingRow.II = 0;
-                    var sumII = Math.Round(MasterBomModel.Rows.Where(y => y.ElementID != "Totals").Sum(x => x.II), 4);
-                    mBomTotals.II = sumII;
-                    mBomMtrlRow.III = 0;
-                    mBomSalaryFundRow.III = 0;
-                    mBomMachinaryRow.III = 0;
-                    mBomHumanRow.III = 0;
-                    mBomAdministrativeRow.III = 0;
-                    mBomMaterialOverHeadsRow.III = 0;
-                    mBomManufacturingRow.III = 0;
-                }
-                else
-                {
-                    mBomMtrlRow.II = mBomMtrlRow.Margin / mBomMtrlRow.FinalCustomerPrice * 100;
-                    mBomSalaryFundRow.II = mBomSalaryFundRow.Margin / mBomSalaryFundRow.FinalCustomerPrice * 100;
-                    mBomMachinaryRow.II = mBomMachinaryRow.Margin / mBomMachinaryRow.FinalCustomerPrice * 100;
-                    mBomHumanRow.II = mBomHumanRow.Margin / mBomHumanRow.FinalCustomerPrice * 100;
-                    mBomAdministrativeRow.II = mBomAdministrativeRow.Margin / mBomAdministrativeRow.FinalCustomerPrice * 100;
 
-                    mBomMaterialOverHeadsRow.II = mBomMaterialOverHeadsRow.Margin / mBomMaterialOverHeadsRow.FinalCustomerPrice * 100;
-                    mBomManufacturingRow.II = mBomManufacturingRow.Margin / mBomManufacturingRow.FinalCustomerPrice * 100;
-                    var sumII = Math.Round(MasterBomModel.Rows.Where(y => y.ElementID != "Totals").Sum(x => x.II), 4);
-                    mBomTotals.II = sumII;
-                    mBomMtrlRow.III = mBomMtrlRow.Margin / mBomTotals.FinalCustomerPrice * 100;
-                    mBomSalaryFundRow.III = mBomSalaryFundRow.Margin / mBomTotals.FinalCustomerPrice * 100;
-                    mBomMachinaryRow.III = mBomMachinaryRow.Margin / mBomTotals.FinalCustomerPrice * 100;
-                    mBomHumanRow.III = mBomHumanRow.Margin / mBomTotals.FinalCustomerPrice * 100;
-                    mBomAdministrativeRow.III = mBomAdministrativeRow.Margin / mBomTotals.FinalCustomerPrice * 100;
-                    mBomMaterialOverHeadsRow.III = mBomMaterialOverHeadsRow.Margin / mBomTotals.FinalCustomerPrice * 100;
-                    mBomManufacturingRow.III = mBomManufacturingRow.Margin / mBomTotals.FinalCustomerPrice * 100;
-                }
+                mBomMtrlRow.II = mBomMtrlRow.FinalCustomerPrice == 0 ? 0 : mBomMtrlRow.Margin / mBomMtrlRow.FinalCustomerPrice * 100;
+                mBomSalaryFundRow.II = mBomSalaryFundRow.FinalCustomerPrice == 0 ? 0 : mBomSalaryFundRow.Margin / mBomSalaryFundRow.FinalCustomerPrice * 100;
+                mBomMachinaryRow.II = mBomMachinaryRow.FinalCustomerPrice == 0 ? 0 : mBomMachinaryRow.Margin / mBomMachinaryRow.FinalCustomerPrice * 100;
+                mBomHumanRow.II = mBomHumanRow.FinalCustomerPrice == 0 ? 0 : mBomHumanRow.Margin / mBomHumanRow.FinalCustomerPrice * 100;
+                mBomAdministrativeRow.II = mBomAdministrativeRow.FinalCustomerPrice == 0 ? 0 : mBomAdministrativeRow.Margin / mBomAdministrativeRow.FinalCustomerPrice * 100;
+
+                mBomMaterialOverHeadsRow.II = mBomMaterialOverHeadsRow.FinalCustomerPrice == 0 ? 0 : mBomMaterialOverHeadsRow.Margin / mBomMaterialOverHeadsRow.FinalCustomerPrice * 100;
+                mBomManufacturingRow.II = mBomManufacturingRow.FinalCustomerPrice == 0 ? 0 : mBomManufacturingRow.Margin / mBomManufacturingRow.FinalCustomerPrice * 100;
+                var sumII = Math.Round(MasterBomModel.Rows.Where(y => y.ElementID != "Totals").Sum(x => x.II), 4);
+                mBomTotals.II = sumII;
+                mBomMtrlRow.III = mBomTotals.FinalCustomerPrice == 0 ? 0 : mBomMtrlRow.Margin / mBomTotals.FinalCustomerPrice * 100;
+                mBomSalaryFundRow.III = mBomTotals.FinalCustomerPrice == 0 ? 0 : mBomSalaryFundRow.Margin / mBomTotals.FinalCustomerPrice * 100;
+                mBomMachinaryRow.III = mBomTotals.FinalCustomerPrice == 0 ? 0 : mBomMachinaryRow.Margin / mBomTotals.FinalCustomerPrice * 100;
+                mBomHumanRow.III = mBomTotals.FinalCustomerPrice == 0 ? 0 : mBomHumanRow.Margin / mBomTotals.FinalCustomerPrice * 100;
+                mBomAdministrativeRow.III = mBomTotals.FinalCustomerPrice == 0 ? 0 : mBomAdministrativeRow.Margin / mBomTotals.FinalCustomerPrice * 100;
+                mBomMaterialOverHeadsRow.III = mBomTotals.FinalCustomerPrice == 0 ? 0 : mBomMaterialOverHeadsRow.Margin / mBomTotals.FinalCustomerPrice * 100;
+                mBomManufacturingRow.III = mBomTotals.FinalCustomerPrice == 0 ? 0 : mBomManufacturingRow.Margin / mBomTotals.FinalCustomerPrice * 100;
+
 
                 var sumIII = Math.Round(MasterBomModel.Rows.Where(y => y.ElementID != "Totals").Sum(x => x.III), 4);
                 mBomTotals.III = sumIII;
