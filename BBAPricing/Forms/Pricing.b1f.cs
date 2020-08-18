@@ -493,20 +493,10 @@ namespace BBAPricing.Forms
                 var mBomReferenceFeeRow = MasterBomModel.Rows.First(x => x.ElementID == "Reference Fee" && x.ParentItemCode == MasterBomModel.ParentItem);
                 mBomReferenceFeeRow.Percent = mBomTotals.Cost == 0 ? 0 : Math.Round(mBomReferenceFeeRow.Cost / mBomTotals.Cost * 100, 4);
 
-                if (mBomTransportRow.FinalCustomerPrice == 0)
-                {
-                    mBomTransportRow.II = 0;
-                    mBomTripRow.III = 0;
-                    mBomTransportRow.III = 0;
-                    mBomTripRow.II = 0;
-                }
-                else
-                {
-                    mBomTransportRow.II = mBomTransportRow.Margin / mBomTransportRow.FinalCustomerPrice * 100;
-                    mBomTripRow.III = mBomTripRow.Margin / mBomTotals.FinalCustomerPrice * 100;
-                    mBomTransportRow.III = mBomTransportRow.Margin / mBomTotals.FinalCustomerPrice * 100;
-                    mBomTripRow.II = mBomTripRow.Margin / mBomTripRow.FinalCustomerPrice * 100;
-                }
+                mBomTransportRow.II = mBomTransportRow.FinalCustomerPrice == 0 ? 0 : mBomTransportRow.Margin / mBomTransportRow.FinalCustomerPrice * 100;
+                mBomTripRow.III = mBomTotals.FinalCustomerPrice == 0 ? 0 : mBomTripRow.Margin / mBomTotals.FinalCustomerPrice * 100;
+                mBomTransportRow.III = mBomTotals.FinalCustomerPrice == 0 ? 0 : mBomTransportRow.Margin / mBomTotals.FinalCustomerPrice * 100;
+                mBomTripRow.II = mBomTripRow.FinalCustomerPrice == 0 ? 0 : mBomTripRow.Margin / mBomTripRow.FinalCustomerPrice * 100;
 
                 mBomTripRow.Percent = mBomTotals.Cost == 0 ? 0 : Math.Round(mBomTripRow.Cost / mBomTotals.Cost * 100, 4);
                 mBomTransportRow.Percent = mBomTotals.Cost == 0 ? 0 : Math.Round(mBomTransportRow.Cost / mBomTotals.Cost * 100, 4);
