@@ -181,8 +181,7 @@ FROM [@RSM_MTRL]";
                 materialModel.SharedPercentage = (double)_grid.DataTable.GetValue("Shared Percentage", i);
                 materialModel.DiscountPercentage = (double)_grid.DataTable.GetValue("Discount Percentage", i);
 
-                if (_MasterBomModel.Currency == "GEL")
-                {
+                
                     var rate = DiManager.GetCurrencyRate(materialModel.Currency, _MasterBomModel.ExchangeRateDate, DiManager.Company);
                     if (_MasterBomModel.Currency != materialModel.Currency)
                     {
@@ -190,17 +189,7 @@ FROM [@RSM_MTRL]";
                         materialModel.UnitRetailPrice *= rate;
                         materialModel.UnitWorkingPrice *= rate;
                     }
-                }
-                else
-                {
-                    if (_MasterBomModel.Currency != materialModel.Currency)
-                    {
-                        materialModel.UnitCost /= _MasterBomModel.Rate;
-                        materialModel.UnitRetailPrice /= _MasterBomModel.Rate;
-                        materialModel.UnitWorkingPrice /= _MasterBomModel.Rate;
-                    }
-                }
-
+               
                 materialModel.TotalCost = Math.Round(materialModel.Quantity * materialModel.UnitCost, 4);
 
                 ConvertPrices(materialModel);

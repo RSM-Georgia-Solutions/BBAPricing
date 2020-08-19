@@ -145,8 +145,8 @@ namespace BBAPricing.FormControllers
 
             if (MasterBomModel.Currency != "GEL")
             {
-                overheadModel.TotalCost /= MasterBomModel.Rate;
-                overheadModel.UnitCost /= MasterBomModel.Rate;
+                overheadModel.TotalCost = totalCost / MasterBomModel.Rate;
+                overheadModel.UnitCost  = unitCost/ MasterBomModel.Rate;
             }
             else
             {
@@ -154,19 +154,17 @@ namespace BBAPricing.FormControllers
                 overheadModel.TotalCost = totalCost;
             }
 
-            overheadModel.RequiredResource = requiredResource;
-            overheadModel.UnitCost = unitCost;
-            overheadModel.TotalCost = totalCost;
+            overheadModel.RequiredResource = requiredResource; 
             overheadModel.Version = MasterBomModel.Version;
             overheadModel.ParentItemCode = MasterBomModel.ParentItem;
             overheadModel.SalesQuotationDocEntry = MasterBomModel.SalesQuotationDocEntry;
             overheadModel.OverheadType = "Administrative";
             OverheadModel = overheadModel;
             var mtrlLine = MasterBomModel.Rows.First(x => x.ElementID == "Administrative Overheads");
-            mtrlLine.Cost = totalCost;
-            mtrlLine.Price = totalCost;
+            mtrlLine.Cost = overheadModel.TotalCost;
+            mtrlLine.Price = overheadModel.TotalCost;
             mtrlLine.Margin = 0;
-            mtrlLine.FinalCustomerPrice = totalCost;
+            mtrlLine.FinalCustomerPrice = overheadModel.TotalCost;
         }
 
 

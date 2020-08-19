@@ -323,10 +323,10 @@ namespace BBAPricing.Forms
                     SAPbouiCOM.Framework.Application.SBO_Application.MessageBox("human Resource თვითღირებულება 0 ის ტოლია");
                     return;
                 }
-                SalaryFundlLine.Cost = salaryFundPercent / 100 * humanResourcelLine.Cost;
+                SalaryFundlLine.Cost = salaryFundPercent / 100 * humanResourcelLine.Cost/MasterBomModel.Rate;
                 SalaryFundlLine.Margin = 0;
-                SalaryFundlLine.FinalCustomerPrice = salaryFundPercent / 100 * humanResourcelLine.Cost;
-                SalaryFundlLine.Price = salaryFundPercent / 100 * humanResourcelLine.Cost;
+                SalaryFundlLine.FinalCustomerPrice = salaryFundPercent / 100 * humanResourcelLine.Cost / MasterBomModel.Rate;
+                SalaryFundlLine.Price = salaryFundPercent / 100 * humanResourcelLine.Cost / MasterBomModel.Rate;
                 MasterBomModel.Update();
                 FillForm();
             }
@@ -334,7 +334,7 @@ namespace BBAPricing.Forms
             {
                 var mBomReferenceFeeRow = MasterBomModel.Rows.First(x => x.ElementID == "Reference Fee" && x.ParentItemCode == MasterBomModel.ParentItem);
                 var sumCostsExceptReferenceFee = MasterBomModel.Rows.Where(x => x.ElementID != "Reference Fee" && x.ElementID != "Totals" && x.ParentItemCode == MasterBomModel.ParentItem).Sum(x => x.FinalCustomerPrice);
-                mBomReferenceFeeRow.Cost = Math.Round(sumCostsExceptReferenceFee * MasterBomModel.ReferenceFeePercentage / 100, 4);
+                mBomReferenceFeeRow.Cost = Math.Round(sumCostsExceptReferenceFee / MasterBomModel.Rate * MasterBomModel.ReferenceFeePercentage / 100, 4);
                 mBomReferenceFeeRow.Price = 0;
                 mBomReferenceFeeRow.Margin = 0;
                 mBomReferenceFeeRow.FinalCustomerPrice = 0;

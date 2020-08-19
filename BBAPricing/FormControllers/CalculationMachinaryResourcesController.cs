@@ -204,6 +204,7 @@ namespace BBAPricing.FormControllers
                     resourceModel.TotalStandartCost /= MasterBomModel.Rate;
                     resourceModel.ResourceTotalPrice /= MasterBomModel.Rate;
                     resourceModel.ResourceUnitPrice /= MasterBomModel.Rate;
+                    resourceModel.StandartCost /= MasterBomModel.Rate;
                 }
 
                 resourceModel.OtherQtyResource = (double)recSet.Fields.Item("OtherQtyResource").Value;

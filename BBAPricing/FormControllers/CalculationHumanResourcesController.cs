@@ -230,19 +230,22 @@ FROM ITT1
                 }
                 resourceModel.TotalStandartCost = (double)recSet.Fields.Item("TotalStandartCost").Value;
                 resourceModel.ResourceUnitPrice = (double)recSet.Fields.Item("ResourceUnitPrice").Value;
-                resourceModel.ResourceTotalPrice = resourceModel.ResourceUnitPrice * resourceModel.Quantity;
-                resourceModel.CostOfUnit = resourceModel.TotalStandartCost / resourceModel.OtherQtyResource;
-                resourceModel.TotalAmount = resourceModel.ResourceTotalPrice - resourceModel.TotalStandartCost;
-                resourceModel.MarginPercent = (resourceModel.ResourceTotalPrice - resourceModel.TotalStandartCost) / resourceModel.ResourceTotalPrice;
-                resourceModel.AmountOnUnit = resourceModel.ResourceUnitPrice - resourceModel.StandartCost;
+
+
+               
 
                 if (MasterBomModel.Currency != "GEL")
                 {
                     resourceModel.TotalStandartCost /= MasterBomModel.Rate;
                     resourceModel.ResourceTotalPrice /= MasterBomModel.Rate;
                     resourceModel.ResourceUnitPrice /= MasterBomModel.Rate;
+                    resourceModel.StandartCost /= MasterBomModel.Rate;
                 }
-
+                resourceModel.AmountOnUnit = resourceModel.ResourceUnitPrice - resourceModel.StandartCost;
+                resourceModel.ResourceTotalPrice = resourceModel.ResourceUnitPrice * resourceModel.Quantity;
+                resourceModel.TotalAmount = resourceModel.ResourceTotalPrice - resourceModel.TotalStandartCost;
+                resourceModel.MarginPercent = (resourceModel.ResourceTotalPrice - resourceModel.TotalStandartCost) / resourceModel.ResourceTotalPrice;
+                resourceModel.CostOfUnit = resourceModel.TotalStandartCost / resourceModel.OtherQtyResource;
                 resourceModel.PriceOfUnit = resourceModel.ResourceTotalPrice / resourceModel.OtherQtyResource;
                 resourceModel.MarginOfUnit = resourceModel.PriceOfUnit - resourceModel.CostOfUnit;
                 resourceModel.InfoPercent = resourceModel.MarginOfUnit / resourceModel.PriceOfUnit;
