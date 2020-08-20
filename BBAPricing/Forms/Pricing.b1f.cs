@@ -562,7 +562,16 @@ namespace BBAPricing.Forms
 
         private void ComboBox0_ComboSelectAfter(object sboObject, SBOItemEventArg pVal)
         {
-            EditText9.Item.Enabled = ComboBox0.Selected.Value != "GEL";
+            if (ComboBox0.Selected.Value == "GEL")
+            {
+                EditText9.Item.Enabled = false;
+                EditText9.Value = "1";
+            }
+            else
+            {
+                EditText9.Item.Enabled = true;
+            }
+
         }
     }
 }
