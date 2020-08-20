@@ -53,6 +53,7 @@ namespace BBAPricing.Forms
             this.StaticText8 = ((SAPbouiCOM.StaticText)(this.GetItem("Item_20").Specific));
             this.EditText9 = ((SAPbouiCOM.EditText)(this.GetItem("Item_21").Specific));
             this.ComboBox0 = ((SAPbouiCOM.ComboBox)(this.GetItem("Item_22").Specific));
+            this.ComboBox0.ComboSelectAfter += new SAPbouiCOM._IComboBoxEvents_ComboSelectAfterEventHandler(this.ComboBox0_ComboSelectAfter);
             this.StaticText9 = ((SAPbouiCOM.StaticText)(this.GetItem("Item_23").Specific));
             this.StaticText10 = ((SAPbouiCOM.StaticText)(this.GetItem("Item_24").Specific));
             this.EditText10 = ((SAPbouiCOM.EditText)(this.GetItem("Item_25").Specific));
@@ -323,7 +324,7 @@ namespace BBAPricing.Forms
                     SAPbouiCOM.Framework.Application.SBO_Application.MessageBox("human Resource თვითღირებულება 0 ის ტოლია");
                     return;
                 }
-                SalaryFundlLine.Cost = salaryFundPercent / 100 * humanResourcelLine.Cost/MasterBomModel.Rate;
+                SalaryFundlLine.Cost = salaryFundPercent / 100 * humanResourcelLine.Cost / MasterBomModel.Rate;
                 SalaryFundlLine.Margin = 0;
                 SalaryFundlLine.FinalCustomerPrice = salaryFundPercent / 100 * humanResourcelLine.Cost / MasterBomModel.Rate;
                 SalaryFundlLine.Price = salaryFundPercent / 100 * humanResourcelLine.Cost / MasterBomModel.Rate;
@@ -509,14 +510,14 @@ namespace BBAPricing.Forms
                 mBomTotals.Percent = MasterBomModel.Rows.Where(x => x.ElementID != "Totals" && x.ParentItemCode == MasterBomModel.ParentItem).Sum(x => x.Percent);
                 var sumCosts = Math.Round(MasterBomModel.Rows.Where(y => y.ElementID != "Totals").Sum(x => x.Cost), 4);
                 mBomTotals.Cost = Math.Round(sumCosts, 4);
-                MasterBomModel.PriceForSquareMeter = MasterBomModel.TotalSquareMeter ==0? 0 : sumFinalCustomerPrice / MasterBomModel.TotalSquareMeter;
+                MasterBomModel.PriceForSquareMeter = MasterBomModel.TotalSquareMeter == 0 ? 0 : sumFinalCustomerPrice / MasterBomModel.TotalSquareMeter;
 
                 mBomMtrlRow.I = mBomTotals.Margin == 0 ? 0 : mBomMtrlRow.Margin / mBomTotals.Margin * 100;
-                mBomSalaryFundRow.I = mBomTotals.Margin ==0 ? 0 : mBomSalaryFundRow.Margin / mBomTotals.Margin * 100;
-                mBomMachinaryRow.I = mBomTotals.Margin ==0 ? 0 : mBomMachinaryRow.Margin / mBomTotals.Margin * 100;
-                mBomHumanRow.I = mBomTotals.Margin == 0 ? 0:mBomHumanRow.Margin / mBomTotals.Margin * 100;
-                mBomAdministrativeRow.I = mBomTotals.Margin==0? 0 :  mBomAdministrativeRow.Margin / mBomTotals.Margin * 100;
-                mBomMaterialOverHeadsRow.I = mBomTotals.Margin ==0 ? 0 : mBomMaterialOverHeadsRow.Margin / mBomTotals.Margin * 100;
+                mBomSalaryFundRow.I = mBomTotals.Margin == 0 ? 0 : mBomSalaryFundRow.Margin / mBomTotals.Margin * 100;
+                mBomMachinaryRow.I = mBomTotals.Margin == 0 ? 0 : mBomMachinaryRow.Margin / mBomTotals.Margin * 100;
+                mBomHumanRow.I = mBomTotals.Margin == 0 ? 0 : mBomHumanRow.Margin / mBomTotals.Margin * 100;
+                mBomAdministrativeRow.I = mBomTotals.Margin == 0 ? 0 : mBomAdministrativeRow.Margin / mBomTotals.Margin * 100;
+                mBomMaterialOverHeadsRow.I = mBomTotals.Margin == 0 ? 0 : mBomMaterialOverHeadsRow.Margin / mBomTotals.Margin * 100;
 
                 mBomManufacturingRow.I = mBomTotals.Margin == 0 ? 0 : mBomManufacturingRow.Margin / mBomTotals.Margin * 100;
 
@@ -557,6 +558,11 @@ namespace BBAPricing.Forms
             {
                 Application.SBO_Application.MessageBox(e.Message);
             }
+        }
+
+        private void ComboBox0_ComboSelectAfter(object sboObject, SBOItemEventArg pVal)
+        {
+            EditText9.Item.Enabled = ComboBox0.Selected.Value != "GEL";
         }
     }
 }
